@@ -1,0 +1,34 @@
+{
+  "name": "pique",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Retos compartidos para gente que se pica bien.",
+  "packageManager": "pnpm@11.18.0",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @pique/web dev",
+    "build": "pnpm -r --if-present build",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "test:coverage": "pnpm --filter @pique/domain test:coverage",
+    "test:e2e": "pnpm --filter @pique/web test:e2e",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:start": "supabase start",
+    "db:reset": "supabase db reset",
+    "db:stop": "supabase stop",
+    "db:types": "supabase gen types typescript --local > packages/database/src/database.types.ts",
+    "smoke": "bash scripts/smoke.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "prettier": "^3.6.2",
+    "supabase": "^2.48.3",
+    "typescript": "^5.9.3"
+  }
+}
+
