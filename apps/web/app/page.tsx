@@ -95,7 +95,7 @@ export default function LandingPage() {
           }}
         >
           <div style={{ padding: 14 }}>
-            <small style={{ opacity: 0.65 }}>Buenos días, Raúl</small>
+            <small style={{ opacity: 0.65 }}>Buenos días</small>
             <h2
               className="display"
               style={{ fontSize: 34, margin: "5px 0 20px" }}
@@ -141,7 +141,7 @@ export default function LandingPage() {
               }}
             >
               <Trophy size={20} color="var(--gold)" />
-              <b style={{ display: "block", marginTop: 10 }}>#1 Raúl</b>
+              <b style={{ display: "block", marginTop: 10 }}>#1 Tú</b>
               <small style={{ opacity: 0.65 }}>40 puntos</small>
             </div>
             <div
