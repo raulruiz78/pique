@@ -6,7 +6,18 @@ async function login(page: import("@playwright/test").Page, email: string) {
   await page.goto("/login");
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Contraseña").fill("PiqueDemo2026!");
+  const authResponsePromise = page.waitForResponse(
+    (response) =>
+      response.url().includes("/auth/v1/token") &&
+      response.request().method() === "POST",
+    { timeout: 15_000 },
+  );
   await page.getByRole("button", { name: "Entrar al pique" }).click();
+  const authResponse = await authResponsePromise;
+  expect(
+    authResponse.ok(),
+    `Supabase Auth respondió con HTTP ${authResponse.status()}`,
+  ).toBeTruthy();
   await expect(page).toHaveURL(/\/hoy/, { timeout: 15_000 });
 }
 

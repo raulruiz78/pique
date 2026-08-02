@@ -4,9 +4,6 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseOrigin = supabaseUrl ? new URL(supabaseUrl).origin : "";
 
 const config: NextConfig = {
-  ...(process.env.NODE_ENV === "development"
-    ? { allowedDevOrigins: ["127.0.0.1"] }
-    : {}),
   transpilePackages: [
     "@pique/domain",
     "@pique/validation",
