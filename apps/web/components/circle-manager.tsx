@@ -7,6 +7,7 @@ import {
   Trash2,
   Users,
 } from "lucide-react";
+import { Avatar } from "./avatar";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -20,6 +21,7 @@ export function CircleManager({
     memberCount: number;
     activeCount?: number;
     isOwner: boolean;
+    imageSrc?: string | null;
   }>;
 }) {
   const router = useRouter();
@@ -101,19 +103,28 @@ export function CircleManager({
             style={{ padding: 14, cursor: "pointer" }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 16,
-                  display: "grid",
-                  placeItems: "center",
-                  background: "var(--lime)",
-                  color: "#16131d",
-                }}
-              >
-                <Users />
-              </span>
+              {circle.imageSrc ? (
+                <Avatar
+                  name={circle.name}
+                  src={circle.imageSrc}
+                  size={44}
+                  accent="var(--lime)"
+                />
+              ) : (
+                <span
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 16,
+                    display: "grid",
+                    placeItems: "center",
+                    background: "var(--lime)",
+                    color: "#16131d",
+                  }}
+                >
+                  <Users />
+                </span>
+              )}
               <div style={{ flex: 1, color: "inherit", minWidth: 0 }}>
                 <b>{circle.name}</b>
                 <small

@@ -2,6 +2,8 @@
 
 PWA privada y mobile-first para convertir objetivos cotidianos en retos compartidos. Incluye reglas aceptadas, calendario, evidencia fotográfica privada, validación social, ledger de puntos, ranking, rachas y consecuencias no monetarias.
 
+Versión actual: **0.2.0**. Consulta [CHANGELOG.md](CHANGELOG.md).
+
 ## Inicio rápido
 
 Requisitos: Node.js 24 LTS, pnpm 11, Docker Desktop y Supabase CLI (incluida como dependencia).
@@ -56,3 +58,31 @@ Monorepo pnpm con Next.js 16, React 19, TypeScript, Tailwind 4, Supabase y módu
 - `docs`: arquitectura, seguridad y despliegue.
 
 Consulta [arquitectura](docs/architecture/ARCHITECTURE.md), [desarrollo local](docs/deployment/LOCAL.md) y [despliegue](docs/deployment/DEPLOYMENT.md).
+
+## Servicios de producción
+
+- **Vercel:** despliega automáticamente el contenido protegido de `main`.
+- **Supabase:** Auth, PostgreSQL, RLS, cron y Storage privado.
+- **Brevo:** SMTP transaccional limitado de momento a confirmar el registro y recuperar la contraseña. El seguimiento de enlaces debe permanecer desactivado.
+- **GitHub:** PR, checks, ramas protegidas, etiquetas y releases.
+
+Las imágenes de evidencias, perfiles y círculos son privadas. No se guardan URLs públicas: la aplicación comprueba la sesión y la relación con el círculo antes de entregar cada archivo.
+
+## Versionado y despliegues
+
+Los cambios llegan a producción exclusivamente mediante PR a `main`. CI valida formato, lint, tipos, tests, compilación, migraciones y E2E; Vercel genera una preview y, tras la fusión, producción. Las migraciones de `main` se aplican sin datos seed.
+
+Las versiones siguen `MAJOR.MINOR.PATCH` y se publican mediante el workflow manual **Release** de GitHub. El proceso completo está en [VERSIONING.md](docs/deployment/VERSIONING.md).
+
+## Mejoras futuras
+
+- Enviar avisos sociales de retos y círculos solo cuando haya preferencias de usuario y presupuesto de correo definidos.
+- Mostrar las fotos de perfil en actividad, revisiones y todos los rankings, además del perfil y los círculos.
+- Recorte y compresión de imágenes antes de subirlas, con eliminación automática de huérfanos.
+- Selector de idioma completo y traducción de todos los textos.
+- Notificaciones push y horas silenciosas reales.
+- Recuperación guiada de círculos eliminados mediante papelera con retención limitada.
+- Proyecto Supabase separado para previews y staging.
+- Observabilidad de errores, métricas de cron y alertas de cuota de Storage/SMTP.
+- Dominio propio, DKIM/DMARC y revisión de entregabilidad de correo.
+- Exportación y borrado completo de cuenta conforme a privacidad.
