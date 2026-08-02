@@ -15,10 +15,23 @@ export const usernameSchema = z
   .max(30)
   .regex(/^[a-z0-9_]+$/i);
 
+export const timezoneSchema = z
+  .string()
+  .min(3)
+  .max(64)
+  .refine((timezone) => {
+    try {
+      new Intl.DateTimeFormat("es", { timeZone: timezone }).format();
+      return true;
+    } catch {
+      return false;
+    }
+  }, "Zona horaria inválida");
+
 export const profileSchema = z.object({
   username: usernameSchema,
   displayName: z.string().trim().min(2).max(60),
-  timezone: z.string().min(3).max(64),
+  timezone: timezoneSchema,
   locale: z.enum(["es", "en"]).default("es"),
 });
 
@@ -35,7 +48,7 @@ export const createChallengeSchema = z
     type: z.enum(["DAILY", "FREQUENCY", "CUMULATIVE", "ONE_VS_ONE", "GROUP"]),
     startAt: z.iso.datetime(),
     endAt: z.iso.datetime(),
-    timezone: z.string().min(3).max(64),
+    timezone: timezoneSchema,
     recurrence: z.string().max(200),
     points: z.int().min(1).max(10_000),
     evidenceRequired: z.boolean(),

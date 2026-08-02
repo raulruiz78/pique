@@ -13,7 +13,7 @@ Cuentas GitHub, Supabase y Vercel; dominio opcional. Node 24/pnpm 11 local. Veri
 5. Aplica: `pnpm exec supabase db push --linked`.
 6. `db push` aplica únicamente migraciones: no carga `seed.sql`. No ejecutes `db reset` ni el seed local contra producción.
 
-La migración crea bucket `evidence` privado, límite 10 MiB, MIME permitidos, RLS, índices, funciones y publicación Realtime solo para participantes, validaciones y actividad.
+Las migraciones crean `evidence` (10 MiB) y `profile-images` (5 MiB) como buckets privados, con MIME permitidos y RLS. Realtime solo replica información necesaria para participantes, validaciones y actividad.
 
 ## 3. Auth
 
@@ -46,16 +46,25 @@ Conecta el dominio y repite URL/callback en Supabase. Fuerza HTTPS.
 
 Programa `POST /api/v1/cron/maintenance` cada 15 minutos con header `Authorization: Bearer CRON_SECRET`. El job es reintentable: caduca ocurrencias, rompe rachas, finaliza retos, asigna posiciones/consecuencias y marca outbox procesada. Para volumen mayor, separa el consumidor outbox sin alterar las transacciones.
 
-## 7. Integraciones opcionales
+## 7. Correo transaccional
+
+Brevo SMTP está configurado en Supabase Auth. Por control de cuota solo se usan:
+
+- confirmación del registro;
+- recuperación/cambio de contraseña solicitado por el usuario.
+
+Los avisos de seguridad adicionales están desactivados y la aplicación no usa invitaciones por email ni magic links. Mantén desactivado el seguimiento de enlaces de Brevo para no reescribir los enlaces de Auth. Las credenciales SMTP se guardan en Supabase, nunca en Git ni en variables públicas de Vercel.
+
+## 8. Integraciones opcionales
 
 - Push: guarda suscripciones en `devices` y conecta Web Push/FCM al adaptador.
-- Email: configura Resend y `EMAIL_FROM` verificado.
+- Email social: reutiliza Brevo solo cuando se definan preferencias, límites y plantillas para retos/círculos.
 - Sentry: añade DSN solo servidor y source maps protegidos.
 - PostHog: usa host UE, consentimiento y minimización de datos.
 
 Sin credenciales, las implementaciones no-op mantienen funcional el núcleo.
 
-## 8. Migraciones seguras
+## 9. Migraciones seguras
 
 - Una migración nueva por cambio; nunca edites una ya aplicada.
 - Primero cambios aditivos compatibles, luego despliegue de app y por último limpieza.
@@ -63,7 +72,7 @@ Sin credenciales, las implementaciones no-op mantienen funcional el núcleo.
 - Preview usa otro proyecto: jamás una rama contra producción.
 - Ejecuta RLS y flujo crítico tras cada migración.
 
-## 9. Smoke test
+## 10. Smoke test
 
 1. Registro y confirmación de dos usuarios.
 2. Crear círculo, copiar invitación y unirse.
@@ -75,18 +84,18 @@ Sin credenciales, las implementaciones no-op mantienen funcional el núcleo.
 8. Instalar PWA desde móvil.
 9. `PIQUE_APP_URL=https://... pnpm smoke`.
 
-## 10. Operación y costes
+## 11. Operación y costes
 
 Activa alertas de errores 5xx, latencia, base al 80 %, storage, Auth y cron fallido. Configura backups/PITR según plan. Retención de audit logs y evidencias debe responder a la política de privacidad. Para un MVP pequeño suelen bastar planes gratuitos o básicos de Vercel/Supabase, pero consulta sus calculadoras oficiales antes de decidir; storage/egress de fotos es la variable principal.
 
-## 11. Rollback
+## 12. Rollback
 
 - Aplicación: promueve el deployment Vercel anterior.
 - Base: una migración forward correctiva es preferible. Para pérdida/corrupción, restaura backup a proyecto nuevo, valida y cambia variables.
 - Rota `SUPABASE_SECRET_KEY`/`CRON_SECRET` si el incidente implica secretos.
 - No reviertas columnas usadas por el deployment todavía activo.
 
-## 12. Checklist
+## 13. Checklist
 
 - [ ] CI verde y ramas protegidas.
 - [ ] RLS negativa y storage firmado verificados.

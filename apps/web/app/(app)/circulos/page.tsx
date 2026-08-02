@@ -10,7 +10,7 @@ export default async function CirclesPage() {
     ? await supabase
         .from("circles")
         .select(
-          "id,name,description,owner_id,circle_members(user_id),challenges(id,status,challenge_participants(user_id,acceptance))",
+          "id,name,description,avatar_path,owner_id,circle_members(user_id),challenges(id,status,challenge_participants(user_id,acceptance))",
         )
         .order("created_at", { ascending: false })
     : { data: null };
@@ -33,6 +33,9 @@ export default async function CirclesPage() {
             id: circle.id,
             name: circle.name,
             description: circle.description,
+            imageSrc: circle.avatar_path
+              ? `/api/v1/media/circles/${circle.id}?v=${encodeURIComponent(circle.avatar_path)}`
+              : null,
             isOwner: circle.owner_id === user?.id,
             memberCount: circle.circle_members.length,
             activeCount: circle.challenges.filter((challenge) =>
