@@ -1,6 +1,6 @@
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { fail, ok, requestId } from "@/lib/api";
-export async function POST(request: Request) {
+async function runMaintenance(request: Request) {
   const id = requestId(request);
   if (
     !process.env.CRON_SECRET ||
@@ -52,4 +52,12 @@ export async function POST(request: Request) {
     completed,
     outbox: outbox.data?.length ?? 0,
   });
+}
+
+export async function GET(request: Request) {
+  return runMaintenance(request);
+}
+
+export async function POST(request: Request) {
+  return runMaintenance(request);
 }
