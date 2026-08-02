@@ -73,44 +73,54 @@ export async function dashboardQuery() {
   if (!user) return null;
   const profile = await supabase
     .from("profiles")
-    .select("id,display_name,username,total_points,current_streak,timezone")
+    .select(
+      "id,display_name,username,avatar_path,total_points,current_streak,timezone",
+    )
     .eq("id", user.id)
     .single();
   const { start, end } = dayBounds(
     new Date(),
     profile.data?.timezone ?? "Europe/Madrid",
   );
-  const [occurrences, participants, activities, reviews] = await Promise.all([
-    supabase
-      .from("goal_occurrences")
-      .select(
-        "id,starts_at,closes_at,status,goals(id,name,recurrence,base_points,evidence_required),challenges(id,title)",
-      )
-      .eq("participant_id", user.id)
-      .lt("starts_at", end.toISOString())
-      .gte("closes_at", start.toISOString())
-      .order("starts_at"),
-    supabase
-      .from("challenge_participants")
-      .select(
-        "user_id,score,current_streak,challenges!inner(circle_id,status),profiles(display_name,username)",
-      )
-      .in("challenges.status", ["ACTIVE", "SCHEDULED"])
-      .order("score", { ascending: false })
-      .limit(5),
-    supabase
-      .from("activities")
-      .select("id,type,payload,created_at,profiles(display_name)")
-      .order("created_at", { ascending: false })
-      .limit(8),
-    supabase
-      .from("check_ins")
-      .select("id,note,submitted_at,profiles(display_name),challenges(title)")
-      .eq("status", "PENDING_REVIEW")
-      .neq("user_id", user.id)
-      .order("submitted_at", { ascending: false })
-      .limit(4),
-  ]);
+  const [occurrences, participants, activities, reviews, unreadNotifications] =
+    await Promise.all([
+      supabase
+        .from("goal_occurrences")
+        .select(
+          "id,starts_at,closes_at,status,goals(id,name,recurrence,base_points,evidence_required),challenges(id,title)",
+        )
+        .eq("participant_id", user.id)
+        .lt("starts_at", end.toISOString())
+        .gte("closes_at", start.toISOString())
+        .order("starts_at"),
+      supabase
+        .from("challenge_participants")
+        .select(
+          "user_id,score,current_streak,challenges!inner(circle_id,status),profiles(display_name,username,avatar_path)",
+        )
+        .in("challenges.status", ["ACTIVE", "SCHEDULED"])
+        .order("score", { ascending: false })
+        .limit(5),
+      supabase
+        .from("activities")
+        .select("id,type,payload,created_at,profiles(display_name)")
+        .order("created_at", { ascending: false })
+        .limit(8),
+      supabase
+        .from("check_ins")
+        .select(
+          "id,note,submitted_at,user_id,profiles(display_name,avatar_path),challenges(title)",
+        )
+        .eq("status", "PENDING_REVIEW")
+        .neq("user_id", user.id)
+        .order("submitted_at", { ascending: false })
+        .limit(4),
+      supabase
+        .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .is("read_at", null),
+    ]);
   const reviewRows = reviews.data ?? [];
   const evidenceByCheckIn = new Map<string, string>();
   if (reviewRows.length > 0) {
@@ -142,6 +152,7 @@ export async function dashboardQuery() {
       ...review,
       evidenceUrl: evidenceByCheckIn.get(review.id) ?? null,
     })),
+    unreadNotifications: unreadNotifications.count ?? 0,
   };
 }
 

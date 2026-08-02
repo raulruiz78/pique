@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { Avatar } from "@/components/avatar";
 import { CheckInButton } from "@/components/check-in-button";
 import { EmptyState } from "@/components/empty-state";
@@ -12,7 +13,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 
 interface Relation {
   id?: string;
@@ -60,12 +60,15 @@ export default async function TodayPage() {
   const participants = (data?.participants ?? []) as unknown as Array<{
     user_id: string;
     score: number;
-    profiles: { display_name?: string } | Array<{ display_name?: string }>;
+    profiles:
+      | { display_name?: string; avatar_path?: string | null }
+      | Array<{ display_name?: string; avatar_path?: string | null }>;
   }>;
   const reviews = (data?.reviews ?? []) as unknown as Array<{
     id: string;
+    user_id: string;
     note: string | null;
-    profiles: { display_name?: string };
+    profiles: { display_name?: string; avatar_path?: string | null };
     challenges: { title?: string };
     evidenceUrl: string | null;
   }>;
@@ -76,6 +79,7 @@ export default async function TodayPage() {
     created_at: string;
   }>;
   const displayName = profile?.display_name ?? "jugador";
+  const unreadNotifications = data?.unreadNotifications ?? 0;
   return (
     <main className="page">
       <header
@@ -98,9 +102,32 @@ export default async function TodayPage() {
           aria-label="Notificaciones"
           href={"/notificaciones" as "/hoy"}
           className="button button-secondary"
-          style={{ width: 48, padding: 0 }}
+          style={{ width: 48, padding: 0, position: "relative" }}
         >
           <Bell size={20} />
+          {unreadNotifications > 0 && (
+            <span
+              aria-label={`${unreadNotifications} notificaciones sin leer`}
+              style={{
+                position: "absolute",
+                top: -6,
+                right: -6,
+                minWidth: 20,
+                height: 20,
+                padding: "0 5px",
+                borderRadius: 10,
+                display: "grid",
+                placeItems: "center",
+                background: "var(--coral)",
+                color: "white",
+                border: "2px solid var(--canvas)",
+                fontSize: 10,
+                fontWeight: 900,
+              }}
+            >
+              {unreadNotifications > 99 ? "99+" : unreadNotifications}
+            </span>
+          )}
         </Link>
       </header>
       <section
@@ -236,16 +263,16 @@ export default async function TodayPage() {
           {reviews.map((review) => (
             <article key={review.id} className="card" style={{ padding: 18 }}>
               {review.evidenceUrl && (
-                <Image
+                <img
                   src={review.evidenceUrl}
                   alt={`Evidencia enviada por ${review.profiles?.display_name ?? "el participante"}`}
-                  width={460}
-                  height={260}
-                  unoptimized
                   style={{
+                    display: "block",
                     width: "100%",
-                    height: 180,
-                    objectFit: "cover",
+                    height: "auto",
+                    maxHeight: 520,
+                    objectFit: "contain",
+                    background: "#0d0b12",
                     borderRadius: 17,
                     marginBottom: 15,
                   }}
@@ -255,6 +282,11 @@ export default async function TodayPage() {
                 <Avatar
                   name={review.profiles?.display_name ?? "Rival"}
                   accent="var(--coral)"
+                  src={
+                    review.profiles?.avatar_path
+                      ? `/api/v1/media/profiles/${review.user_id}`
+                      : null
+                  }
                 />
                 <div style={{ flex: 1 }}>
                   <b>
@@ -320,6 +352,11 @@ export default async function TodayPage() {
                     name={profileValue?.display_name ?? "Jugador"}
                     size={36}
                     accent={index === 0 ? "var(--lime)" : "var(--violet)"}
+                    src={
+                      profileValue?.avatar_path
+                        ? `/api/v1/media/profiles/${participant.user_id}`
+                        : null
+                    }
                   />
                   <span style={{ flex: 1, fontWeight: 800 }}>
                     {profileValue?.display_name}

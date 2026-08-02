@@ -3,17 +3,19 @@
 import { createBrowserClient } from "@supabase/ssr";
 import { Camera, LoaderCircle, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export function ImageUpload({
   endpoint,
   hasImage,
   label,
+  children,
 }: {
   endpoint: string;
   hasImage: boolean;
   label: string;
+  children: ReactNode;
 }) {
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
@@ -41,8 +43,10 @@ export function ImageUpload({
       });
       const body = (await prepare.json()) as {
         data?: { path: string; token: string };
+        error?: { message?: string };
       };
-      if (!prepare.ok || !body.data) throw new Error("prepare");
+      if (!prepare.ok || !body.data)
+        throw new Error(body.error?.message ?? "No se pudo preparar la foto.");
       const supabase = createBrowserClient(url, key);
       const { error } = await supabase.storage
         .from("profile-images")
@@ -55,11 +59,20 @@ export function ImageUpload({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ path: body.data.path }),
       });
-      if (!finalize.ok) throw new Error("finalize");
+      if (!finalize.ok) {
+        const finalBody = (await finalize.json()) as {
+          error?: { message?: string };
+        };
+        throw new Error(
+          finalBody.error?.message ?? "No se pudo terminar la subida.",
+        );
+      }
       toast.success("Foto actualizada.");
       router.refresh();
-    } catch {
-      toast.error("No se pudo guardar la foto.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "No se pudo guardar la foto.",
+      );
     } finally {
       setLoading(false);
       if (input.current) input.current.value = "";
@@ -81,7 +94,9 @@ export function ImageUpload({
   }
 
   return (
-    <div className="card" style={{ padding: 16, display: "grid", gap: 10 }}>
+    <div
+      style={{ position: "relative", width: "fit-content", flex: "0 0 auto" }}
+    >
       <input
         ref={input}
         type="file"
@@ -89,35 +104,69 @@ export function ImageUpload({
         hidden
         onChange={(event) => upload(event.target.files?.[0])}
       />
-      <span className="field-label">{label}</span>
-      <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
-        <button
-          type="button"
-          className="button button-secondary"
-          disabled={loading}
-          onClick={() => input.current?.click()}
+      <button
+        type="button"
+        disabled={loading}
+        aria-label={`${hasImage ? "Cambiar" : "Añadir"} ${label.toLowerCase()}`}
+        title={`${hasImage ? "Cambiar" : "Añadir"} ${label.toLowerCase()}`}
+        onClick={() => input.current?.click()}
+        style={{
+          padding: 0,
+          border: 0,
+          background: "transparent",
+          display: "block",
+          cursor: "pointer",
+        }}
+      >
+        {children}
+        <span
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            right: -3,
+            bottom: -3,
+            width: 28,
+            height: 28,
+            borderRadius: "50%",
+            display: "grid",
+            placeItems: "center",
+            color: "white",
+            background: "var(--violet)",
+            border: "3px solid var(--canvas)",
+          }}
         >
           {loading ? (
-            <LoaderCircle className="animate-spin" size={18} />
+            <LoaderCircle className="animate-spin" size={14} />
           ) : (
-            <Camera size={18} />
+            <Camera size={14} />
           )}
-          {hasImage ? "Cambiar foto" : "Añadir foto"}
+        </span>
+      </button>
+      {hasImage && !loading && (
+        <button
+          type="button"
+          aria-label={`Eliminar ${label.toLowerCase()}`}
+          title={`Eliminar ${label.toLowerCase()}`}
+          onClick={remove}
+          style={{
+            position: "absolute",
+            top: -5,
+            right: -5,
+            width: 24,
+            height: 24,
+            padding: 0,
+            borderRadius: "50%",
+            display: "grid",
+            placeItems: "center",
+            color: "white",
+            background: "var(--coral)",
+            border: "2px solid var(--canvas)",
+            cursor: "pointer",
+          }}
+        >
+          <Trash2 size={12} />
         </button>
-        {hasImage && (
-          <button
-            type="button"
-            className="button button-danger"
-            disabled={loading}
-            onClick={remove}
-          >
-            <Trash2 size={18} /> Eliminar
-          </button>
-        )}
-      </div>
-      <small className="muted">
-        JPG, PNG o WebP · máximo 5 MB · acceso privado.
-      </small>
+      )}
     </div>
   );
 }

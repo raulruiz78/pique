@@ -9,6 +9,31 @@ import { toast } from "sonner";
 
 type Mode = "login" | "signup" | "recover";
 
+function authErrorMessage(mode: Mode, code?: string, message?: string) {
+  const value = `${code ?? ""} ${message ?? ""}`.toLowerCase();
+
+  if (mode === "login" && value.includes("invalid login credentials"))
+    return "El correo o la contraseña no son correctos. Si aún no tienes cuenta, regístrate.";
+  if (
+    value.includes("user_already_exists") ||
+    value.includes("email_exists") ||
+    value.includes("already registered")
+  )
+    return "Este correo ya está registrado. Inicia sesión o recupera tu contraseña.";
+  if (value.includes("weak_password") || value.includes("password should"))
+    return "La contraseña no es suficientemente segura. Usa al menos 8 caracteres.";
+  if (value.includes("over_email_send_rate_limit") || value.includes("rate limit"))
+    return "Has realizado demasiados intentos. Espera unos minutos y vuelve a probar.";
+  if (value.includes("signup_disabled"))
+    return "El registro está temporalmente desactivado.";
+  if (value.includes("email_not_confirmed"))
+    return "Todavía tienes que confirmar tu correo. Revisa tu bandeja de entrada.";
+
+  return mode === "signup"
+    ? "No se pudo crear la cuenta. Revisa los datos e inténtalo de nuevo."
+    : "No hemos podido iniciar sesión. Inténtalo de nuevo.";
+}
+
 export function AuthForm({
   mode,
   nextPath = "/hoy",
@@ -39,27 +64,63 @@ export function AuthForm({
       if (error) return toast.error("No hemos podido enviar el correo.");
       return toast.success("Revisa tu correo: te hemos enviado el enlace.");
     }
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedUsername = username.trim().toLowerCase();
+
+    if (mode === "signup") {
+      const { data: usernameAvailable, error: usernameError } =
+        await supabase.rpc("is_username_available", {
+          candidate: normalizedUsername,
+        });
+      if (usernameError) {
+        setLoading(false);
+        return toast.error("No hemos podido comprobar el nombre de usuario.");
+      }
+      if (!usernameAvailable) {
+        setLoading(false);
+        return toast.error(
+          "Ese nombre de usuario ya existe. Prueba con uno diferente.",
+        );
+      }
+    }
+
     const result =
       mode === "login"
-        ? await supabase.auth.signInWithPassword({ email, password })
+        ? await supabase.auth.signInWithPassword({
+            email: normalizedEmail,
+            password,
+          })
         : await supabase.auth.signUp({
-            email,
+            email: normalizedEmail,
             password,
             options: {
               emailRedirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
               data: {
                 display_name: displayName.trim(),
-                username: username.trim().toLowerCase(),
+                username: normalizedUsername,
               },
             },
           });
     setLoading(false);
     if (result.error)
       return toast.error(
-        result.error.message === "Invalid login credentials"
-          ? "Email o contraseña incorrectos."
-          : "No hemos podido completar el acceso.",
+        authErrorMessage(mode, result.error.code, result.error.message),
       );
+    if (
+      mode === "signup" &&
+      result.data.user &&
+      result.data.user.identities?.length === 0
+    )
+      return toast.error(
+        "Este correo ya está registrado. Inicia sesión o recupera tu contraseña.",
+      );
+    if (mode === "signup" && !result.data.session) {
+      toast.success(
+        "Cuenta creada. Revisa tu correo y confirma el registro para entrar.",
+      );
+      router.replace(`/login?next=${encodeURIComponent(nextPath)}` as Route);
+      return;
+    }
     toast.success(
       mode === "login"
         ? "¡Dentro! Que empiece el pique."

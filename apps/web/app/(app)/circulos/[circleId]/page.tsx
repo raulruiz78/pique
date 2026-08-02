@@ -11,7 +11,11 @@ type Player = {
   acceptance: string;
   score: number;
   current_streak: number;
-  profiles: { display_name?: string; username?: string } | null;
+  profiles: {
+    display_name?: string;
+    username?: string;
+    avatar_path?: string | null;
+  } | null;
 };
 
 export default async function CirclePage({
@@ -28,7 +32,7 @@ export default async function CirclePage({
   const { data: circle } = await supabase
     .from("circles")
     .select(
-      "id,name,description,avatar_path,owner_id,circle_members(user_id,profiles(display_name,username)),challenges(id,title,status,start_at,end_at,challenge_participants(user_id,acceptance,score,current_streak,profiles(display_name,username)))",
+      "id,name,description,avatar_path,owner_id,circle_members(user_id,profiles(display_name,username,avatar_path)),challenges(id,title,status,start_at,end_at,challenge_participants(user_id,acceptance,score,current_streak,profiles(display_name,username,avatar_path)))",
     )
     .eq("id", circleId)
     .maybeSingle();
@@ -45,7 +49,13 @@ export default async function CirclePage({
   );
   const totals = new Map<
     string,
-    { userId: string; name: string; score: number; streak: number }
+    {
+      userId: string;
+      name: string;
+      avatarPath: string | null;
+      score: number;
+      streak: number;
+    }
   >();
   for (const challenge of playable) {
     for (const player of challenge.challenge_participants as Player[]) {
@@ -56,6 +66,7 @@ export default async function CirclePage({
           player.profiles?.display_name ??
           player.profiles?.username ??
           "Jugador",
+        avatarPath: player.profiles?.avatar_path ?? current?.avatarPath ?? null,
         score: (current?.score ?? 0) + player.score,
         streak: Math.max(current?.streak ?? 0, player.current_streak),
       });
@@ -66,16 +77,35 @@ export default async function CirclePage({
   return (
     <main className="page">
       <header style={{ display: "flex", alignItems: "center", gap: 15 }}>
-        <Avatar
-          name={circle.name}
-          size={67}
-          accent="var(--lime)"
-          src={
-            circle.avatar_path
-              ? `/api/v1/media/circles/${circle.id}?v=${encodeURIComponent(circle.avatar_path)}`
-              : null
-          }
-        />
+        {circle.owner_id === user?.id ? (
+          <ImageUpload
+            endpoint={`/api/v1/circles/${circle.id}/image`}
+            hasImage={Boolean(circle.avatar_path)}
+            label="Foto del círculo"
+          >
+            <Avatar
+              name={circle.name}
+              size={67}
+              accent="var(--lime)"
+              src={
+                circle.avatar_path
+                  ? `/api/v1/media/circles/${circle.id}?v=${encodeURIComponent(circle.avatar_path)}`
+                  : null
+              }
+            />
+          </ImageUpload>
+        ) : (
+          <Avatar
+            name={circle.name}
+            size={67}
+            accent="var(--lime)"
+            src={
+              circle.avatar_path
+                ? `/api/v1/media/circles/${circle.id}?v=${encodeURIComponent(circle.avatar_path)}`
+                : null
+            }
+          />
+        )}
         <div>
           <span className="eyebrow">Círculo</span>
           <h1 className="display" style={{ fontSize: 42, margin: "6px 0 8px" }}>
@@ -87,16 +117,6 @@ export default async function CirclePage({
           </p>
         </div>
       </header>
-
-      {circle.owner_id === user?.id && (
-        <section style={{ marginTop: 20 }}>
-          <ImageUpload
-            endpoint={`/api/v1/circles/${circle.id}/image`}
-            hasImage={Boolean(circle.avatar_path)}
-            label="Foto del círculo"
-          />
-        </section>
-      )}
 
       {pending.length > 0 && (
         <section style={{ marginTop: 26 }}>
@@ -160,6 +180,11 @@ export default async function CirclePage({
                     name={player.name}
                     size={38}
                     accent={index === 0 ? "var(--lime)" : "var(--violet)"}
+                    src={
+                      player.avatarPath
+                        ? `/api/v1/media/profiles/${player.userId}`
+                        : null
+                    }
                   />
                   <div style={{ flex: 1 }}>
                     <b>{player.name}</b>

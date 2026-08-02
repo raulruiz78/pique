@@ -26,7 +26,7 @@ export default async function ChallengePage({
   const { data } = await supabase
     .from("challenges")
     .select(
-      "*,goals(*),challenge_participants(user_id,acceptance,score,current_streak,profiles(display_name,username)),penalties(description,status),rewards(description,status)",
+      "*,goals(*),challenge_participants(user_id,acceptance,score,current_streak,profiles(display_name,username,avatar_path)),penalties(description,status),rewards(description,status)",
     )
     .eq("id", challengeId)
     .maybeSingle();
@@ -119,6 +119,11 @@ export default async function ChallengePage({
                 name={participant.profiles?.display_name ?? "Jugador"}
                 size={40}
                 accent={index === 0 ? "var(--lime)" : "var(--violet)"}
+                src={
+                  participant.profiles?.avatar_path
+                    ? `/api/v1/media/profiles/${participant.user_id}`
+                    : null
+                }
               />
               <div style={{ flex: 1 }}>
                 <b>{participant.profiles?.display_name}</b>
