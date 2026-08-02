@@ -1,0 +1,654 @@
+"use client";
+import {
+  CalendarDays,
+  Camera,
+  ChevronLeft,
+  ChevronRight,
+  LoaderCircle,
+  ShieldCheck,
+  Sparkles,
+  Trophy,
+  Users,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+
+interface Member {
+  user_id: string;
+  profiles: { display_name?: string; username?: string };
+}
+interface Circle {
+  id: string;
+  name: string;
+  circle_members: Member[];
+}
+const templates = [
+  { title: "Entrenar sin excusas", emoji: "🏋️", days: "MO,WE,FR", points: 10 },
+  {
+    title: "Leer cada día",
+    emoji: "📚",
+    days: "MO,TU,WE,TH,FR,SA,SU",
+    points: 8,
+  },
+  {
+    title: "Cero comida basura",
+    emoji: "🥗",
+    days: "MO,TU,WE,TH,FR",
+    points: 10,
+  },
+  { title: "Reto libre", emoji: "⚡", days: "MO,WE,FR", points: 10 },
+];
+const weekdays = [
+  { value: "MO", label: "L", name: "Lunes" },
+  { value: "TU", label: "M", name: "Martes" },
+  { value: "WE", label: "X", name: "Miércoles" },
+  { value: "TH", label: "J", name: "Jueves" },
+  { value: "FR", label: "V", name: "Viernes" },
+  { value: "SA", label: "S", name: "Sábado" },
+  { value: "SU", label: "D", name: "Domingo" },
+] as const;
+export function ChallengeWizard({
+  startDate,
+  endDate,
+}: {
+  startDate: string;
+  endDate: string;
+}) {
+  const router = useRouter();
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [circles, setCircles] = useState<Circle[]>([]);
+  const [form, setForm] = useState({
+    circleId: "",
+    title: "",
+    description: "",
+    type: "FREQUENCY",
+    startDate,
+    endDate,
+    scheduleMode: "fixed" as "fixed" | "flexible" | "dailyMultiple",
+    days: "MO,WE,FR",
+    weeklyTarget: 3,
+    dailyTarget: 2,
+    points: "10",
+    evidenceRequired: true,
+    validationType: "PEER_REVIEW",
+    consequence: "El perdedor invita a cenar",
+    participantIds: [] as string[],
+  });
+  useEffect(() => {
+    fetch("/api/v1/circles")
+      .then(async (response) => {
+        if (response.ok) {
+          const body = (await response.json()) as { data: Circle[] };
+          setCircles(body.data);
+          const first = body.data[0];
+          if (first)
+            setForm((current) => ({
+              ...current,
+              circleId: first.id,
+              participantIds: first.circle_members.map(
+                (member) => member.user_id,
+              ),
+            }));
+        }
+      })
+      .catch(() => undefined);
+  }, []);
+  const circle = circles.find((item) => item.id === form.circleId);
+  const ready = useMemo(
+    () =>
+      form.title.length >= 3 &&
+      form.circleId &&
+      form.participantIds.length >= 2 &&
+      Number(form.points) >= 1 &&
+      Number(form.points) <= 10_000,
+    [form],
+  );
+  function chooseTemplate(template: (typeof templates)[number]) {
+    setForm((current) => ({
+      ...current,
+      title: template.title,
+      scheduleMode: "fixed",
+      days: template.days,
+      points: String(template.points),
+    }));
+    setStep(2);
+  }
+  function toggleDay(day: (typeof weekdays)[number]["value"]) {
+    const selected = form.days.split(",").filter(Boolean);
+    const next = selected.includes(day)
+      ? selected.filter((value) => value !== day)
+      : weekdays
+          .map(({ value }) => value)
+          .filter((value) => [...selected, day].includes(value));
+    if (next.length > 0) setForm({ ...form, days: next.join(",") });
+  }
+  async function submit() {
+    if (!ready) return toast.error("Revisa título, círculo y participantes.");
+    setLoading(true);
+    const response = await fetch("/api/v1/challenges", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": crypto.randomUUID(),
+      },
+      body: JSON.stringify({
+        circleId: form.circleId,
+        title: form.title,
+        description: form.description,
+        type: form.type,
+        startAt: new Date(`${form.startDate}T08:00:00`).toISOString(),
+        endAt: new Date(`${form.endDate}T23:59:59`).toISOString(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        recurrence:
+          form.scheduleMode === "flexible"
+            ? `FREQ=WEEKLY;FLEX=${form.weeklyTarget}`
+            : form.scheduleMode === "dailyMultiple"
+              ? `FREQ=DAILY;DAILYCOUNT=${form.dailyTarget}`
+              : `FREQ=WEEKLY;BYDAY=${form.days}`,
+        points: Number(form.points),
+        evidenceRequired: form.evidenceRequired,
+        validationType: form.validationType,
+        consequence: form.consequence,
+        participantIds: form.participantIds,
+      }),
+    });
+    const body = (await response.json()) as {
+      data?: { id: string };
+      error?: { message: string };
+    };
+    setLoading(false);
+    if (!response.ok || !body.data)
+      return toast.error(body.error?.message ?? "No se pudo crear el reto.");
+    toast.success("Reto enviado. Falta que todos acepten.");
+    router.push(`/retos/${body.data.id}`);
+    router.refresh();
+  }
+  return (
+    <div>
+      <div
+        aria-label={`Paso ${step} de 4`}
+        style={{ display: "flex", gap: 6, margin: "20px 0 28px" }}
+      >
+        {[1, 2, 3, 4].map((value) => (
+          <i
+            key={value}
+            style={{
+              height: 6,
+              flex: 1,
+              borderRadius: 6,
+              background: value <= step ? "var(--violet)" : "var(--line)",
+            }}
+          />
+        ))}
+      </div>
+      {step === 1 && (
+        <section>
+          <span className="eyebrow">Paso 1 · Elige la chispa</span>
+          <h2
+            className="display"
+            style={{ fontSize: 36, margin: "8px 0 20px" }}
+          >
+            ¿A qué os vais a picar?
+          </h2>
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}
+          >
+            {templates.map((template) => (
+              <button
+                key={template.title}
+                onClick={() => chooseTemplate(template)}
+                className="card"
+                style={{
+                  border: "1px solid var(--line)",
+                  color: "var(--ink)",
+                  textAlign: "left",
+                  padding: 18,
+                  cursor: "pointer",
+                  minHeight: 130,
+                }}
+              >
+                <span style={{ fontSize: 27 }}>{template.emoji}</span>
+                <b
+                  style={{ display: "block", marginTop: 17, lineHeight: 1.25 }}
+                >
+                  {template.title}
+                </b>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+      {step === 2 && (
+        <section>
+          <span className="eyebrow">Paso 2 · Las reglas</span>
+          <h2
+            className="display"
+            style={{ fontSize: 36, margin: "8px 0 20px" }}
+          >
+            Que quede clarísimo.
+          </h2>
+          <div style={{ display: "grid", gap: 15 }}>
+            <label>
+              <span className="field-label">Título</span>
+              <input
+                className="field"
+                maxLength={80}
+                value={form.title}
+                onChange={(event) =>
+                  setForm({ ...form, title: event.target.value })
+                }
+              />
+            </label>
+            <label>
+              <span className="field-label">Descripción y reglas</span>
+              <textarea
+                className="field"
+                rows={4}
+                maxLength={500}
+                value={form.description}
+                onChange={(event) =>
+                  setForm({ ...form, description: event.target.value })
+                }
+                placeholder="Qué cuenta, qué no y cómo se resuelve una duda."
+              />
+            </label>
+            <label>
+              <span className="field-label">Círculo</span>
+              <select
+                className="field"
+                value={form.circleId}
+                onChange={(event) => {
+                  const selected = circles.find(
+                    (item) => item.id === event.target.value,
+                  );
+                  setForm({
+                    ...form,
+                    circleId: event.target.value,
+                    participantIds:
+                      selected?.circle_members.map(
+                        (member) => member.user_id,
+                      ) ?? [],
+                  });
+                }}
+              >
+                <option value="">Selecciona un círculo</option>
+                {circles.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {circles.length === 0 && (
+              <p className="muted">
+                Primero crea un círculo desde tu perfil e invita a otra persona.
+              </p>
+            )}
+            <div>
+              <span className="field-label">Participantes</span>
+              <div className="card" style={{ padding: 12 }}>
+                {circle?.circle_members.map((member) => (
+                  <label
+                    key={member.user_id}
+                    style={{
+                      display: "flex",
+                      gap: 10,
+                      padding: 8,
+                      alignItems: "center",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={form.participantIds.includes(member.user_id)}
+                      onChange={(event) =>
+                        setForm({
+                          ...form,
+                          participantIds: event.target.checked
+                            ? [...form.participantIds, member.user_id]
+                            : form.participantIds.filter(
+                                (id) => id !== member.user_id,
+                              ),
+                        })
+                      }
+                    />
+                    <Users size={17} />
+                    <span>
+                      {member.profiles?.display_name ??
+                        member.profiles?.username}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+      {step === 3 && (
+        <section>
+          <span className="eyebrow">Paso 3 · Ritmo y puntos</span>
+          <h2
+            className="display"
+            style={{ fontSize: 36, margin: "8px 0 20px" }}
+          >
+            Marca el terreno.
+          </h2>
+          <div style={{ display: "grid", gap: 15 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 10,
+              }}
+            >
+              <label>
+                <span className="field-label">Empieza</span>
+                <input
+                  className="field"
+                  type="date"
+                  value={form.startDate}
+                  onChange={(event) =>
+                    setForm({ ...form, startDate: event.target.value })
+                  }
+                />
+              </label>
+              <label>
+                <span className="field-label">Termina</span>
+                <input
+                  className="field"
+                  type="date"
+                  value={form.endDate}
+                  onChange={(event) =>
+                    setForm({ ...form, endDate: event.target.value })
+                  }
+                />
+              </label>
+            </div>
+            <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+              <legend className="field-label">Ritmo semanal</legend>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, 1fr)",
+                  gap: 8,
+                  marginBottom: 10,
+                }}
+              >
+                {(
+                  [
+                    ["fixed", "Días fijos"],
+                    ["flexible", "Flexible"],
+                    ["dailyMultiple", "Varias al día"],
+                  ] as const
+                ).map(([value, label]) => {
+                  const selected = form.scheduleMode === value;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      aria-pressed={selected}
+                      className={`button ${selected ? "button-primary" : "button-secondary"}`}
+                      onClick={() => setForm({ ...form, scheduleMode: value })}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              {form.scheduleMode === "fixed" ? (
+                <div
+                  role="group"
+                  aria-label="Días del reto"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(7, 1fr)",
+                    gap: 7,
+                  }}
+                >
+                  {weekdays.map((day) => {
+                    const selected = form.days.split(",").includes(day.value);
+                    return (
+                      <button
+                        key={day.value}
+                        type="button"
+                        aria-pressed={selected}
+                        aria-label={day.name}
+                        onClick={() => toggleDay(day.value)}
+                        style={{
+                          height: 48,
+                          borderRadius: 15,
+                          border: `1px solid ${selected ? "var(--violet)" : "var(--line)"}`,
+                          background: selected
+                            ? "var(--violet)"
+                            : "var(--surface)",
+                          color: selected ? "white" : "var(--ink)",
+                          font: "inherit",
+                          fontWeight: 800,
+                          cursor: "pointer",
+                        }}
+                      >
+                        {day.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : form.scheduleMode === "flexible" ? (
+                <label>
+                  <span
+                    className="muted"
+                    style={{ display: "block", marginBottom: 8 }}
+                  >
+                    Veces por semana, en los días que quieras
+                  </span>
+                  <select
+                    className="field"
+                    value={form.weeklyTarget}
+                    onChange={(event) =>
+                      setForm({
+                        ...form,
+                        weeklyTarget: Number(event.target.value),
+                      })
+                    }
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7].map((value) => (
+                      <option key={value} value={value}>
+                        {value} {value === 1 ? "vez" : "veces"} por semana
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : (
+                <label>
+                  <span
+                    className="muted"
+                    style={{ display: "block", marginBottom: 8 }}
+                  >
+                    Veces que debe completarse cada día
+                  </span>
+                  <select
+                    className="field"
+                    value={form.dailyTarget}
+                    onChange={(event) =>
+                      setForm({
+                        ...form,
+                        dailyTarget: Number(event.target.value),
+                      })
+                    }
+                  >
+                    {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
+                      <option key={value} value={value}>
+                        {value} veces al día
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+            </fieldset>
+            <label>
+              <span className="field-label">Puntos por check-in</span>
+              <input
+                className="field"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={5}
+                value={form.points}
+                onChange={(event) => {
+                  const value = event.target.value.replace(/\D/g, "");
+                  setForm({ ...form, points: value });
+                }}
+                placeholder="Ej. 10"
+              />
+            </label>
+            <label
+              className="card"
+              style={{
+                padding: 16,
+                display: "flex",
+                gap: 12,
+                alignItems: "center",
+              }}
+            >
+              <Camera color="var(--violet)" />
+              <span style={{ flex: 1 }}>
+                <b>Foto como evidencia</b>
+                <small className="muted" style={{ display: "block" }}>
+                  Privada y visible para validadores.
+                </small>
+              </span>
+              <input
+                type="checkbox"
+                checked={form.evidenceRequired}
+                onChange={(event) =>
+                  setForm({ ...form, evidenceRequired: event.target.checked })
+                }
+              />
+            </label>
+            <label>
+              <span className="field-label">Validación</span>
+              <select
+                className="field"
+                value={form.validationType}
+                onChange={(event) =>
+                  setForm({ ...form, validationType: event.target.value })
+                }
+              >
+                <option value="PEER_REVIEW">La revisa el rival</option>
+                <option value="SELF">Autovalidación</option>
+              </select>
+            </label>
+          </div>
+        </section>
+      )}
+      {step === 4 && (
+        <section>
+          <span className="eyebrow">Paso 4 · Pacto final</span>
+          <h2
+            className="display"
+            style={{ fontSize: 36, margin: "8px 0 20px" }}
+          >
+            ¿Trato hecho?
+          </h2>
+          <label>
+            <span className="field-label">Consecuencia opcional</span>
+            <input
+              className="field"
+              maxLength={240}
+              value={form.consequence}
+              onChange={(event) =>
+                setForm({ ...form, consequence: event.target.value })
+              }
+            />
+          </label>
+          <div className="card" style={{ marginTop: 18, padding: 20 }}>
+            <div style={{ display: "grid", gap: 15 }}>
+              <Summary Icon={Trophy} label="Reto" value={form.title} />
+              <Summary
+                Icon={Users}
+                label="Participantes"
+                value={`${form.participantIds.length} personas`}
+              />
+              <Summary
+                Icon={CalendarDays}
+                label="Duración"
+                value={`${form.startDate} → ${form.endDate}`}
+              />
+              <Summary
+                Icon={Camera}
+                label="Evidencia"
+                value={form.evidenceRequired ? "Foto obligatoria" : "Opcional"}
+              />
+            </div>
+          </div>
+          <div
+            className="card"
+            style={{
+              padding: 16,
+              marginTop: 13,
+              display: "flex",
+              gap: 11,
+              background: "rgb(200 255 55 / 14%)",
+            }}
+          >
+            <ShieldCheck color="var(--violet)" />
+            <small style={{ lineHeight: 1.45 }}>
+              Nada peligroso, ilegal, humillante ni monetario. Al enviar, las
+              reglas requerirán la aceptación de todos.
+            </small>
+          </div>
+        </section>
+      )}
+      <div style={{ display: "flex", gap: 10, marginTop: 25 }}>
+        {step > 1 && (
+          <button
+            className="button button-secondary"
+            onClick={() => setStep(step - 1)}
+          >
+            <ChevronLeft />
+            Atrás
+          </button>
+        )}
+        <button
+          disabled={loading || (step === 2 && !ready)}
+          className="button button-primary"
+          style={{ flex: 1 }}
+          onClick={() => (step < 4 ? setStep(step + 1) : submit())}
+        >
+          {loading ? (
+            <LoaderCircle className="animate-spin" />
+          ) : step === 4 ? (
+            <>
+              <Sparkles />
+              Enviar reto
+            </>
+          ) : (
+            <>
+              Siguiente
+              <ChevronRight />
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+function Summary({
+  Icon,
+  label,
+  value,
+}: {
+  Icon: typeof Trophy;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+      <Icon size={19} color="var(--violet)" />
+      <span className="muted" style={{ width: 90, fontSize: 13 }}>
+        {label}
+      </span>
+      <b style={{ flex: 1, textAlign: "right" }}>{value}</b>
+    </div>
+  );
+}
