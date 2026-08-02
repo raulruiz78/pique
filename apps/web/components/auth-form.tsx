@@ -21,6 +21,7 @@ export function AuthForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [username, setUsername] = useState("");
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -47,11 +48,8 @@ export function AuthForm({
             options: {
               emailRedirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
               data: {
-                display_name: displayName,
-                username: displayName
-                  .toLowerCase()
-                  .replace(/[^a-z0-9_]/g, "_")
-                  .slice(0, 30),
+                display_name: displayName.trim(),
+                username: username.trim().toLowerCase(),
               },
             },
           });
@@ -74,19 +72,41 @@ export function AuthForm({
   return (
     <form onSubmit={submit} style={{ display: "grid", gap: 16 }}>
       {mode === "signup" && (
-        <label>
-          <span className="field-label">Cómo te llamamos</span>
-          <input
-            className="field"
-            autoComplete="name"
-            required
-            minLength={2}
-            maxLength={60}
-            value={displayName}
-            onChange={(event) => setDisplayName(event.target.value)}
-            placeholder="Raúl"
-          />
-        </label>
+        <>
+          <label>
+            <span className="field-label">Nombre</span>
+            <input
+              className="field"
+              autoComplete="name"
+              required
+              minLength={2}
+              maxLength={60}
+              value={displayName}
+              onChange={(event) => setDisplayName(event.target.value)}
+              placeholder="Tu nombre"
+            />
+          </label>
+          <label>
+            <span className="field-label">Nombre de usuario</span>
+            <input
+              className="field"
+              autoComplete="username"
+              autoCapitalize="none"
+              spellCheck={false}
+              required
+              minLength={3}
+              maxLength={30}
+              pattern="[A-Za-z0-9_]+"
+              title="Usa entre 3 y 30 letras, números o guiones bajos."
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              placeholder="tu_usuario"
+            />
+            <small className="muted" style={{ display: "block", marginTop: 6 }}>
+              Entre 3 y 30 letras, números o guiones bajos.
+            </small>
+          </label>
+        </>
       )}
       <label>
         <span className="field-label">Email</span>

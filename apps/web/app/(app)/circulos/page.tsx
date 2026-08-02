@@ -3,11 +3,14 @@ import { createServerSupabase } from "@/lib/supabase/server";
 
 export default async function CirclesPage() {
   const supabase = await createServerSupabase();
+  const {
+    data: { user },
+  } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
   const { data: circles } = supabase
     ? await supabase
         .from("circles")
         .select(
-          "id,name,description,circle_members(user_id),challenges(id,status,challenge_participants(user_id,acceptance))",
+          "id,name,description,owner_id,circle_members(user_id),challenges(id,status,challenge_participants(user_id,acceptance))",
         )
         .order("created_at", { ascending: false })
     : { data: null };
@@ -30,6 +33,7 @@ export default async function CirclesPage() {
             id: circle.id,
             name: circle.name,
             description: circle.description,
+            isOwner: circle.owner_id === user?.id,
             memberCount: circle.circle_members.length,
             activeCount: circle.challenges.filter((challenge) =>
               ["ACTIVE", "SCHEDULED", "PENDING_ACCEPTANCE"].includes(
