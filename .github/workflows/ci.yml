@@ -43,7 +43,7 @@ jobs:
       - run: pnpm db:reset
       - run: pnpm exec supabase test db
       - run: pnpm --filter @pique/integration-tests test
-      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm --filter @pique/web exec playwright install --with-deps chromium
       - run: pnpm test:e2e
       - if: always()
         uses: actions/upload-artifact@v4
