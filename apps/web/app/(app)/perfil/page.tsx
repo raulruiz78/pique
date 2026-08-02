@@ -30,16 +30,22 @@ export default async function ProfilePage() {
   return (
     <main className="page">
       <header style={{ display: "flex", alignItems: "center", gap: 15 }}>
-        <Avatar
-          name={value?.display_name ?? "Pique"}
-          size={67}
-          accent="var(--violet)"
-          src={
-            value?.avatar_path
-              ? `/api/v1/media/profiles/${user!.id}?v=${encodeURIComponent(value.avatar_path)}`
-              : null
-          }
-        />
+        <ImageUpload
+          endpoint="/api/v1/users/me/avatar"
+          hasImage={Boolean(value?.avatar_path)}
+          label="Foto de perfil"
+        >
+          <Avatar
+            name={value?.display_name ?? "Pique"}
+            size={67}
+            accent="var(--violet)"
+            src={
+              value?.avatar_path
+                ? `/api/v1/media/profiles/${user!.id}?v=${encodeURIComponent(value.avatar_path)}`
+                : null
+            }
+          />
+        </ImageUpload>
         <div>
           <span className="eyebrow">Tu espacio</span>
           <h1 className="display" style={{ fontSize: 39, margin: "5px 0 2px" }}>
@@ -74,13 +80,6 @@ export default async function ProfilePage() {
         </div>
       </section>
       <h2>Tu perfil</h2>
-      <div style={{ marginBottom: 12 }}>
-        <ImageUpload
-          endpoint="/api/v1/users/me/avatar"
-          hasImage={Boolean(value?.avatar_path)}
-          label="Foto de perfil"
-        />
-      </div>
       {value && <ProfileForm profile={value} />}
       <h2 style={{ marginTop: 30 }}>Privacidad y avisos</h2>
       <div className="card" style={{ padding: "4px 17px" }}>
