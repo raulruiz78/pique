@@ -68,4 +68,24 @@ describe.skipIf(!enabled)("RLS privado por defecto", () => {
     });
     expect(error).not.toBeNull();
   });
+  it("solo permite subir imágenes en el espacio propio", async () => {
+    const ownPath = `profiles/${outsiderId}/profile.webp`;
+    const ownUpload = await outsider.storage
+      .from("profile-images")
+      .upload(ownPath, new Blob(["profile"], { type: "image/webp" }), {
+        contentType: "image/webp",
+      });
+    expect(ownUpload.error).toBeNull();
+
+    const forbidden = await outsider.storage
+      .from("profile-images")
+      .upload(
+        "circles/20000000-0000-0000-0000-000000000001/attack.webp",
+        new Blob(["attack"], { type: "image/webp" }),
+        { contentType: "image/webp" },
+      );
+    expect(forbidden.error).not.toBeNull();
+
+    await outsider.storage.from("profile-images").remove([ownPath]);
+  });
 });

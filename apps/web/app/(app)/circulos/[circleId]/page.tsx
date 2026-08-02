@@ -1,5 +1,6 @@
 import { Avatar } from "@/components/avatar";
 import { ChallengeActions } from "@/components/challenge-actions";
+import { ImageUpload } from "@/components/image-upload";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { ChevronRight, Clock3, Trophy, UsersRound } from "lucide-react";
 import Link from "next/link";
@@ -27,7 +28,7 @@ export default async function CirclePage({
   const { data: circle } = await supabase
     .from("circles")
     .select(
-      "id,name,description,circle_members(user_id,profiles(display_name,username)),challenges(id,title,status,start_at,end_at,challenge_participants(user_id,acceptance,score,current_streak,profiles(display_name,username)))",
+      "id,name,description,avatar_path,owner_id,circle_members(user_id,profiles(display_name,username)),challenges(id,title,status,start_at,end_at,challenge_participants(user_id,acceptance,score,current_streak,profiles(display_name,username)))",
     )
     .eq("id", circleId)
     .maybeSingle();
@@ -64,16 +65,38 @@ export default async function CirclePage({
 
   return (
     <main className="page">
-      <header>
-        <span className="eyebrow">Círculo</span>
-        <h1 className="display" style={{ fontSize: 42, margin: "6px 0 8px" }}>
-          {circle.name}
-        </h1>
-        <p className="muted" style={{ margin: 0 }}>
-          {circle.description ||
-            `${circle.circle_members.length} personas en el pique.`}
-        </p>
+      <header style={{ display: "flex", alignItems: "center", gap: 15 }}>
+        <Avatar
+          name={circle.name}
+          size={67}
+          accent="var(--lime)"
+          src={
+            circle.avatar_path
+              ? `/api/v1/media/circles/${circle.id}?v=${encodeURIComponent(circle.avatar_path)}`
+              : null
+          }
+        />
+        <div>
+          <span className="eyebrow">Círculo</span>
+          <h1 className="display" style={{ fontSize: 42, margin: "6px 0 8px" }}>
+            {circle.name}
+          </h1>
+          <p className="muted" style={{ margin: 0 }}>
+            {circle.description ||
+              `${circle.circle_members.length} personas en el pique.`}
+          </p>
+        </div>
       </header>
+
+      {circle.owner_id === user?.id && (
+        <section style={{ marginTop: 20 }}>
+          <ImageUpload
+            endpoint={`/api/v1/circles/${circle.id}/image`}
+            hasImage={Boolean(circle.avatar_path)}
+            label="Foto del círculo"
+          />
+        </section>
+      )}
 
       {pending.length > 0 && (
         <section style={{ marginTop: 26 }}>

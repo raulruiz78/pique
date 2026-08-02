@@ -1,6 +1,7 @@
 import { Avatar } from "@/components/avatar";
 import { EmptyState } from "@/components/empty-state";
 import { ProfileForm } from "@/components/profile-form";
+import { ImageUpload } from "@/components/image-upload";
 import { SignOutButton } from "@/components/sign-out";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { Bell, LockKeyhole, ShieldCheck } from "lucide-react";
@@ -20,7 +21,9 @@ export default async function ProfilePage() {
   } = await supabase.auth.getUser();
   const profile = await supabase
     .from("profiles")
-    .select("username,display_name,timezone,locale,total_points,current_streak")
+    .select(
+      "username,display_name,avatar_path,timezone,locale,total_points,current_streak",
+    )
     .eq("id", user!.id)
     .single();
   const value = profile.data;
@@ -31,6 +34,11 @@ export default async function ProfilePage() {
           name={value?.display_name ?? "Pique"}
           size={67}
           accent="var(--violet)"
+          src={
+            value?.avatar_path
+              ? `/api/v1/media/profiles/${user!.id}?v=${encodeURIComponent(value.avatar_path)}`
+              : null
+          }
         />
         <div>
           <span className="eyebrow">Tu espacio</span>
@@ -66,6 +74,13 @@ export default async function ProfilePage() {
         </div>
       </section>
       <h2>Tu perfil</h2>
+      <div style={{ marginBottom: 12 }}>
+        <ImageUpload
+          endpoint="/api/v1/users/me/avatar"
+          hasImage={Boolean(value?.avatar_path)}
+          label="Foto de perfil"
+        />
+      </div>
       {value && <ProfileForm profile={value} />}
       <h2 style={{ marginTop: 30 }}>Privacidad y avisos</h2>
       <div className="card" style={{ padding: "4px 17px" }}>
