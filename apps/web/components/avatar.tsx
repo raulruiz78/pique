@@ -1,11 +1,15 @@
+import Image from "next/image";
+
 export function Avatar({
   name,
   size = 42,
   accent = "var(--violet)",
+  src,
 }: {
   name: string;
   size?: number;
   accent?: string;
+  src?: string | null;
 }) {
   const initials = name
     .split(/\s+/)
@@ -28,9 +32,21 @@ export function Avatar({
         color: accent === "var(--lime)" ? "#16131d" : "white",
         fontSize: size * 0.32,
         fontWeight: 950,
+        overflow: "hidden",
       }}
     >
-      {initials}
+      {src ? (
+        <Image
+          src={src}
+          alt=""
+          width={size}
+          height={size}
+          unoptimized
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+      ) : (
+        initials
+      )}
     </span>
   );
 }

@@ -1,6 +1,6 @@
 {
   "name": "pique",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Retos compartidos para gente que se pica bien.",
   "packageManager": "pnpm@11.18.0",

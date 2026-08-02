@@ -1,7 +1,7 @@
 "use client";
 import { LoaderCircle, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 export function ProfileForm({
   profile,
@@ -15,6 +15,23 @@ export function ProfileForm({
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const timezones = useMemo(() => {
+    const fallback = [
+      "Europe/Madrid",
+      "Europe/Lisbon",
+      "Europe/London",
+      "Europe/Paris",
+      "America/New_York",
+      "America/Mexico_City",
+      "America/Argentina/Buenos_Aires",
+      "Asia/Tokyo",
+    ];
+    const supported =
+      typeof Intl.supportedValuesOf === "function"
+        ? Intl.supportedValuesOf("timeZone")
+        : fallback;
+    return Array.from(new Set([profile.timezone, "UTC", ...supported]));
+  }, [profile.timezone]);
   const [form, setForm] = useState({
     username: profile.username,
     displayName: profile.display_name,
@@ -62,13 +79,19 @@ export function ProfileForm({
       </label>
       <label>
         <span className="field-label">Zona horaria</span>
-        <input
+        <select
           className="field"
           value={form.timezone}
           onChange={(event) =>
             setForm({ ...form, timezone: event.target.value })
           }
-        />
+        >
+          {timezones.map((timezone) => (
+            <option key={timezone} value={timezone}>
+              {timezone.replaceAll("_", " ")}
+            </option>
+          ))}
+        </select>
       </label>
       <button className="button button-primary" disabled={loading}>
         {loading ? (
