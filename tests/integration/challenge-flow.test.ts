@@ -69,6 +69,8 @@ describe.skipIf(!enabled)("flujo crítico transaccional", () => {
       .select("id")
       .eq("challenge_id", challengeId)
       .eq("participant_id", "10000000-0000-0000-0000-000000000001")
+      .lte("starts_at", new Date().toISOString())
+      .gte("closes_at", new Date().toISOString())
       .order("starts_at")
       .limit(1);
     expect(occurrences.data).toHaveLength(1);
@@ -100,10 +102,11 @@ describe.skipIf(!enabled)("flujo crítico transaccional", () => {
     expect(ledger.data).toEqual([{ points: 10 }]);
   });
   it("finaliza, ordena y asigna la consecuencia", async () => {
-    await admin
+    const closed = await admin
       .from("challenges")
       .update({ end_at: new Date(Date.now() - 1000).toISOString() })
       .eq("id", challengeId);
+    expect(closed.error).toBeNull();
     const completed = await admin.rpc("complete_challenge", {
       target_challenge_id: challengeId,
     });
