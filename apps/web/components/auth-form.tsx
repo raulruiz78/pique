@@ -22,7 +22,10 @@ function authErrorMessage(mode: Mode, code?: string, message?: string) {
     return "Este correo ya está registrado. Inicia sesión o recupera tu contraseña.";
   if (value.includes("weak_password") || value.includes("password should"))
     return "La contraseña no es suficientemente segura. Usa al menos 8 caracteres.";
-  if (value.includes("over_email_send_rate_limit") || value.includes("rate limit"))
+  if (
+    value.includes("over_email_send_rate_limit") ||
+    value.includes("rate limit")
+  )
     return "Has realizado demasiados intentos. Espera unos minutos y vuelve a probar.";
   if (value.includes("signup_disabled"))
     return "El registro está temporalmente desactivado.";
