@@ -1,23 +1,20 @@
 export type ChallengeStatus =
-  | 'DRAFT'
-  | 'PENDING_ACCEPTANCE'
-  | 'SCHEDULED'
-  | 'ACTIVE'
-  | 'PAUSED'
-  | 'COMPLETED'
-  | 'CANCELLED'
-  | 'REJECTED'
-  | 'EXPIRED'
-  | 'DISPUTED';
+  | "DRAFT"
+  | "PENDING_ACCEPTANCE"
+  | "SCHEDULED"
+  | "ACTIVE"
+  | "PAUSED"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "REJECTED"
+  | "EXPIRED"
+  | "DISPUTED";
 
 export type CheckInStatus =
-  | 'PENDING_REVIEW'
-  | 'APPROVED'
-  | 'REJECTED'
-  | 'DISPUTED'
-  | 'EXPIRED';
+  "PENDING_REVIEW" | "APPROVED" | "REJECTED" | "DISPUTED" | "EXPIRED";
 
-export type ChallengeType = 'DAILY' | 'FREQUENCY' | 'CUMULATIVE' | 'ONE_VS_ONE' | 'GROUP';
+export type ChallengeType =
+  "DAILY" | "FREQUENCY" | "CUMULATIVE" | "ONE_VS_ONE" | "GROUP";
 
 export interface ScoreBreakdown {
   base: number;
@@ -38,4 +35,3 @@ export interface RankingEntry {
 export interface RankedEntry extends RankingEntry {
   position: number;
 }
-

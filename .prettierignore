@@ -3,4 +3,6 @@ node_modules
 coverage
 pnpm-lock.yaml
 public/sw.js
-
+PRODUCT_SPEC_PIQUE.md
+PROMPT_CODEX_CONSTRUIR_PIQUE.md
+supabase/.temp/

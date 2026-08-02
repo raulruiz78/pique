@@ -1,0 +1,55 @@
+import { createAdminSupabase } from "@/lib/supabase/admin";
+import { fail, ok, requestId } from "@/lib/api";
+export async function POST(request: Request) {
+  const id = requestId(request);
+  if (
+    !process.env.CRON_SECRET ||
+    request.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`
+  )
+    return fail("NOT_AUTHORIZED", "No autorizado.", id, 401);
+  const admin = createAdminSupabase();
+  if (!admin)
+    return fail("SERVICE_NOT_CONFIGURED", "Servicio no configurado.", id, 503);
+  const now = new Date().toISOString();
+  const expired = await admin
+    .from("goal_occurrences")
+    .update({ status: "EXPIRED" })
+    .eq("status", "PENDING")
+    .lt("closes_at", now)
+    .select("id,challenge_id,participant_id");
+  for (const occurrence of expired.data ?? []) {
+    await admin
+      .from("challenge_participants")
+      .update({ current_streak: 0 })
+      .eq("challenge_id", occurrence.challenge_id)
+      .eq("user_id", occurrence.participant_id);
+    await admin
+      .from("profiles")
+      .update({ current_streak: 0 })
+      .eq("id", occurrence.participant_id);
+  }
+  const ended = await admin
+    .from("challenges")
+    .select("id")
+    .eq("status", "ACTIVE")
+    .lt("end_at", now);
+  let completed = 0;
+  for (const challenge of ended.data ?? []) {
+    const result = await admin.rpc("complete_challenge", {
+      target_challenge_id: challenge.id,
+    });
+    if (!result.error) completed += 1;
+  }
+  const outbox = await admin
+    .from("outbox_events")
+    .update({ processed_at: now })
+    .is("processed_at", null)
+    .lte("available_at", now)
+    .select("id")
+    .limit(100);
+  return ok({
+    expired: expired.data?.length ?? 0,
+    completed,
+    outbox: outbox.data?.length ?? 0,
+  });
+}
