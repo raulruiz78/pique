@@ -3,6 +3,7 @@ node_modules
 coverage
 pnpm-lock.yaml
 public/sw.js
+stitch_pique_app_redesign/
 PRODUCT_SPEC_PIQUE.md
 PROMPT_CODEX_CONSTRUIR_PIQUE.md
 supabase/.temp/

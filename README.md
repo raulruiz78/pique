@@ -2,7 +2,17 @@
 
 PWA privada y mobile-first para convertir objetivos cotidianos en retos compartidos. Incluye reglas aceptadas, calendario, evidencia fotográfica privada, validación social, ledger de puntos, ranking, rachas y consecuencias no monetarias.
 
-Versión actual: **0.2.0**. Consulta [CHANGELOG.md](CHANGELOG.md).
+Versión actual: **0.3.0**. Consulta [CHANGELOG.md](CHANGELOG.md).
+
+## Experiencia actual
+
+- Inicio diario con objetivos, racha, puntos y validaciones laterales.
+- Calendario mensual interactivo y agenda futura sin ocurrencias pasadas.
+- Retos categorizados con ritmos fijos, flexibles o varias veces al día.
+- Círculos privados o públicos; el creador aprueba todas las solicitudes de acceso.
+- Podios globales y marcadores independientes por reto.
+- Niveles, rangos y logros calculados desde actividad real.
+- Evidencia fotográfica privada y validación social en una cola dedicada.
 
 ## Inicio rápido
 
@@ -77,10 +87,9 @@ Las versiones siguen `MAJOR.MINOR.PATCH` y se publican mediante el workflow manu
 ## Mejoras futuras
 
 - Enviar avisos sociales de retos y círculos solo cuando haya preferencias de usuario y presupuesto de correo definidos.
-- Mostrar las fotos de perfil en actividad, revisiones y todos los rankings, además del perfil y los círculos.
 - Recorte y compresión de imágenes antes de subirlas, con eliminación automática de huérfanos.
 - Selector de idioma completo y traducción de todos los textos.
-- Notificaciones push y horas silenciosas reales.
+- Notificaciones push y aplicación efectiva de horas silenciosas.
 - Recuperación guiada de círculos eliminados mediante papelera con retención limitada.
 - Proyecto Supabase separado para previews y staging.
 - Observabilidad de errores, métricas de cron y alertas de cuota de Storage/SMTP.

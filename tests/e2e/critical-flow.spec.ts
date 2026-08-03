@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-test.setTimeout(90_000);
+// El primer arranque de Next.js en CI compila varias rutas bajo demanda.
+// Dejamos margen al flujo completo sin relajar los timeouts de cada aserción.
+test.setTimeout(180_000);
 
 async function login(page: import("@playwright/test").Page, email: string) {
   for (let attempt = 0; attempt < 3; attempt += 1) {
@@ -29,7 +31,7 @@ test("A crea → B acepta → A cumple → B valida → ranking cambia", async (
   try {
     await login(pageA, "raul@pique.local");
     await pageA.goto("/crear");
-    await pageA.getByRole("button", { name: /Leer cada día/ }).click();
+    await pageA.getByRole("button", { name: /Foco y mente/ }).click();
     await expect(pageA.getByText("Carmen")).toBeVisible();
     await pageA.getByLabel("Título").fill(challengeTitle);
     await pageA
@@ -54,7 +56,7 @@ test("A crea → B acepta → A cumple → B valida → ranking cambia", async (
     await expect(objectiveA).toBeVisible({ timeout: 15_000 });
     await objectiveA.getByRole("button", { name: "Hecho" }).click();
     await pageA.getByLabel("Nota opcional").fill("Veinte minutos terminados.");
-    await pageA.getByRole("button", { name: /Enviar check-in/ }).click();
+    await pageA.getByRole("button", { name: /Confirmar hecho/ }).click();
     await expect(pageA.getByText(/Check-in enviado/)).toBeVisible();
     await pageB.goto("/hoy");
     const pending = pageB
@@ -69,7 +71,8 @@ test("A crea → B acepta → A cumple → B valida → ranking cambia", async (
     await pageA.goto("/ranking");
     await expect(pageA.getByText("Raúl").first()).toBeVisible();
   } finally {
-    await a.close();
-    await b.close();
+    // No dejamos que un cierre lento de WebKit oculte el fallo original.
+    void a.close().catch(() => undefined);
+    void b.close().catch(() => undefined);
   }
 });

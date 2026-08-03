@@ -87,7 +87,7 @@ export async function dashboardQuery() {
       supabase
         .from("goal_occurrences")
         .select(
-          "id,starts_at,closes_at,status,goals(id,name,recurrence,base_points,evidence_required),challenges(id,title)",
+          "id,starts_at,closes_at,status,goals(id,name,recurrence,base_points,evidence_required),challenges(id,title,category)",
         )
         .eq("participant_id", user.id)
         .lt("starts_at", end.toISOString())
@@ -114,7 +114,7 @@ export async function dashboardQuery() {
         .eq("status", "PENDING_REVIEW")
         .neq("user_id", user.id)
         .order("submitted_at", { ascending: false })
-        .limit(4),
+        .limit(50),
       supabase
         .from("notifications")
         .select("id", { count: "exact", head: true })
@@ -166,7 +166,7 @@ export async function calendarQuery(from: Date, to: Date) {
   const { data } = await supabase
     .from("goal_occurrences")
     .select(
-      "id,starts_at,closes_at,status,goals(id,name,recurrence,base_points),challenges(id,title)",
+      "id,starts_at,closes_at,status,goals(id,name,recurrence,base_points),challenges(id,title,category)",
     )
     .eq("participant_id", user.id)
     .lte("starts_at", to.toISOString())

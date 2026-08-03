@@ -1,17 +1,13 @@
-/* eslint-disable @next/next/no-img-element */
 import { Avatar } from "@/components/avatar";
 import { CheckInButton } from "@/components/check-in-button";
 import { EmptyState } from "@/components/empty-state";
-import { ReviewButtons } from "@/components/review-button";
-import { dashboardQuery } from "@/lib/queries";
 import {
-  Bell,
-  ChevronRight,
-  Clock3,
-  Flame,
-  Medal,
-  Sparkles,
-} from "lucide-react";
+  EvidenceReviewCard,
+  type EvidenceReview,
+} from "@/components/evidence-review-card";
+import { CategoryBadge } from "@/components/challenge-category";
+import { dashboardQuery } from "@/lib/queries";
+import { Bell, ChevronRight, Clock3, Flame, Award } from "lucide-react";
 import Link from "next/link";
 
 interface Relation {
@@ -21,11 +17,13 @@ interface Relation {
   base_points?: number;
   evidence_required?: boolean;
   title?: string;
+  category?: string;
 }
 export default async function TodayPage() {
   const data = await dashboardQuery();
   const profile = data?.profile as {
     display_name?: string;
+    avatar_path?: string | null;
     total_points?: number;
     current_streak?: number;
   } | null;
@@ -57,29 +55,12 @@ export default async function TodayPage() {
     groupedOccurrences.set(key, group);
   }
   const objectiveCards = [...groupedOccurrences.values()];
-  const participants = (data?.participants ?? []) as unknown as Array<{
-    user_id: string;
-    score: number;
-    profiles:
-      | { display_name?: string; avatar_path?: string | null }
-      | Array<{ display_name?: string; avatar_path?: string | null }>;
-  }>;
-  const reviews = (data?.reviews ?? []) as unknown as Array<{
-    id: string;
-    user_id: string;
-    note: string | null;
-    profiles: { display_name?: string; avatar_path?: string | null };
-    challenges: { title?: string };
-    evidenceUrl: string | null;
-  }>;
-  const activities = (data?.activities ?? []) as unknown as Array<{
-    id: string;
-    type: string;
-    payload: Record<string, string | number>;
-    created_at: string;
-  }>;
+  const reviews = (data?.reviews ?? []) as unknown as EvidenceReview[];
   const displayName = profile?.display_name ?? "jugador";
   const unreadNotifications = data?.unreadNotifications ?? 0;
+  const totalPoints = profile?.total_points ?? 0;
+  const level = Math.floor(totalPoints / 500) + 1;
+  const levelProgress = totalPoints % 500;
   return (
     <main className="page">
       <header
@@ -90,13 +71,29 @@ export default async function TodayPage() {
           marginBottom: 28,
         }}
       >
-        <div>
-          <span className="muted" style={{ fontSize: 14 }}>
-            Buenos días, {displayName}
-          </span>
-          <h1 className="display" style={{ fontSize: 39, margin: "4px 0 0" }}>
-            Hoy toca dar la talla.
-          </h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <Avatar
+            name={displayName}
+            size={48}
+            src={
+              profile?.avatar_path && data?.user.id
+                ? `/api/v1/media/profiles/${data.user.id}`
+                : null
+            }
+          />
+          <div>
+            <span className="eyebrow">Tu día</span>
+            <h1
+              className="display"
+              style={{
+                color: "var(--violet)",
+                fontSize: 27,
+                margin: "4px 0 0",
+              }}
+            >
+              Hoy toca dar la talla.
+            </h1>
+          </div>
         </div>
         <Link
           aria-label="Notificaciones"
@@ -139,26 +136,65 @@ export default async function TodayPage() {
           marginBottom: 24,
         }}
       >
-        <div
-          className="card"
-          style={{ padding: 18, background: "var(--violet)", color: "white" }}
-        >
-          <span style={{ fontSize: 12, opacity: 0.75 }}>PUNTOS TOTALES</span>
+        <div className="stat-card stat-points">
+          <span className="field-label" style={{ color: "var(--muted)" }}>
+            Puntos totales
+          </span>
           <strong
             className="display"
-            style={{ display: "block", fontSize: 39, marginTop: 5 }}
+            style={{
+              color: "var(--violet)",
+              display: "block",
+              fontSize: 39,
+              marginTop: 12,
+            }}
           >
-            {profile?.total_points ?? 0}
+            {totalPoints.toLocaleString("es")}
           </strong>
+          <Award className="stat-watermark" aria-hidden="true" />
         </div>
-        <div className="card" style={{ padding: 18 }}>
-          <Flame color="var(--coral)" size={20} />
-          <strong style={{ display: "block", fontSize: 21, marginTop: 7 }}>
+        <div className="stat-card stat-streak">
+          <span className="field-label" style={{ color: "var(--muted)" }}>
+            Racha actual
+          </span>
+          <strong
+            className="display"
+            style={{
+              color: "var(--lime)",
+              display: "flex",
+              alignItems: "center",
+              gap: 7,
+              fontSize: 30,
+              marginTop: 12,
+            }}
+          >
+            <Flame size={24} />
             {profile?.current_streak ?? 0} días
           </strong>
-          <span className="muted" style={{ fontSize: 12 }}>
-            de racha
-          </span>
+          <Flame className="stat-watermark" aria-hidden="true" />
+        </div>
+      </section>
+      <section style={{ margin: "-10px 0 30px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: 8,
+          }}
+        >
+          <small className="field-label" style={{ margin: 0 }}>
+            Nivel {level}
+          </small>
+          <small className="muted">{levelProgress}/500 para subir</small>
+        </div>
+        <div className="wizard-progress-track">
+          <div
+            className="wizard-progress-fill"
+            style={{
+              width: `${(levelProgress / 500) * 100}%`,
+              background: "var(--lime)",
+            }}
+          />
         </div>
       </section>
       <div
@@ -220,6 +256,7 @@ export default async function TodayPage() {
                     alignItems: "center",
                   }}
                 >
+                  <CategoryBadge category={challenge?.category} />
                   <div style={{ flex: 1 }}>
                     <span
                       className={`pill ${done ? "pill-lime" : "pill-violet"}`}
@@ -256,175 +293,28 @@ export default async function TodayPage() {
       )}
       {reviews.length > 0 && (
         <section>
-          <div style={{ margin: "30px 2px 12px" }}>
-            <span className="eyebrow">Te toca decidir</span>
-            <h2 style={{ margin: "4px 0 0" }}>Pendiente de tu visto bueno</h2>
-          </div>
-          {reviews.map((review) => (
-            <article key={review.id} className="card" style={{ padding: 18 }}>
-              {review.evidenceUrl && (
-                <img
-                  src={review.evidenceUrl}
-                  alt={`Evidencia enviada por ${review.profiles?.display_name ?? "el participante"}`}
-                  style={{
-                    display: "block",
-                    width: "100%",
-                    height: "auto",
-                    maxHeight: 520,
-                    objectFit: "contain",
-                    background: "#0d0b12",
-                    borderRadius: 17,
-                    marginBottom: 15,
-                  }}
-                />
-              )}
-              <div style={{ display: "flex", gap: 13, alignItems: "center" }}>
-                <Avatar
-                  name={review.profiles?.display_name ?? "Rival"}
-                  accent="var(--coral)"
-                  src={
-                    review.profiles?.avatar_path
-                      ? `/api/v1/media/profiles/${review.user_id}`
-                      : null
-                  }
-                />
-                <div style={{ flex: 1 }}>
-                  <b>
-                    {review.profiles?.display_name ?? "Tu rival"} ha enviado
-                    prueba
-                  </b>
-                  <p
-                    className="muted"
-                    style={{ margin: "4px 0 0", fontSize: 13 }}
-                  >
-                    {review.challenges?.title}
-                  </p>
-                </div>
-                <ReviewButtons checkInId={review.id} />
-              </div>
-            </article>
-          ))}
-        </section>
-      )}
-      {participants.length > 0 && (
-        <section>
           <div
             style={{
-              margin: "30px 2px 12px",
+              margin: "34px 2px 14px",
               display: "flex",
               justifyContent: "space-between",
+              alignItems: "end",
             }}
           >
-            <div>
-              <span className="eyebrow">Marcador rápido</span>
-              <h2 style={{ margin: "4px 0 0" }}>Así va el pique</h2>
-            </div>
-            <Medal color="var(--gold)" />
+            <h2 style={{ margin: 0, maxWidth: 260 }}>
+              Pendientes de validación
+            </h2>
+            <Link href={"/validaciones" as "/hoy"} className="eyebrow">
+              Ver todo
+            </Link>
           </div>
-          <div className="card" style={{ padding: "6px 18px" }}>
-            {participants.slice(0, 3).map((participant, index) => {
-              const profileValue = Array.isArray(participant.profiles)
-                ? participant.profiles[0]
-                : participant.profiles;
-              return (
-                <div
-                  key={`${participant.user_id}-${index}`}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    padding: "13px 0",
-                    borderBottom:
-                      index < Math.min(participants.length, 3) - 1
-                        ? "1px solid var(--line)"
-                        : 0,
-                  }}
-                >
-                  <b
-                    style={{
-                      width: 22,
-                      color: index === 0 ? "var(--gold)" : "var(--muted)",
-                    }}
-                  >
-                    #{index + 1}
-                  </b>
-                  <Avatar
-                    name={profileValue?.display_name ?? "Jugador"}
-                    size={36}
-                    accent={index === 0 ? "var(--lime)" : "var(--violet)"}
-                    src={
-                      profileValue?.avatar_path
-                        ? `/api/v1/media/profiles/${participant.user_id}`
-                        : null
-                    }
-                  />
-                  <span style={{ flex: 1, fontWeight: 800 }}>
-                    {profileValue?.display_name}
-                  </span>
-                  <strong>{participant.score} pt</strong>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-      {activities.length > 0 && (
-        <section>
-          <div style={{ margin: "30px 2px 12px" }}>
-            <span className="eyebrow">En tu círculo</span>
-            <h2 style={{ margin: "4px 0 0" }}>Actividad reciente</h2>
-          </div>
-          <div className="card" style={{ padding: "5px 18px" }}>
-            {activities.slice(0, 5).map((activity, index) => (
-              <div
-                key={activity.id}
-                style={{
-                  padding: "14px 0",
-                  borderBottom:
-                    index < Math.min(activities.length, 5) - 1
-                      ? "1px solid var(--line)"
-                      : 0,
-                }}
-              >
-                <b>
-                  {activity.type === "STREAK_INCREASED"
-                    ? `${String(activity.payload.displayName ?? "Alguien")} lleva ${String(activity.payload.streak ?? "")} días de racha 🔥`
-                    : activity.type === "CHALLENGE_LEAD"
-                      ? `${String(activity.payload.displayName ?? "Alguien")} se ha puesto por delante`
-                      : activity.type === "CHALLENGE_COMPLETED"
-                        ? "Reto terminado. Ya hay veredicto."
-                        : "Hay movimiento en el reto"}
-                </b>
-                <small
-                  className="muted"
-                  style={{ display: "block", marginTop: 4 }}
-                >
-                  {new Date(activity.created_at).toLocaleString("es", {
-                    dateStyle: "short",
-                    timeStyle: "short",
-                  })}
-                </small>
-              </div>
+          <div className="review-carousel">
+            {reviews.slice(0, 8).map((review) => (
+              <EvidenceReviewCard key={review.id} review={review} compact />
             ))}
           </div>
         </section>
       )}
-      <div
-        className="card"
-        style={{
-          marginTop: 28,
-          padding: 18,
-          display: "flex",
-          gap: 12,
-          background: "rgb(200 255 55 / 14%)",
-        }}
-      >
-        <Sparkles color="var(--violet)" />
-        <p style={{ margin: 0, lineHeight: 1.45, fontSize: 14 }}>
-          <b>Consejo Pique:</b> una consecuencia divertida motiva más que una
-          humillación. Siempre segura y consentida.
-        </p>
-      </div>
     </main>
   );
 }

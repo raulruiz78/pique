@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Hoy toca dar la talla - Daily Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Sora:wght@100..900&family=Space+Grotesk:wght@100..900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(26, 26, 30, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(39, 39, 42, 0.5);
+        }
+        .glow-primary {
+            box-shadow: 0 0 20px rgba(210, 187, 255, 0.15);
+        }
+        .glow-secondary {
+            box-shadow: 0 0 20px rgba(188, 255, 95, 0.15);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes pulse-gentle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .animate-pulse-gentle {
+            animation: pulse-gentle 3s ease-in-out infinite;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#3a3939",
+                        "on-primary": "#3f008e",
+                        "surface-tint": "#d2bbff",
+                        "outline-variant": "#4a4455",
+                        "secondary": "#bcff5f",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "primary-fixed": "#eaddff",
+                        "error": "#ffb4ab",
+                        "on-surface-variant": "#ccc3d8",
+                        "on-tertiary": "#68000f",
+                        "tertiary-fixed": "#ffdad8",
+                        "secondary-container": "#95e400",
+                        "tertiary": "#ffb3b0",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#410006",
+                        "on-primary-fixed": "#25005a",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#d2bbff",
+                        "tertiary-fixed-dim": "#ffb3b0",
+                        "on-tertiary-container": "#ffdfdd",
+                        "surface-variant": "#353534",
+                        "surface": "#131313",
+                        "surface-container": "#201f1f",
+                        "on-primary-container": "#ede0ff",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#314f00",
+                        "surface-dim": "#131313",
+                        "secondary-fixed-dim": "#8fdb00",
+                        "inverse-primary": "#732ee4",
+                        "on-secondary": "#203600",
+                        "on-secondary-container": "#3d6200",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#8c1520",
+                        "surface-container-highest": "#353534",
+                        "on-background": "#e5e2e1",
+                        "surface-container-high": "#2a2a2a",
+                        "on-secondary-fixed": "#112000",
+                        "primary-fixed-dim": "#d2bbff",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary-fixed": "#a8f928",
+                        "on-error": "#690005",
+                        "primary-container": "#7c3aed",
+                        "background": "#131313",
+                        "tertiary-container": "#b9383c",
+                        "outline": "#958da1",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-on-surface": "#313030"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "24px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "32px",
+                        "md": "24px",
+                        "base": "8px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "xl": "48px",
+                        "gutter": "16px",
+                        "container-margin": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Sora"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Space Grotesk"],
+                        "headline-sm": ["Sora"],
+                        "headline-md": ["Sora"],
+                        "stat-number": ["Sora"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-md": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "stat-number": ["28px", { "lineHeight": "1", "fontWeight": "800" }],
+                        "body-lg": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-md selection:bg-primary selection:text-on-primary overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-background flex justify-between items-center px-container-margin py-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border-2 border-primary p-0.5">
+<img class="w-full h-full rounded-full object-cover" data-alt="A cinematic, high-contrast close-up portrait of a young athletic person with intense focus. The lighting is dramatic with neon violet and lime green highlights reflecting off their skin. The background is a dark, minimalist futuristic gym setting with a clean, premium cyberpunk aesthetic. Deep shadows and vibrant accents create a sense of determination and achievement." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3vAhlxut0f9LH2CWXhSm0Gl8dRtKPDf88Za1Yh_CBKDhgmIHd0XNSdh-YFK8Zipnkb9o3LdF92dhhfF6e6oz4GoxK_t_lnHLLacISmm_znPTgSZ28tPZj1ve5ul_YMHpQKeYvwBxeIU-06uAEU4HzCr3ypkUClJhWR44o307EAsoU0LgJum9Y-TZ_5WW8jOg5aViJX7ifPPQ7IiDRSJxAGjIwmnxVDzAts1WKnjEUrn0HaOYDnCbBBw"/>
+</div>
+<h1 class="font-headline-sm text-headline-sm text-primary tracking-tight">Hoy toca dar la talla.</h1>
+</div>
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-high hover:opacity-80 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="flex-1 pt-24 pb-32 px-container-margin space-y-lg">
+<!-- Score & Streak Overview -->
+<section class="grid grid-cols-2 gap-md">
+<div class="glass-card rounded-2xl p-md flex flex-col justify-between h-32 relative overflow-hidden">
+<div class="z-10">
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-1">PUNTOS TOTALES</span>
+<div class="flex items-baseline gap-1">
+<span class="font-stat-number text-stat-number text-primary">2,450</span>
+<span class="font-label-caps text-label-caps text-primary/60">PT</span>
+</div>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-10">
+<span class="material-symbols-outlined text-[80px]" data-icon="military_tech">military_tech</span>
+</div>
+</div>
+<div class="glass-card rounded-2xl p-md flex flex-col justify-between h-32 relative overflow-hidden">
+<div class="z-10">
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-1">RACHA ACTUAL</span>
+<div class="flex items-baseline gap-2">
+<span class="font-stat-number text-stat-number text-secondary">12</span>
+<span class="font-label-caps text-label-caps text-secondary/60">DÍAS</span>
+</div>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-20">
+<span class="material-symbols-outlined text-[80px] text-tertiary" data-icon="local_fire_department" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+</div>
+</div>
+</section>
+<!-- Tus Objetivos -->
+<section class="space-y-base">
+<div class="flex justify-between items-end">
+<h2 class="font-headline-md text-headline-md text-on-surface">Tus objetivos</h2>
+<span class="font-label-caps text-label-caps text-primary">2/4 COMPLETADOS</span>
+</div>
+<div class="space-y-sm">
+<!-- Objective Card 1 (Completed) -->
+<div class="glass-card rounded-2xl p-md flex items-center justify-between border-l-4 border-l-secondary">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" data-icon="fitness_center">fitness_center</span>
+</div>
+<div>
+<h3 class="font-body-lg text-body-lg text-on-surface">Entrenar sin excusas</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant">HOY · 10 PT</p>
+</div>
+</div>
+<div class="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary text-[20px]" data-icon="check" style="font-variation-settings: 'wght' 700;">check</span>
+</div>
+</div>
+<!-- Objective Card 2 (In Progress) -->
+<div class="glass-card rounded-2xl p-md flex items-center justify-between border-l-4 border-l-primary animate-pulse-gentle">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="water_drop">water_drop</span>
+</div>
+<div>
+<h3 class="font-body-lg text-body-lg text-on-surface">Hidratación pro</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant">FALTA 1L · 5 PT</p>
+</div>
+</div>
+<button class="px-4 py-2 bg-primary rounded-full font-label-caps text-label-caps text-on-primary hover:opacity-90 transition-opacity">
+                        VALIDAR
+                    </button>
+</div>
+<!-- Objective Card 3 (Pending) -->
+<div class="glass-card rounded-2xl p-md flex items-center justify-between opacity-60">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="menu_book">menu_book</span>
+</div>
+<div>
+<h3 class="font-body-lg text-body-lg text-on-surface">Lectura 20 min</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant">PENDIENTE · 8 PT</p>
+</div>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant"></div>
+</div>
+</div>
+</section>
+<!-- Pendientes de Validación -->
+<section class="space-y-base">
+<div class="flex justify-between items-end">
+<h2 class="font-headline-md text-headline-md text-on-surface">Pendientes de validación</h2>
+<button class="text-primary font-label-caps text-label-caps hover:underline">VER TODO</button>
+</div>
+<div class="flex gap-md overflow-x-auto no-scrollbar pb-xs -mx-container-margin px-container-margin">
+<!-- Validation Card 1 -->
+<div class="flex-shrink-0 w-64 glass-card rounded-2xl overflow-hidden flex flex-col">
+<div class="relative h-48">
+<img class="w-full h-full object-cover" data-alt="A high-quality, authentic action shot of a person finishing a run in an urban park during sunset. The lighting is warm and golden, casting long shadows. The style is modern and social-media-ready, with a slightly gritty yet premium feel. Vibrant violet accents from the UI elements frame the image. The mood is energetic and triumphant." src="https://lh3.googleusercontent.com/aida-public/AB6AXuArTMKWEz37jvKX0V1Ci8cbv3sW9R_8kEkblFC37NkUUqVR93kHC5gWUbxmktvMHQzUNvYZZOQbEJsAZoA3Uqo2bFpPuoY_fNXU_wP_LU11T9FFBfSSRl-2-Yt9PNwZ6WkVeLDNb8_dwj5xULub1sTyqPqx2wZsmj4minDPxHd167gLE7HRSOfnfZ2J_k7AcEI-dTWJa_gGYXFHRhaEW-4PW8YzhNqlk74YOaYMJf5udh_xGj94s7J2xw"/>
+<div class="absolute top-3 left-3 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+<div class="w-5 h-5 rounded-full overflow-hidden border border-primary">
+<img class="w-full h-full object-cover" data-alt="A professional studio headshot of a friendly young man with a slight smile. The lighting is soft and neutral, typical of a high-end profile picture. The background is a solid deep charcoal grey, allowing the vibrant primary purple accents of the UI to pop. Modern, clean aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRZ1J1Uu0ZMipdsk_PalhEseisaebABEo5U44HvYwz3yFM0V_SytXVLa3xKhkqp_vbVW2D7MRCeSBhlBKV-njt7y9ELXmVEQgWtlOmfiovSm9b2WQizowvqS93-LWqtJ3f6JAJBtTEdzXKeTX-brrcPGaniu_D4-M3_mcZKIYHmMWhL6nABn4eNNSuE0FRnAZpi33uVG7_-J89eo0zM2BHKCc_PowHhpN4QeS3CBSCynQaRS6UhOiiOA"/>
+</div>
+<span class="text-[10px] font-label-caps text-white">MARCO G.</span>
+</div>
+</div>
+<div class="p-md space-y-sm">
+<p class="font-body-md text-on-surface line-clamp-1">"5km completados bajo la lluvia"</p>
+<div class="flex gap-sm">
+<button class="flex-1 py-2 rounded-xl bg-secondary/10 border border-secondary/20 text-secondary font-label-caps text-label-caps hover:bg-secondary/20 transition-colors">
+                                RECHAZAR
+                            </button>
+<button class="flex-1 py-2 rounded-xl bg-secondary text-on-secondary font-label-caps text-label-caps hover:opacity-90 transition-opacity">
+                                VALIDAR
+                            </button>
+</div>
+</div>
+</div>
+<!-- Validation Card 2 -->
+<div class="flex-shrink-0 w-64 glass-card rounded-2xl overflow-hidden flex flex-col">
+<div class="relative h-48">
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist overhead shot of a healthy breakfast bowl with vibrant fruits, nuts, and yogurt. The scene is lit with bright, natural morning light on a dark slate table, creating a sophisticated contrast. The aesthetic is health-focused and premium, matching the dark and vibrant UI theme with occasional pops of lime green." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXpO9743OfqOD3uEmmr4hTAr4iIofQ2B9MRaFKYLNhEiTB5sbCuyKYrK99TD9Unvjc65H759YuXhb0ddZv-f3Xe0ZoYzgqpZ9N-s7iKZRZpLlonf0eu_EskNJcK0MZnGPjUuAemZqrFA_q5SBnWrLzpM2JPFL-NgphhdV86F_L2YumRPlGSfNQYLKo_AyXWRSB2cqn-Wwtlwf0C6TTLBxDK1FJ0MTqV2NeQIaYNGirPU1iCBFCX5RWwQ"/>
+<div class="absolute top-3 left-3 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+<div class="w-5 h-5 rounded-full overflow-hidden border border-primary">
+<img class="w-full h-full object-cover" data-alt="A stylish portrait of a young woman with a creative professional look. She is smiling confidently. The lighting uses soft pink and violet ambient tones against a dark background, perfectly aligning with the modern cyberpunk-influenced social gaming aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQxRn6zxBf-zsIf8G667ERnFZeMnvt4onsZeC6jyqmOLnKCTr-AvSiY3c8Xk8EwEpDc5vLr_1SyJKsuAssBAkvS_r8j1NvIIyQsmNcbHVU2LgZgJBC9SU-O4oluYXq0vonUt7JCnKtcFnPoA46mKS5FzHftUb9cWYKaXRK8IZJE55LNWt72lhhdrPWeQ7EuLRqoU1o5BigCwjqppZEN8GMu9PKkSjRz78Q_5Xi_FXxzVQFdICXL-kGXg"/>
+</div>
+<span class="text-[10px] font-label-caps text-white">ELENA V.</span>
+</div>
+</div>
+<div class="p-md space-y-sm">
+<p class="font-body-md text-on-surface line-clamp-1">"Desayuno saludable check ✅"</p>
+<div class="flex gap-sm">
+<button class="flex-1 py-2 rounded-xl bg-secondary/10 border border-secondary/20 text-secondary font-label-caps text-label-caps hover:bg-secondary/20 transition-colors">
+                                RECHAZAR
+                            </button>
+<button class="flex-1 py-2 rounded-xl bg-secondary text-on-secondary font-label-caps text-label-caps hover:opacity-90 transition-opacity">
+                                VALIDAR
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-t border-outline-variant/20 rounded-t-3xl shadow-lg h-20 px-4 pb-safe flex justify-around items-center">
+<a class="flex flex-col items-center justify-center text-primary font-bold active:scale-110 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-caps text-label-caps">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-caps text-label-caps">Calendario</span>
+</a>
+<!-- FAB-like Center Item -->
+<div class="relative -top-6">
+<button class="w-16 h-16 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-[0_0_20px_rgba(210,187,255,0.4)] active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[32px]" data-icon="add_circle" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+</button>
+</div>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-caps text-label-caps">Círculos</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-caps text-label-caps">Perfil</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions and effects
+        document.querySelectorAll('button, a').forEach(el => {
+            el.addEventListener('click', function(e) {
+                if (this.tagName === 'BUTTON' || this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                }
+                
+                // Add a haptic-like visual feedback if needed
+                this.classList.add('scale-95');
+                setTimeout(() => this.classList.remove('scale-95'), 100);
+            });
+        });
+
+        // Horizontal scroll momentum tweak
+        const scrollContainer = document.querySelector('.overflow-x-auto');
+        if(scrollContainer) {
+            scrollContainer.addEventListener('wheel', (evt) => {
+                evt.preventDefault();
+                scrollContainer.scrollLeft += evt.deltaY;
+            });
+        }
+    </script>
+</body></html>

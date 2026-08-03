@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&family=Inter:wght@400;500&family=Space+Grotesk:wght@500;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Sora:wght@100..900&family=Space+Grotesk:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(26, 26, 30, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(188, 255, 95, 0.3);
+        }
+        .tap-active:active {
+            transform: scale(0.96);
+            transition: transform 0.1s ease;
+        }
+        /* Custom scrollbar for textareas */
+        textarea::-webkit-scrollbar {
+            width: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #27272A;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#3a3939",
+                        "on-primary": "#3f008e",
+                        "surface-tint": "#d2bbff",
+                        "outline-variant": "#4a4455",
+                        "secondary": "#bcff5f",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "primary-fixed": "#eaddff",
+                        "error": "#ffb4ab",
+                        "on-surface-variant": "#ccc3d8",
+                        "on-tertiary": "#68000f",
+                        "tertiary-fixed": "#ffdad8",
+                        "secondary-container": "#95e400",
+                        "tertiary": "#ffb3b0",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#410006",
+                        "on-primary-fixed": "#25005a",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#d2bbff",
+                        "tertiary-fixed-dim": "#ffb3b0",
+                        "on-tertiary-container": "#ffdfdd",
+                        "surface-variant": "#353534",
+                        "surface": "#131313",
+                        "surface-container": "#201f1f",
+                        "on-primary-container": "#ede0ff",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#314f00",
+                        "surface-dim": "#131313",
+                        "secondary-fixed-dim": "#8fdb00",
+                        "inverse-primary": "#732ee4",
+                        "on-secondary": "#203600",
+                        "on-secondary-container": "#3d6200",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#8c1520",
+                        "surface-container-highest": "#353534",
+                        "on-background": "#e5e2e1",
+                        "surface-container-high": "#2a2a2a",
+                        "on-secondary-fixed": "#112000",
+                        "primary-fixed-dim": "#d2bbff",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary-fixed": "#a8f928",
+                        "on-error": "#690005",
+                        "primary-container": "#7c3aed",
+                        "background": "#131313",
+                        "tertiary-container": "#b9383c",
+                        "outline": "#958da1",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-on-surface": "#313030"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "3xl": "2rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "32px",
+                        "md": "24px",
+                        "base": "8px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "xl": "48px",
+                        "gutter": "16px",
+                        "container-margin": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Sora"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Space Grotesk"],
+                        "headline-sm": ["Sora"],
+                        "headline-md": ["Sora"],
+                        "stat-number": ["Sora"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-sm": ["20px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "headline-md-mobile": ["22px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "stat-number": ["28px", {"lineHeight": "1", "fontWeight": "800"}],
+                        "body-lg": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-x-hidden">
+<!-- Top Navigation (Shell Implementation) -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md px-container-margin py-sm flex justify-between items-center w-full">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high tap-active">
+<span class="material-symbols-outlined text-on-surface">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm text-primary tracking-tight">Hoy toca dar la talla.</h1>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20">
+<img class="w-full h-full object-cover" data-alt="A profile picture of a young athlete with focused expression, high-contrast studio lighting with subtle violet rim light, sharp detail, professional social gaming UI style, deep blacks and vibrant primary colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDUtf8MHQWacmRbQIAurBVF0uvBAEb0JHa0wfIe7kQxo0END7cR1zkrEwF4Ski7NOUGkD6ONdVroTFdANawrFcZJVI3ehIEJXW-auC6Emq_5Mj1wgvNpGO_OaDRqGCqr18zfU5HliP1kGelBdGDejCL5rUn8P6q16GUxQHFk04L7l9jPJ9MxGTzUFRF1q9f1C4V3ATj50zXSAjy_qxERKwV127xU2F2VYQ9jfWqJecWlO1YjX9hQxOhg"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-24 pb-32 px-container-margin max-w-lg mx-auto w-full">
+<!-- Header Section -->
+<div class="mb-md">
+<div class="flex items-center justify-between mb-xs">
+<span class="font-label-caps text-label-caps text-primary tracking-widest">VERIFICACIÓN</span>
+<div class="flex items-center gap-xs bg-secondary/10 px-sm py-xs rounded-full border border-secondary/20">
+<span class="material-symbols-outlined text-secondary text-lg" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="font-stat-number text-lg text-secondary">+10 PT</span>
+</div>
+</div>
+<h2 class="font-headline-md-mobile text-headline-md-mobile text-on-surface">Sube tu prueba</h2>
+<p class="text-on-surface-variant text-body-md mt-xs">Asegúrate de que el resultado sea bien visible para que tus círculos puedan validarlo.</p>
+</div>
+<!-- Photo Preview Area -->
+<div class="relative w-full aspect-[3/4] rounded-3xl overflow-hidden bg-surface-container border border-outline-variant/30 mb-md shadow-2xl">
+<img class="w-full h-full object-contain" data-alt="A crisp, close-up photograph of a digital fitness watch showing a completed workout with 10,000 steps and heart rate data, resting on a sweaty gym towel. The lighting is dramatic and cinematic, emphasizing textures with a cyan and violet neon atmospheric glow, high energy gaming aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCk6DV_EfKIeySWSuYL642vqp-85SD4gfAHH-Mmylai4v8TuZdqSeeaTzO3ftiXuOblzFojxO1KzHb9Pc6O6J6_b-wNTGyBYrA_GG7GjjoBVH9k_kUco50nRoiECVDxWEdGqfaISTUjYgQUuh0gT30cWL_sR2lvn7LDcLySkicB03suYcwS4XOBsGXmZM-grBAdZbFbhACwxKTDgAImnMi7vqiEFHYc8V8eo9S9x3kgSU1Yqo6p1DcsEQ"/>
+<!-- Retake Button Overlay -->
+<button class="absolute top-4 right-4 bg-surface/60 backdrop-blur-md p-3 rounded-2xl border border-white/10 text-on-surface tap-active">
+<span class="material-symbols-outlined">flip_camera_ios</span>
+</button>
+<!-- Bottom Gradient Overlay for readability if needed -->
+<div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background/80 to-transparent pointer-events-none"></div>
+</div>
+<!-- Commentary Input -->
+<div class="space-y-sm mb-lg">
+<div class="flex justify-between items-center px-1">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase" for="comment">Comentario opcional</label>
+<span class="text-[10px] font-label-caps text-outline" id="char-count">0/140</span>
+</div>
+<div class="relative">
+<textarea class="w-full bg-surface-container border-2 border-outline-variant/30 rounded-2xl p-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:ring-0 transition-all resize-none font-body-md" id="comment" maxlength="140" placeholder="¿Cómo te has sentido hoy?" rows="3"></textarea>
+<div class="absolute bottom-3 right-3 text-primary/40">
+<span class="material-symbols-outlined text-xl">edit_note</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Fixed Bottom Action Area -->
+<div class="fixed bottom-0 left-0 right-0 glass-panel border-t border-outline-variant/20 px-container-margin pt-md pb-10 z-50">
+<div class="max-w-lg mx-auto w-full flex flex-col gap-sm">
+<button class="w-full h-14 bg-secondary text-on-secondary font-headline-sm flex items-center justify-center gap-sm rounded-2xl neon-glow tap-active transition-all group" id="confirm-btn" onclick="simulateUpload()">
+<span class="confirm-text">Confirmar Hecho</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">send</span>
+</button>
+<p class="text-center text-[10px] font-label-caps text-on-surface-variant uppercase tracking-tighter">Tu círculo recibirá una notificación inmediata</p>
+</div>
+</div>
+<!-- Success Overlay (Hidden by default) -->
+<div class="fixed inset-0 z-[100] bg-background/95 flex flex-col items-center justify-center p-xl opacity-0 pointer-events-none transition-opacity duration-500" id="success-modal">
+<div class="relative mb-lg">
+<div class="absolute inset-0 bg-secondary blur-3xl opacity-20 animate-pulse"></div>
+<div class="w-32 h-32 rounded-full border-4 border-secondary flex items-center justify-center relative">
+<span class="material-symbols-outlined text-6xl text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-center mb-sm">¡Objetivo Cumplido!</h3>
+<p class="text-on-surface-variant text-center text-body-lg mb-xl">Has sumado +10 puntos a tu ranking semanal.</p>
+<button class="bg-surface-container-high text-on-surface px-xl py-md rounded-2xl font-label-caps tracking-widest hover:bg-surface-bright transition-colors" onclick="window.location.reload()">VOLVER AL INICIO</button>
+</div>
+<script>
+        const textarea = document.getElementById('comment');
+        const charCount = document.getElementById('char-count');
+        const confirmBtn = document.getElementById('confirm-btn');
+        const successModal = document.getElementById('success-modal');
+
+        textarea.addEventListener('input', (e) => {
+            const length = e.target.value.length;
+            charCount.textContent = `${length}/140`;
+            if(length > 120) {
+                charCount.classList.add('text-primary');
+            } else {
+                charCount.classList.remove('text-primary');
+            }
+        });
+
+        function simulateUpload() {
+            // Visual feedback on button
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = `
+                <svg class="animate-spin h-6 w-6 text-on-secondary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Subiendo...</span>
+            `;
+            
+            // Artificial delay to simulate upload
+            setTimeout(() => {
+                successModal.classList.remove('opacity-0', 'pointer-events-none');
+                successModal.classList.add('opacity-100');
+            }, 1800);
+        }
+
+        // Add subtle parallax to photo on mouse move (desktop) or tilt (mobile logic placeholder)
+        const photoContainer = document.querySelector('.aspect-\\[3\\/4\\]');
+        document.addEventListener('mousemove', (e) => {
+            if (window.innerWidth > 768) {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 50;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 50;
+                photoContainer.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            }
+        });
+    </script>
+</body></html>

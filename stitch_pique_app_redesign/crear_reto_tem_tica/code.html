@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&amp;family=Inter:wght@400;500&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#d2bbff",
+                    "primary": "#d2bbff",
+                    "primary-fixed-dim": "#d2bbff",
+                    "on-secondary-fixed": "#112000",
+                    "secondary-fixed": "#a8f928",
+                    "inverse-surface": "#e5e2e1",
+                    "on-background": "#e5e2e1",
+                    "on-surface": "#e5e2e1",
+                    "error-container": "#93000a",
+                    "on-error-container": "#ffdad6",
+                    "primary-container": "#7c3aed",
+                    "tertiary-container": "#b9383c",
+                    "tertiary-fixed-dim": "#ffb3b0",
+                    "secondary-fixed-dim": "#8fdb00",
+                    "on-tertiary-fixed": "#410006",
+                    "surface": "#131313",
+                    "inverse-primary": "#732ee4",
+                    "surface-bright": "#3a3939",
+                    "primary-fixed": "#eaddff",
+                    "surface-dim": "#131313",
+                    "surface-container": "#201f1f",
+                    "on-primary": "#3f008e",
+                    "on-primary-fixed-variant": "#5a00c6",
+                    "inverse-on-surface": "#313030",
+                    "outline": "#958da1",
+                    "on-tertiary-fixed-variant": "#8c1520",
+                    "secondary-container": "#95e400",
+                    "surface-container-low": "#1c1b1b",
+                    "surface-container-high": "#2a2a2a",
+                    "error": "#ffb4ab",
+                    "on-tertiary": "#68000f",
+                    "tertiary": "#ffb3b0",
+                    "secondary": "#bcff5f",
+                    "surface-variant": "#353534",
+                    "on-surface-variant": "#ccc3d8",
+                    "on-secondary-container": "#3d6200",
+                    "on-error": "#690005",
+                    "on-tertiary-container": "#ffdfdd",
+                    "background": "#131313",
+                    "surface-container-lowest": "#0e0e0e",
+                    "tertiary-fixed": "#ffdad8",
+                    "on-secondary": "#203600",
+                    "outline-variant": "#4a4455",
+                    "on-primary-fixed": "#25005a",
+                    "surface-container-highest": "#353534",
+                    "on-secondary-fixed-variant": "#314f00",
+                    "on-primary-container": "#ede0ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "2xl": "24px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "12px",
+                    "lg": "32px",
+                    "md": "24px",
+                    "xs": "4px",
+                    "gutter": "16px",
+                    "container-margin": "20px",
+                    "xl": "48px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Sora"],
+                    "stat-number": ["Sora"],
+                    "headline-lg": ["Sora"],
+                    "headline-sm": ["Sora"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-caps": ["Space Grotesk"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "headline-md-mobile": ["20px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "stat-number": ["28px", {"lineHeight": "1", "fontWeight": "800"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-sm": ["20px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .bento-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bento-card:active {
+            transform: scale(0.96);
+        }
+        .selected-card {
+            border: 2px solid #d2bbff;
+            background-color: rgba(210, 187, 255, 0.1);
+            box-shadow: 0 0 20px rgba(210, 187, 255, 0.15);
+        }
+        .glass-effect {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-surface antialiased">
+<!-- Top Progress Bar Container -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md px-container-margin pt-sm pb-xs">
+<div class="max-w-md mx-auto">
+<div class="flex justify-between items-center mb-xs">
+<span class="font-label-caps text-label-caps text-outline">PASO 1 DE 4</span>
+<span class="font-label-caps text-label-caps text-primary">25%</span>
+</div>
+<div class="h-1 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-1/4 transition-all duration-700 ease-out"></div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="min-h-screen pt-24 pb-32 px-container-margin flex flex-col max-w-md mx-auto relative overflow-hidden">
+<!-- Background Atmospheric Element -->
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 blur-[100px] rounded-full"></div>
+<div class="absolute top-1/2 -left-32 w-64 h-64 bg-secondary/5 blur-[100px] rounded-full"></div>
+<!-- Headline -->
+<div class="mb-lg relative z-10">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-xs">¿A qué os vais a picar?</h1>
+<p class="font-body-md text-on-surface-variant">Elige una temática para empezar la competición con tus amigos.</p>
+</div>
+<!-- Grid Options (Asymmetric Bento Style) -->
+<div class="grid grid-cols-2 gap-gutter relative z-10 mb-lg">
+<!-- Option 1: Training -->
+<button class="bento-card group flex flex-col justify-between items-start p-md h-44 bg-surface-container rounded-2xl border border-outline-variant/30 text-left overflow-hidden relative" onclick="selectTheme(this)">
+<div class="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center text-primary mb-sm">
+<span class="material-symbols-outlined text-3xl">fitness_center</span>
+</div>
+<div>
+<span class="font-label-caps text-label-caps text-primary opacity-0 group-hover:opacity-100 transition-opacity mb-1 block">FITNESS</span>
+<h3 class="font-headline-sm text-headline-sm leading-tight">Entrenar sin excusas</h3>
+</div>
+<div class="absolute -bottom-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-8xl">fitness_center</span>
+</div>
+</button>
+<!-- Option 2: Reading -->
+<button class="bento-card group flex flex-col justify-between items-start p-md h-44 bg-surface-container rounded-2xl border border-outline-variant/30 text-left overflow-hidden relative" onclick="selectTheme(this)">
+<div class="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center text-secondary mb-sm">
+<span class="material-symbols-outlined text-3xl">menu_book</span>
+</div>
+<div>
+<span class="font-label-caps text-label-caps text-secondary opacity-0 group-hover:opacity-100 transition-opacity mb-1 block">MENTE</span>
+<h3 class="font-headline-sm text-headline-sm leading-tight">Leer cada día</h3>
+</div>
+<div class="absolute -bottom-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-8xl">menu_book</span>
+</div>
+</button>
+<!-- Option 3: Food (Spans 2 columns) -->
+<button class="bento-card group col-span-2 flex items-center justify-between p-md bg-surface-container rounded-2xl border border-outline-variant/30 text-left overflow-hidden relative" onclick="selectTheme(this)">
+<div class="flex items-center gap-md">
+<div class="w-14 h-14 rounded-xl bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-3xl">nutrition</span>
+</div>
+<div>
+<span class="font-label-caps text-label-caps text-tertiary opacity-80 mb-1 block">SALUD</span>
+<h3 class="font-headline-sm text-headline-sm leading-tight">Cero comida basura</h3>
+</div>
+</div>
+<div class="pr-sm opacity-20 group-hover:opacity-40 transition-all">
+<span class="material-symbols-outlined text-4xl">chevron_right</span>
+</div>
+<div class="absolute -bottom-6 -right-6 opacity-5 group-hover:opacity-10 transition-opacity rotate-12">
+<span class="material-symbols-outlined text-9xl">nutrition</span>
+</div>
+</button>
+<!-- Option 4: Free/Custom -->
+<button class="bento-card group col-span-2 flex items-center justify-between p-md bg-surface-container-high rounded-2xl border border-primary/20 text-left overflow-hidden relative" onclick="selectTheme(this)">
+<div class="flex items-center gap-md">
+<div class="w-14 h-14 rounded-xl bg-primary flex items-center justify-center text-on-primary shadow-[0_0_15px_rgba(210,187,255,0.4)]">
+<span class="material-symbols-outlined text-3xl icon-fill" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<div>
+<span class="font-label-caps text-label-caps text-primary opacity-80 mb-1 block">PERSONALIZADO</span>
+<h3 class="font-headline-sm text-headline-sm leading-tight">Reto libre</h3>
+</div>
+</div>
+<div class="pr-sm">
+<span class="font-body-md text-on-surface-variant italic">Crea el tuyo propio</span>
+</div>
+</button>
+</div>
+<!-- Bottom Action Bar -->
+<footer class="fixed bottom-0 left-0 right-0 p-container-margin z-50">
+<div class="max-w-md mx-auto flex flex-col gap-sm">
+<button class="w-full h-14 bg-primary text-on-primary font-headline-sm rounded-2xl flex items-center justify-center gap-base transition-all active:scale-95 shadow-lg shadow-primary/20 disabled:opacity-50 disabled:grayscale" disabled="" id="nextBtn">
+                    Siguiente
+                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</footer>
+</main>
+<script>
+        function selectTheme(element) {
+            // Remove selection from all cards
+            document.querySelectorAll('.bento-card').forEach(card => {
+                card.classList.remove('selected-card');
+                card.classList.add('bg-surface-container');
+                card.classList.remove('bg-surface-container-low');
+            });
+
+            // Add selection to clicked card
+            element.classList.add('selected-card');
+            element.classList.remove('bg-surface-container');
+            
+            // Enable next button
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = false;
+            
+            // Haptic feedback simulation
+            if (window.navigator.vibrate) {
+                window.navigator.vibrate(10);
+            }
+        }
+
+        // Simple enter animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.bento-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 + (index * 100));
+            });
+        });
+    </script>
+</body></html>

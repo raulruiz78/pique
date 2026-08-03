@@ -1,8 +1,10 @@
 import { Avatar } from "@/components/avatar";
 import { ChallengeActions } from "@/components/challenge-actions";
+import { CategoryBadge, categoryMeta } from "@/components/challenge-category";
 import { EmptyState } from "@/components/empty-state";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { CalendarDays, Camera, ShieldCheck, Trophy } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 export default async function ChallengePage({
   params,
@@ -36,16 +38,16 @@ export default async function ChallengePage({
   );
   return (
     <main className="page">
-      <header>
+      <header style={{ marginBottom: 28 }}>
+        <CategoryBadge category={data.category} size={68} />
         <span className="pill pill-violet">
           {data.status.replaceAll("_", " ")}
         </span>
-        <h1 className="display" style={{ fontSize: 44, margin: "13px 0 8px" }}>
-          {data.title}
-        </h1>
+        <h1 className="display screen-title">{data.title}</h1>
         <p className="muted" style={{ lineHeight: 1.5 }}>
           {data.description}
         </p>
+        <span className="eyebrow">{categoryMeta(data.category).label}</span>
       </header>
       {data.status === "PENDING_ACCEPTANCE" &&
         self?.acceptance === "PENDING" && (
@@ -64,23 +66,29 @@ export default async function ChallengePage({
             <ChallengeActions challengeId={challengeId} />
           </div>
         )}
-      <section className="card" style={{ padding: 20, margin: "22px 0" }}>
-        <div style={{ display: "grid", gap: 16 }}>
+      <section className="metric-grid" style={{ margin: "22px 0" }}>
+        <div className="stitch-card metric-card">
           <Row
             Icon={CalendarDays}
             label="Fechas"
             value={`${new Date(data.start_at).toLocaleDateString("es")} — ${new Date(data.end_at).toLocaleDateString("es")}`}
           />
+        </div>
+        <div className="stitch-card metric-card">
           <Row
             Icon={Trophy}
             label="Puntos"
             value={`${data.goals[0]?.base_points ?? 0} por check-in`}
           />
+        </div>
+        <div className="stitch-card metric-card">
           <Row
             Icon={Camera}
             label="Prueba"
             value={data.evidence_required ? "Foto privada" : "No obligatoria"}
           />
+        </div>
+        <div className="stitch-card metric-card">
           <Row
             Icon={ShieldCheck}
             label="Validación"
@@ -93,7 +101,7 @@ export default async function ChallengePage({
         </div>
       </section>
       <h2>Marcador</h2>
-      <div className="card" style={{ padding: "5px 18px" }}>
+      <div className="stitch-card" style={{ padding: "5px 18px" }}>
         {[...data.challenge_participants]
           .sort((a, b) => b.score - a.score)
           .map((participant, index) => (
@@ -136,7 +144,7 @@ export default async function ChallengePage({
           ))}
       </div>
       <h2 style={{ marginTop: 28 }}>Reglas aceptadas</h2>
-      <div className="card" style={{ padding: 20 }}>
+      <div className="stitch-card" style={{ padding: 24 }}>
         <p style={{ whiteSpace: "pre-wrap", lineHeight: 1.55, margin: 0 }}>
           {data.rules ||
             "Cumplir el objetivo dentro de su ventana y aportar la evidencia acordada."}
@@ -146,8 +154,12 @@ export default async function ChallengePage({
         <>
           <h2 style={{ marginTop: 28 }}>Lo que hay en juego</h2>
           <div
-            className="card"
-            style={{ padding: 20, borderLeft: "5px solid var(--coral)" }}
+            className="stitch-card"
+            style={{
+              padding: 24,
+              border: "1px solid #813b3b",
+              background: "#341a1c",
+            }}
           >
             <b>{data.penalties[0].description}</b>
             <p className="muted" style={{ margin: "7px 0 0", fontSize: 13 }}>
@@ -155,6 +167,15 @@ export default async function ChallengePage({
             </p>
           </div>
         </>
+      )}
+      {data.status === "ACTIVE" && (
+        <Link
+          href="/hoy"
+          className="button button-primary"
+          style={{ width: "100%", marginTop: 20 }}
+        >
+          <Camera size={19} /> Subir evidencia
+        </Link>
       )}
     </main>
   );
@@ -169,12 +190,23 @@ function Row({
   value: string;
 }) {
   return (
-    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-      <Icon size={19} color="var(--violet)" />
-      <span className="muted" style={{ width: 80, fontSize: 13 }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100%",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        gap: 18,
+      }}
+    >
+      <Icon size={25} color="var(--violet)" />
+      <span
+        className="muted"
+        style={{ fontSize: 12, textTransform: "uppercase", fontWeight: 800 }}
+      >
         {label}
       </span>
-      <b style={{ flex: 1, textAlign: "right" }}>{value}</b>
+      <b style={{ fontSize: 18 }}>{value}</b>
     </div>
   );
 }

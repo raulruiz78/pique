@@ -1,10 +1,22 @@
 import { EmptyState } from "@/components/empty-state";
+import { Avatar } from "@/components/avatar";
 import { MarkNotificationsRead } from "@/components/notification-list";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { Bell, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Bell, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 export default async function NotificationsPage() {
   const supabase = await createServerSupabase();
+  const {
+    data: { user },
+  } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
+  const { data: profile } =
+    supabase && user
+      ? await supabase
+          .from("profiles")
+          .select("display_name,avatar_path")
+          .eq("id", user.id)
+          .maybeSingle()
+      : { data: null };
   const { data } = supabase
     ? await supabase
         .from("notifications")
@@ -17,19 +29,51 @@ export default async function NotificationsPage() {
       <header
         style={{
           display: "flex",
-          alignItems: "end",
+          alignItems: "center",
           justifyContent: "space-between",
           gap: 12,
         }}
       >
-        <div>
-          <span className="eyebrow">Al día</span>
-          <h1 className="display" style={{ fontSize: 43, margin: "6px 0 0" }}>
+        <Link
+          href="/hoy"
+          className="button button-secondary"
+          aria-label="Volver"
+          style={{ width: 48, padding: 0 }}
+        >
+          <ArrowLeft />
+        </Link>
+        <div style={{ flex: 1 }}>
+          <h1
+            className="display"
+            style={{ color: "var(--violet)", fontSize: 30, margin: 0 }}
+          >
             Notificaciones
           </h1>
         </div>
-        <MarkNotificationsRead />
+        <Avatar
+          name={profile?.display_name ?? "Pique"}
+          size={46}
+          src={
+            profile?.avatar_path && user
+              ? `/api/v1/media/profiles/${user.id}`
+              : null
+          }
+        />
       </header>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginTop: 34,
+        }}
+      >
+        <div>
+          <span className="eyebrow">Hoy</span>
+          <h2 style={{ margin: "6px 0 0" }}>Actividad reciente</h2>
+        </div>
+        <MarkNotificationsRead />
+      </div>
       <div style={{ marginTop: 24 }}>
         {!data?.length ? (
           <EmptyState
@@ -37,17 +81,23 @@ export default async function NotificationsPage() {
             text="Aquí llegarán invitaciones, validaciones, rachas en riesgo y finales de reto."
           />
         ) : (
-          <div className="card" style={{ padding: "5px 18px" }}>
-            {data.map((item, index) => (
+          <div style={{ display: "grid", gap: 14 }}>
+            {data.map((item) => (
               <Link
                 href={(item.href || "/hoy") as "/hoy"}
                 key={item.id}
                 style={{
                   display: "flex",
                   gap: 13,
-                  padding: "16px 0",
-                  borderBottom:
-                    index < data.length - 1 ? "1px solid var(--line)" : 0,
+                  padding: "20px 18px 20px 22px",
+                  border: "1px solid var(--line)",
+                  borderLeft: item.read_at
+                    ? "1px solid var(--line)"
+                    : "4px solid var(--violet)",
+                  borderRadius: 24,
+                  background: item.read_at
+                    ? "var(--surface)"
+                    : "linear-gradient(135deg,rgb(210 187 255 / 8%),var(--surface))",
                   textDecoration: "none",
                   color: "var(--ink)",
                 }}
@@ -57,7 +107,7 @@ export default async function NotificationsPage() {
                 ) : (
                   <Bell color="var(--violet)" />
                 )}
-                <div>
+                <div style={{ flex: 1 }}>
                   <b>{item.title}</b>
                   <p
                     className="muted"
@@ -65,6 +115,17 @@ export default async function NotificationsPage() {
                   >
                     {item.body}
                   </p>
+                  <small
+                    className="eyebrow"
+                    style={{ display: "block", marginTop: 10 }}
+                  >
+                    {new Intl.DateTimeFormat("es", {
+                      day: "numeric",
+                      month: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }).format(new Date(item.created_at))}
+                  </small>
                 </div>
               </Link>
             ))}

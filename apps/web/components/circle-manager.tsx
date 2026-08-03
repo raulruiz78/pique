@@ -1,6 +1,7 @@
 "use client";
 import {
   ChevronRight,
+  Compass,
   Copy,
   LoaderCircle,
   Plus,
@@ -13,7 +14,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 export function CircleManager({
   circles,
+  pendingCount = 0,
 }: {
+  pendingCount?: number;
   circles: Array<{
     id: string;
     name: string;
@@ -29,6 +32,41 @@ export function CircleManager({
   const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [removedIds, setRemovedIds] = useState<string[]>([]);
+  const [exploring, setExploring] = useState(false);
+  const [publicCircles, setPublicCircles] = useState<
+    Array<{
+      id: string;
+      name: string;
+      description?: string | null;
+      member_count: number;
+      active_count: number;
+    }>
+  >([]);
+  const [joiningId, setJoiningId] = useState<string | null>(null);
+
+  async function explore() {
+    const next = !exploring;
+    setExploring(next);
+    if (!next || publicCircles.length) return;
+    const response = await fetch("/api/v1/circles/public");
+    const body = (await response.json()) as { data?: typeof publicCircles };
+    if (!response.ok)
+      return toast.error("No se pudieron cargar los círculos públicos.");
+    setPublicCircles(body.data ?? []);
+  }
+
+  async function join(circleId: string) {
+    setJoiningId(circleId);
+    const response = await fetch("/api/v1/circles/public", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ circleId }),
+    });
+    setJoiningId(null);
+    if (!response.ok) return toast.error("No se pudo completar la unión.");
+    toast.success("Solicitud enviada. El creador debe aprobarla.");
+    setPublicCircles((items) => items.filter((item) => item.id !== circleId));
+  }
   async function create() {
     if (name.length < 2) return;
     setLoading(true);
@@ -84,11 +122,53 @@ export function CircleManager({
   }
   return (
     <div style={{ display: "grid", gap: 11 }}>
+      {pendingCount > 0 && (
+        <button
+          className="stitch-card"
+          onClick={() => router.push("/notificaciones")}
+          style={{
+            padding: 22,
+            minHeight: 128,
+            display: "flex",
+            alignItems: "center",
+            gap: 16,
+            textAlign: "left",
+            color: "var(--ink)",
+            borderColor: "var(--lime)",
+            borderLeftWidth: 5,
+            cursor: "pointer",
+          }}
+        >
+          <span
+            style={{
+              width: 58,
+              height: 58,
+              borderRadius: 18,
+              display: "grid",
+              placeItems: "center",
+              color: "var(--lime)",
+              background: "rgb(188 255 95 / 12%)",
+            }}
+          >
+            <Users />
+          </span>
+          <span style={{ flex: 1 }}>
+            <b style={{ display: "block", fontSize: 20 }}>
+              Tienes {pendingCount}{" "}
+              {pendingCount === 1 ? "reto pendiente" : "retos pendientes"}
+            </b>
+            <small className="muted">
+              Revisa las invitaciones y entra en juego.
+            </small>
+          </span>
+          <ChevronRight />
+        </button>
+      )}
       {circles
         .filter((circle) => !removedIds.includes(circle.id))
         .map((circle) => (
           <article
-            className="card"
+            className="stitch-card"
             key={circle.id}
             role="link"
             tabIndex={0}
@@ -100,22 +180,22 @@ export function CircleManager({
                 router.push(`/circulos/${circle.id}`);
               }
             }}
-            style={{ padding: 14, cursor: "pointer" }}
+            style={{ padding: 24, cursor: "pointer", minHeight: 190 }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               {circle.imageSrc ? (
                 <Avatar
                   name={circle.name}
                   src={circle.imageSrc}
-                  size={44}
+                  size={68}
                   accent="var(--lime)"
                 />
               ) : (
                 <span
                   style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 16,
+                    width: 68,
+                    height: 68,
+                    borderRadius: 22,
                     display: "grid",
                     placeItems: "center",
                     background: "var(--lime)",
@@ -126,7 +206,7 @@ export function CircleManager({
                 </span>
               )}
               <div style={{ flex: 1, color: "inherit", minWidth: 0 }}>
-                <b>{circle.name}</b>
+                <b style={{ fontSize: 21 }}>{circle.name}</b>
                 <small
                   className="muted"
                   style={{ display: "block", marginTop: 3 }}
@@ -135,6 +215,9 @@ export function CircleManager({
                   retos en juego
                 </small>
               </div>
+              <span className="pill pill-violet">
+                {circle.activeCount ?? 0} retos activos
+              </span>
               <button
                 aria-label={`Invitar a ${circle.name}`}
                 className="button button-secondary"
@@ -165,14 +248,17 @@ export function CircleManager({
             {circle.description && (
               <p
                 className="muted"
-                style={{ margin: "12px 2px 2px", fontSize: 13 }}
+                style={{ margin: "22px 2px 2px", fontSize: 13 }}
               >
                 {circle.description}
               </p>
             )}
           </article>
         ))}
-      <div className="card" style={{ padding: 14, display: "flex", gap: 8 }}>
+      <div
+        className="stitch-card"
+        style={{ padding: 14, display: "flex", gap: 8 }}
+      >
         <input
           className="field"
           value={name}
@@ -189,6 +275,79 @@ export function CircleManager({
           {loading ? <LoaderCircle className="animate-spin" /> : <Plus />}
         </button>
       </div>
+      <button
+        className="stitch-card"
+        onClick={explore}
+        style={{
+          minHeight: 150,
+          padding: 24,
+          borderStyle: "dashed",
+          color: "var(--ink)",
+          cursor: "pointer",
+        }}
+      >
+        <Compass color="var(--violet)" />
+        <b style={{ display: "block", fontSize: 20, marginTop: 12 }}>
+          ¿Buscas motivación?
+        </b>
+        <span className="muted">
+          Explora círculos públicos y únete a la comunidad.
+        </span>
+      </button>
+      {exploring && (
+        <section style={{ display: "grid", gap: 10 }}>
+          <span className="eyebrow">Explorar círculos</span>
+          {publicCircles.length === 0 ? (
+            <p className="muted">
+              No hay círculos públicos disponibles ahora mismo.
+            </p>
+          ) : (
+            publicCircles.map((circle) => (
+              <article
+                key={circle.id}
+                className="stitch-card"
+                style={{
+                  padding: 18,
+                  display: "flex",
+                  gap: 12,
+                  alignItems: "center",
+                }}
+              >
+                <span
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 16,
+                    display: "grid",
+                    placeItems: "center",
+                    background: "rgb(188 255 95 / 12%)",
+                  }}
+                >
+                  <Users />
+                </span>
+                <div style={{ flex: 1 }}>
+                  <b>{circle.name}</b>
+                  <small className="muted" style={{ display: "block" }}>
+                    {circle.member_count} miembros · {circle.active_count} retos
+                  </small>
+                </div>
+                <button
+                  className="button button-primary"
+                  disabled={joiningId === circle.id}
+                  onClick={() => join(circle.id)}
+                  style={{ minHeight: 44, paddingInline: 14 }}
+                >
+                  {joiningId === circle.id ? (
+                    <LoaderCircle className="animate-spin" />
+                  ) : (
+                    "Unirme"
+                  )}
+                </button>
+              </article>
+            ))
+          )}
+        </section>
+      )}
     </div>
   );
 }

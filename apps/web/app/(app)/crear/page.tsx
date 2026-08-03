@@ -5,14 +5,17 @@ export default function CreatePage() {
   end.setDate(end.getDate() + 30);
   return (
     <main className="page">
-      <header>
-        <span className="eyebrow">Nuevo desafío</span>
-        <h1 className="display" style={{ fontSize: 44, margin: "6px 0 8px" }}>
-          Enciende el pique.
-        </h1>
-        <p className="muted" style={{ margin: 0 }}>
-          En cuatro pasos. Reglas claras desde el principio.
-        </p>
+      <header style={{ marginBottom: 34 }}>
+        <b
+          className="display"
+          style={{
+            color: "var(--violet)",
+            fontSize: 24,
+            letterSpacing: "0.02em",
+          }}
+        >
+          PIQUE
+        </b>
       </header>
       <ChallengeWizard
         startDate={start.toISOString().slice(0, 10)}

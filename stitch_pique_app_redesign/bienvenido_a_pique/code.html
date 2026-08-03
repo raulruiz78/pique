@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pique - Enciende el pique</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&amp;family=Inter:wght@400;500&amp;family=Space+Grotesk:wght@700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&family=Inter:wght@400;500&family=Space+Grotesk:wght@700&display=swap');
+
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(26, 26, 30, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(39, 39, 42, 0.5);
+        }
+
+        .floating-label-group {
+            position: relative;
+        }
+
+        .floating-label-group input:focus ~ label,
+        .floating-label-group input:not(:placeholder-shown) ~ label {
+            transform: translateY(-24px) scale(0.85);
+            color: #d2bbff;
+        }
+
+        .floating-label-group label {
+            position: absolute;
+            left: 16px;
+            top: 16px;
+            transition: all 0.2s ease;
+            pointer-events: none;
+            color: #71717A;
+        }
+
+        .primary-glow {
+            box-shadow: 0 0 20px rgba(210, 187, 255, 0.3);
+        }
+
+        .primary-glow:hover {
+            box-shadow: 0 0 35px rgba(210, 187, 255, 0.5);
+            transform: scale(1.02);
+        }
+
+        .cyber-gradient {
+            background: linear-gradient(135deg, #d2bbff 0%, #7c3aed 100%);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.9; }
+        }
+
+        .animate-pulse-slow {
+            animation: pulse-subtle 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#3a3939",
+                        "on-primary": "#3f008e",
+                        "surface-tint": "#d2bbff",
+                        "outline-variant": "#4a4455",
+                        "secondary": "#bcff5f",
+                        "primary": "#d2bbff",
+                        "surface": "#131313",
+                        "surface-container": "#201f1f",
+                        "primary-container": "#7c3aed",
+                        "background": "#131313",
+                        "outline": "#958da1",
+                        "on-surface": "#e5e2e1",
+                        "on-surface-variant": "#ccc3d8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "24px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "32px",
+                        "md": "24px",
+                        "base": "8px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "xl": "48px",
+                        "gutter": "16px",
+                        "container-margin": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Sora"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Space Grotesk"],
+                        "headline-sm": ["Sora"],
+                        "headline-md": ["Sora"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-sm": ["20px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background min-h-screen flex flex-col items-center justify-center p-gutter">
+<!-- Ambient Background Element -->
+<div class="fixed inset-0 z-0 pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-primary-container opacity-10 blur-[120px] rounded-full animate-pulse-slow"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-secondary opacity-5 blur-[120px] rounded-full animate-pulse-slow"></div>
+</div>
+<!-- Main Content Shell -->
+<main class="relative z-10 w-full max-w-[420px] flex flex-col items-center">
+<!-- Logo Section -->
+<div class="mb-xl flex flex-col items-center gap-base">
+<div class="w-16 h-16 cyber-gradient rounded-2xl flex items-center justify-center primary-glow rotate-3 hover:rotate-0 transition-transform duration-500">
+<span class="material-symbols-outlined text-on-primary text-4xl" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<h1 class="font-headline-sm text-headline-sm text-primary tracking-tighter mt-sm">PIQUE</h1>
+</div>
+<!-- Dynamic Content (Login/Register) -->
+<div class="w-full" id="auth-container">
+<!-- Welcome Header -->
+<div class="text-center mb-lg">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface mb-xs" id="auth-title">Enciende el pique.</h2>
+<p class="font-body-md text-on-surface-variant" id="auth-subtitle">Únete a la competición social definitiva.</p>
+</div>
+<!-- Form -->
+<form class="space-y-md" id="auth-form" onsubmit="event.preventDefault();">
+<!-- User Field (Dynamic for Signup) -->
+<div class="floating-label-group hidden opacity-0 transition-all duration-300" id="field-name">
+<input class="w-full h-14 bg-surface-container border border-outline-variant/30 rounded-2xl px-md pt-base text-on-surface focus:outline-none focus:border-primary transition-colors font-body-md" id="name" placeholder=" " type="text"/>
+<label class="font-label-caps text-label-caps" for="name">NOMBRE COMPLETO</label>
+</div>
+<!-- Email Field -->
+<div class="floating-label-group">
+<input class="w-full h-14 bg-surface-container border border-outline-variant/30 rounded-2xl px-md pt-base text-on-surface focus:outline-none focus:border-primary transition-colors font-body-md" id="email" placeholder=" " type="email"/>
+<label class="font-label-caps text-label-caps" for="email">EMAIL</label>
+</div>
+<!-- Password Field -->
+<div class="floating-label-group">
+<input class="w-full h-14 bg-surface-container border border-outline-variant/30 rounded-2xl px-md pt-base text-on-surface focus:outline-none focus:border-primary transition-colors font-body-md" id="password" placeholder=" " type="password"/>
+<label class="font-label-caps text-label-caps" for="password">CONTRASEÑA</label>
+</div>
+<!-- Action Button -->
+<button class="w-full h-14 cyber-gradient text-on-primary font-headline-sm text-headline-sm rounded-2xl primary-glow active:scale-95 transition-all duration-200 mt-base" type="submit">
+<span id="submit-text">Empezar</span>
+</button>
+</form>
+<!-- Divider -->
+<div class="flex items-center gap-md my-xl">
+<div class="flex-1 h-[1px] bg-outline-variant/30"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">O CONTINÚA CON</span>
+<div class="flex-1 h-[1px] bg-outline-variant/30"></div>
+</div>
+<!-- Social Auth -->
+<div class="grid grid-cols-2 gap-md">
+<button class="flex items-center justify-center gap-sm h-14 bg-surface-container border border-outline-variant/30 rounded-2xl hover:bg-surface-bright transition-colors group">
+<span class="material-symbols-outlined text-on-surface group-hover:scale-110 transition-transform">google</span>
+<span class="font-label-caps text-label-caps">GOOGLE</span>
+</button>
+<button class="flex items-center justify-center gap-sm h-14 bg-surface-container border border-outline-variant/30 rounded-2xl hover:bg-surface-bright transition-colors group">
+<span class="material-symbols-outlined text-on-surface group-hover:scale-110 transition-transform">file_download</span>
+<span class="font-label-caps text-label-caps">APPLE</span>
+</button>
+</div>
+<!-- Switcher -->
+<div class="mt-xl text-center">
+<p class="font-body-md text-on-surface-variant">
+<span id="switch-prompt">¿No tienes cuenta?</span>
+<button class="text-primary font-bold ml-xs hover:underline decoration-2 underline-offset-4" id="switch-auth-mode">
+                        Crear cuenta
+                    </button>
+</p>
+</div>
+</div>
+<!-- Footer Visual Hint -->
+<div class="mt-xl text-center opacity-40">
+<p class="font-label-caps text-[10px] tracking-widest text-on-surface-variant uppercase">Gaming Accountability Network • v2.0</p>
+</div>
+</main>
+<!-- Visual Polish: Top right avatar placeholder -->
+<div class="fixed top-container-margin right-container-margin z-50">
+<div class="w-10 h-10 rounded-full border-2 border-outline-variant/20 overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A close-up high-fashion portrait of a digital persona, glowing skin textures with faint violet light reflecting off high-tech eyewear. The background is a dark, cinematic studio setup with deep blacks and sharp highlights, maintaining a premium social gaming aesthetic. Ultra-detailed 8k render, minimalist but intense." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBX_6_o41P-wZAO1o7uEQld-ZP31mftfCnfiRfzDzicHEXt44T7T668ducXf74aLZS6SwbBZYNhKb_N8Km3fAV8Q9iimUhVpUtpyAR3qRXv1-NM631JLQ_vBSYIrxHYiJz2LYaBnn1wwYAVuqsNbt9PU7v7_vpH5mP1SM1eaqhc4oaOX39gLuRpw0ujk5aVdDtndF_lFnea28zbpqGo7LOrDUxsY7fRig7axnDt4dgOqRgNkAz4FNbJ1g"/>
+</div>
+</div>
+<script>
+        const switchBtn = document.getElementById('switch-auth-mode');
+        const authTitle = document.getElementById('auth-title');
+        const authSubtitle = document.getElementById('auth-subtitle');
+        const submitText = document.getElementById('submit-text');
+        const switchPrompt = document.getElementById('switch-prompt');
+        const nameField = document.getElementById('field-name');
+        
+        let isLogin = false; // Defaulting to register as requested for impact
+
+        switchBtn.addEventListener('click', () => {
+            isLogin = !isLogin;
+            
+            if (isLogin) {
+                authTitle.innerText = "Vuelve al juego.";
+                authSubtitle.innerText = "Tus rivales te están esperando.";
+                submitText.innerText = "Entrar";
+                switchPrompt.innerText = "¿Nuevo en el barrio?";
+                switchBtn.innerText = "Únete ahora";
+                nameField.classList.add('hidden', 'opacity-0');
+            } else {
+                authTitle.innerText = "Enciende el pique.";
+                authSubtitle.innerText = "Únete a la competición social definitiva.";
+                submitText.innerText = "Empezar";
+                switchPrompt.innerText = "¿Ya tienes cuenta?";
+                switchBtn.innerText = "Iniciar sesión";
+                nameField.classList.remove('hidden');
+                setTimeout(() => nameField.classList.remove('opacity-0'), 10);
+            }
+        });
+
+        // Micro-interaction for inputs
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('scale-[1.01]');
+                input.parentElement.style.transition = 'transform 0.2s ease';
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('scale-[1.01]');
+            });
+        });
+    </script>
+</body></html>

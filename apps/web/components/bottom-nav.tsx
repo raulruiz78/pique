@@ -34,7 +34,7 @@ export function BottomNav() {
           className={`nav-item ${create ? "nav-create" : ""}`}
           data-active={pathname.startsWith(href)}
         >
-          <Icon size={create ? 27 : 21} strokeWidth={2.4} />
+          <Icon size={create ? 30 : 22} strokeWidth={2.35} />
           <span>{create ? "" : label}</span>
         </Link>
       ))}

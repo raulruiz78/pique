@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Puesta a Tono - Detalle del Círculo</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&family=Inter:wght@400;600&family=Space+Grotesk:wght@700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Sora:wght@100..900&family=Space+Grotesk:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .podium-gradient {
+            background: linear-gradient(180deg, rgba(188, 255, 95, 0.15) 0%, rgba(10, 10, 10, 0) 100%);
+        }
+        .glass-card {
+            background: rgba(26, 26, 30, 0.8);
+            backdrop-filter: blur(12px);
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-bright": "#3a3939",
+                        "on-primary": "#3f008e",
+                        "surface-tint": "#d2bbff",
+                        "outline-variant": "#4a4455",
+                        "secondary": "#bcff5f",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "primary-fixed": "#eaddff",
+                        "error": "#ffb4ab",
+                        "on-surface-variant": "#ccc3d8",
+                        "on-tertiary": "#68000f",
+                        "tertiary-fixed": "#ffdad8",
+                        "secondary-container": "#95e400",
+                        "tertiary": "#ffb3b0",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#410006",
+                        "on-primary-fixed": "#25005a",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#d2bbff",
+                        "tertiary-fixed-dim": "#ffb3b0",
+                        "on-tertiary-container": "#ffdfdd",
+                        "surface-variant": "#353534",
+                        "surface": "#131313",
+                        "surface-container": "#201f1f",
+                        "on-primary-container": "#ede0ff",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#314f00",
+                        "surface-dim": "#131313",
+                        "secondary-fixed-dim": "#8fdb00",
+                        "inverse-primary": "#732ee4",
+                        "on-secondary": "#203600",
+                        "on-secondary-container": "#3d6200",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#8c1520",
+                        "surface-container-highest": "#353534",
+                        "on-background": "#e5e2e1",
+                        "surface-container-high": "#2a2a2a",
+                        "on-secondary-fixed": "#112000",
+                        "primary-fixed-dim": "#d2bbff",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary-fixed": "#a8f928",
+                        "on-error": "#690005",
+                        "primary-container": "#7c3aed",
+                        "background": "#131313",
+                        "tertiary-container": "#b9383c",
+                        "outline": "#958da1",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-on-surface": "#313030"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "24": "24px",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "lg": "32px",
+                        "md": "24px",
+                        "base": "8px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "xl": "48px",
+                        "gutter": "16px",
+                        "container-margin": "20px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Sora"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Space Grotesk"],
+                        "headline-sm": ["Sora"],
+                        "headline-md": ["Sora"],
+                        "stat-number": ["Sora"],
+                        "body-lg": ["Inter"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-sm": ["20px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "stat-number": ["28px", {"lineHeight": "1", "fontWeight": "800"}],
+                        "body-lg": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="fixed top-0 z-50 w-full bg-background/90 backdrop-blur-md flex justify-between items-center px-container-margin py-sm">
+<div class="flex items-center gap-sm">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-all" onclick="history.back()">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm text-primary">Puesta a Tono</h1>
+</div>
+<div class="flex items-center gap-base">
+<button class="material-symbols-outlined p-base text-primary hover:opacity-80 transition-transform active:scale-95" data-icon="share">share</button>
+<div class="w-10 h-10 rounded-full border-2 border-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A stylized portrait of a competitive athlete in a high-tech gaming environment, illuminated by neon violet and lime green lights. The background is a deep, obsidian black with sharp, cinematic lighting that emphasizes a modern, premium social gaming aesthetic. The atmosphere is energetic and focused." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzLE3Gg9S5IFywVbYatusunddiy0Ah3KAurDOfyxHnZ3MY2wXpeENyYdvFYLnIr1MypVZtUZtzUPrddRa9hTC1B05xxikeAMtHJC2t6NG9tkTAVyiyTIXa73ta6qMgPeBWlOserksE5D3C7GA96adrYegUiOHgZt59JjE8rk9ccQaGwFo46dRzckW7WLWZOWM3QhGk_Tg1grXAbofgSrOfhVzBPvghZxuvXUvwJH5eBoKr3Un4MPRNOw"/>
+</div>
+</div>
+</header>
+<main class="pt-24 px-container-margin space-y-lg">
+<!-- Podium Section -->
+<section class="podium-gradient rounded-24 pt-md pb-lg overflow-hidden">
+<div class="flex justify-center items-end gap-base h-64 px-sm relative">
+<!-- 2nd Place -->
+<div class="flex flex-col items-center flex-1">
+<div class="relative mb-base">
+<div class="w-16 h-16 rounded-full border-2 border-on-surface-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A high-resolution profile avatar of a male athlete with glowing blue accents on his sportswear, set against a dark, minimalist background with cyberpunk-inspired lighting. The aesthetic is sleek, sporty, and ultra-modern, using deep blacks and electric highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAny-7uXMKmJQ0j9NsjPcrTIXfy_6lUJUX_Yg6TPhatEKbEgz64QHEWvVvqPsOoKEUXPbUqcKLzE3WMGR-8xbmcGQIkMYE88hl3Zm8jstNeBq2Lg-EU_7Edppovf7Wf1fl-A6cPEyG7la60mkcMtVu0ERb9YXLQOqbRQJ_FMdE2KDp4zBPIlMdiriAwKoyauBel2odCu2GrbQWMS_P2olhLuDC_CkBo8mgRS28fasgZMzDT8rinR0ya7Q"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-surface-container text-on-surface text-[10px] px-2 rounded-full font-bold">#2</div>
+</div>
+<div class="bg-surface-container-high w-full h-24 rounded-t-xl flex flex-col items-center justify-center pt-2">
+<span class="font-label-caps text-[10px] text-on-surface-variant mb-1">M. ROSA</span>
+<span class="font-stat-number text-headline-sm text-on-surface">1,240</span>
+<span class="text-[10px] text-error font-bold">-40 PTS</span>
+</div>
+</div>
+<!-- 1st Place (Leader) -->
+<div class="flex flex-col items-center flex-1 z-10">
+<div class="relative mb-base animate-float">
+<div class="w-20 h-20 rounded-full border-4 border-secondary overflow-hidden shadow-[0_0_20px_rgba(188,255,95,0.4)]">
+<img class="w-full h-full object-cover" data-alt="A dynamic, close-up portrait of a female competitor with an intense, focused expression, wearing futuristic athletic gear. Her silhouette is outlined by a vibrant lime green glow, contrasting sharply with a dark, textured cyberpunk backdrop. The lighting is dramatic and energetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQBfOEbRmMuE6aaYZUlqZ2g9dfOZ0kzfIOXJYX6QxRw956cEjbDo8IYuw9fNytAsTbgDDNkuCPAj4_wGR-OHg5PL9U1bBWXC_LsTvRK2FajQzbUZRONraFW9ltHi-4B1eDIFiYd0UxvliDLQoLjGmZA60rA6EJ5YT2Z_NVK2_7txWCcPEH2rsk-E8AR58B9F5Bjy3akYTvN7cdQ7ZiT4uwVYiVTSdVxAreo3eomdrI8OfFUmlYry7uBw"/>
+</div>
+<div class="absolute -top-4 left-1/2 -translate-x-1/2">
+<span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-secondary text-background text-[10px] px-2 rounded-full font-bold">#1</div>
+</div>
+<div class="bg-secondary w-full h-32 rounded-t-xl flex flex-col items-center justify-center pt-2">
+<span class="font-label-caps text-[10px] text-background mb-1">TÚ (LÍDER)</span>
+<span class="font-stat-number text-headline-md text-background">1,280</span>
+<span class="text-[10px] text-background/60 font-bold">LÍDER ACTUAL</span>
+</div>
+</div>
+<!-- 3rd Place -->
+<div class="flex flex-col items-center flex-1">
+<div class="relative mb-base">
+<div class="w-16 h-16 rounded-full border-2 border-on-surface-variant/40 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A futuristic profile avatar of a person in a minimalist urban setting, with soft violet ambient lighting. The style is tech-forward and clean, adhering to a high-energy social gaming palette of deep blacks and neon accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoIhLDFMVFvgiA0_-gFApA6nBZOO6O4KLSwY6c_QgUMwoVAIwA09KbOI4QeHCWrLd3umh1cIOzskI7Tis5BGKAG9RrTQxU9EtOjBnbD3EvDyUJkiWN3FfKKELFqahQ5ZwK4Uu05nBOfzuBr6TlLwZDGpIWxx5HW5eNCFmG87G0F9sM2dHlf6M-o6Kimtk35oSbXOvS-jqwv1P34knwVNLIYzd07_gOoNoUF-PifY_8xNyhOdTGw1wljw"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-surface-container text-on-surface text-[10px] px-2 rounded-full font-bold">#3</div>
+</div>
+<div class="bg-surface-container-low w-full h-20 rounded-t-xl flex flex-col items-center justify-center pt-2">
+<span class="font-label-caps text-[10px] text-on-surface-variant mb-1">J. SMITH</span>
+<span class="font-stat-number text-headline-sm text-on-surface">1,150</span>
+<span class="text-[10px] text-error font-bold">-130 PTS</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Ranking List -->
+<section class="space-y-sm">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant px-xs">RESTO DEL GRUPO</h2>
+<div class="space-y-base">
+<!-- Ranking Item -->
+<div class="bg-surface-container rounded-24 p-base flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<span class="font-stat-number text-body-lg text-on-surface-variant w-6 text-center">4</span>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A small profile thumbnail of a smiling athlete, set against a dark studio background with subtle secondary color rim lighting. Modern minimalist aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBP3cHLPtka4rVrIvICR8tn89i9ZS-HY9niwoTQnKMlwQK7DAxV3xXNJP9uLxcSlDiMCRX47itkLtkhjfvFVqD-f1hOQHCO0LFMMtSySpxzHr0YaUhrLJAnz-d0jatN-UTHuW922f-lp9WA4ympvDpKHKfsSRsEvk6yPscpaLpTkeCMo-Mty8uTS2cI9tB-RDtXtoaLEknkNb7Xw1SfvHODII0ubGAQOvI5E-O_mHDHK1n9VOfdAhGZSw"/>
+</div>
+<div>
+<p class="font-body-md text-on-surface font-bold">Carlos Fit</p>
+<p class="text-[11px] text-on-surface-variant">A 210 pts del líder</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-stat-number text-body-lg text-on-surface">1,070</p>
+</div>
+</div>
+<div class="bg-surface-container rounded-24 p-base flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<span class="font-stat-number text-body-lg text-on-surface-variant w-6 text-center">5</span>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a male runner at dusk, highlighted by electric purple street lights. The style is cinematic and high-energy, matching a social gaming theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoomm-drzc_twlPZj-qpDA77WHqMJs8v47jg4B7FG-t327UgOvrFuVTAcyznw5t_15XQ69JqPR6the-Azm72vL1XlszBJjECLXL4v0DXSgYId8Q_qEPNlGmLx2cTJ781oTFOlVZ0MZVI299-WCWU7tdgPW9LbWDOPBHCBittGTVx8lb9MeNj5GF6srQrVtzTB3qDHhH144Cd6Q40EZjr7bpfci69ZP5-gMsGLdyd6-1aCrOnUH6A3sKA"/>
+</div>
+<div>
+<p class="font-body-md text-on-surface font-bold">Elena Runner</p>
+<p class="text-[11px] text-on-surface-variant">A 285 pts del líder</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-stat-number text-body-lg text-on-surface">995</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Active Challenges -->
+<section class="space-y-sm">
+<div class="flex justify-between items-center px-xs">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant">RETOS ACTIVOS</h2>
+<button class="text-primary font-label-caps text-[10px] hover:underline">VER TODOS</button>
+</div>
+<div class="grid grid-cols-1 gap-sm">
+<!-- Challenge Card -->
+<div class="glass-card border border-outline-variant/20 rounded-24 p-md relative overflow-hidden group hover:scale-[1.02] transition-all">
+<div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full -mr-12 -mt-12 group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-start justify-between mb-base">
+<div class="flex items-center gap-base">
+<div class="w-10 h-10 rounded-xl bg-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="bolt">bolt</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-[16px] text-on-surface">Sprint Semanal</h3>
+<p class="text-[11px] text-on-surface-variant">Finaliza en 2 días</p>
+</div>
+</div>
+<span class="bg-secondary-container/20 text-secondary px-3 py-1 rounded-full font-label-caps text-[10px]">100 PTS</span>
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between text-[11px] font-label-caps">
+<span class="text-on-surface-variant">PROGRESO</span>
+<span class="text-primary">85%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 85%"></div>
+</div>
+</div>
+</div>
+<div class="glass-card border border-outline-variant/20 rounded-24 p-md relative overflow-hidden group hover:scale-[1.02] transition-all">
+<div class="flex items-start justify-between mb-base">
+<div class="flex items-center gap-base">
+<div class="w-10 h-10 rounded-xl bg-on-tertiary-fixed-variant/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" data-icon="local_fire_department">local_fire_department</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-[16px] text-on-surface">Racha de Fuego</h3>
+<p class="text-[11px] text-on-surface-variant">5 días seguidos</p>
+</div>
+</div>
+<span class="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full font-label-caps text-[10px]">50 PTS</span>
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between text-[11px] font-label-caps">
+<span class="text-on-surface-variant">PROGRESO</span>
+<span class="text-on-surface">3/5 Días</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-container rounded-full" style="width: 60%"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Actions -->
+<section class="bg-surface-container-high rounded-24 p-md flex items-center justify-between border-2 border-dashed border-outline-variant/30">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full border-2 border-primary border-dashed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="person_add">person_add</span>
+</div>
+<div>
+<h4 class="font-body-lg text-on-surface font-bold">¡Invita a tu equipo!</h4>
+<p class="text-body-md text-on-surface-variant text-[12px]">Más gente, más competitividad.</p>
+</div>
+</div>
+<button class="bg-primary text-on-primary px-gutter py-2 rounded-xl font-label-caps active:scale-95 transition-transform">INVITAR</button>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-3xl bg-surface/80 dark:bg-surface/80 backdrop-blur-xl border-t border-outline-variant/20 shadow-lg flex justify-around items-center h-20 px-4 pb-safe">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-caps text-label-caps">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-caps text-label-caps">Calendario</span>
+</a>
+<button class="flex flex-col items-center justify-center text-primary active:scale-110 transition-all duration-300 -mt-8 bg-surface-container-highest p-4 rounded-full border-4 border-background">
+<span class="material-symbols-outlined text-4xl" data-icon="add_circle" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+</button>
+<a class="flex flex-col items-center justify-center text-primary font-bold transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label-caps text-label-caps">Círculos</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-caps text-label-caps">Perfil</span>
+</a>
+</nav>
+<script>
+        // Simple Micro-interaction for challenge cards
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousedown', () => card.style.transform = 'scale(0.98)');
+            card.addEventListener('mouseup', () => card.style.transform = 'scale(1.02)');
+            card.addEventListener('mouseleave', () => card.style.transform = 'scale(1)');
+        });
+    </script>
+</body></html>

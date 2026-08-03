@@ -27,6 +27,7 @@ export function CheckInButton({
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   async function submit() {
     if (evidenceRequired && !file)
       return toast.error("Este reto necesita una foto.");
@@ -126,21 +127,24 @@ export function CheckInButton({
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgb(16 12 24 / 60%)",
+            background: "rgb(0 0 0 / 78%)",
+            backdropFilter: "blur(10px)",
             zIndex: 80,
           }}
         />
         <Dialog.Content
           aria-describedby="check-description"
-          className="card"
+          className="stitch-card"
           style={{
             position: "fixed",
             zIndex: 81,
             left: "50%",
-            bottom: 12,
-            transform: "translateX(-50%)",
-            width: "min(calc(100% - 24px), 500px)",
-            padding: 24,
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "min(calc(100% - 20px), 520px)",
+            maxHeight: "calc(100dvh - 20px)",
+            overflowY: "auto",
+            padding: 26,
           }}
         >
           <div
@@ -151,12 +155,12 @@ export function CheckInButton({
             }}
           >
             <div>
-              <span className="eyebrow">Check-in</span>
+              <span className="eyebrow">Verificación</span>
               <Dialog.Title
                 className="display"
                 style={{ fontSize: 35, margin: "7px 0" }}
               >
-                {title}: hecho.
+                Sube tu prueba
               </Dialog.Title>
             </div>
             <Dialog.Close
@@ -172,26 +176,65 @@ export function CheckInButton({
             className="muted"
             style={{ lineHeight: 1.5 }}
           >
-            Deja una prueba rápida. La hora válida será la del servidor.
+            Asegúrate de que el resultado sea visible para que tu círculo pueda
+            validarlo.
           </Dialog.Description>
+          <span className="pill pill-violet">{title}</span>
           <div style={{ display: "grid", gap: 15, marginTop: 20 }}>
             <label>
               <span className="field-label">
                 Foto {evidenceRequired ? "obligatoria" : "opcional"}
               </span>
-              <span
-                className="button button-secondary"
-                style={{ width: "100%" }}
-              >
-                <Camera size={18} />
-                {file ? file.name : "Elegir foto"}
+              <span style={{ display: "block", position: "relative" }}>
+                {preview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    className="evidence-preview"
+                    src={preview}
+                    alt="Vista previa de la evidencia"
+                  />
+                ) : (
+                  <span
+                    className="stitch-card"
+                    style={{
+                      minHeight: 260,
+                      display: "grid",
+                      placeItems: "center",
+                      borderStyle: "dashed",
+                    }}
+                  >
+                    <span style={{ textAlign: "center" }}>
+                      <Camera size={38} />
+                      <b style={{ display: "block", marginTop: 12 }}>
+                        Toca para añadir la foto
+                      </b>
+                    </span>
+                  </span>
+                )}
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
                   capture="environment"
                   hidden
-                  onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+                  onChange={(event) => {
+                    const nextFile = event.target.files?.[0] ?? null;
+                    if (preview) URL.revokeObjectURL(preview);
+                    setFile(nextFile);
+                    setPreview(nextFile ? URL.createObjectURL(nextFile) : null);
+                  }}
                 />
+                <span
+                  className="button button-secondary"
+                  style={{
+                    position: "absolute",
+                    right: 14,
+                    top: 14,
+                    width: 48,
+                    padding: 0,
+                  }}
+                >
+                  <Camera size={19} />
+                </span>
               </span>
             </label>
             <label>
@@ -201,16 +244,17 @@ export function CheckInButton({
                 rows={3}
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
-                placeholder="Entreno terminado. Costó, pero salió."
+                maxLength={140}
+                placeholder="¿Cómo te has sentido hoy?"
               />
             </label>
             <button
-              className="button button-primary"
+              className="button button-lime"
               disabled={loading}
               onClick={submit}
             >
               {loading ? <LoaderCircle className="animate-spin" /> : <Check />}{" "}
-              Enviar check-in
+              Confirmar hecho
             </button>
           </div>
         </Dialog.Content>
