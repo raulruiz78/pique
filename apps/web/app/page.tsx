@@ -1,9 +1,13 @@
 import { ArrowRight, Camera, Check, Flame, Trophy } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LandingPage() {
   return (
-    <main style={{ minHeight: "100dvh", overflow: "hidden" }}>
+    <main
+      className="ambient-background"
+      style={{ minHeight: "100dvh", overflow: "hidden" }}
+    >
       <nav
         style={{
           maxWidth: 1080,
@@ -14,8 +18,11 @@ export default function LandingPage() {
           alignItems: "center",
         }}
       >
-        <div className="display" style={{ fontSize: 28 }}>
-          pi<span style={{ color: "var(--violet)" }}>que</span>.
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <Image src="/icon.svg" alt="" width={42} height={42} priority />
+          <div className="display brand-word" style={{ fontSize: 28 }}>
+            pi<span>que</span>.
+          </div>
         </div>
         <Link
           className="button button-secondary"
@@ -110,7 +117,7 @@ export default function LandingPage() {
               background: "var(--violet)",
               borderRadius: 22,
               padding: 20,
-              color: "white",
+              color: "#25005a",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between" }}>

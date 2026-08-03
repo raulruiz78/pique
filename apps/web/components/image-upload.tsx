@@ -130,7 +130,7 @@ export function ImageUpload({
             borderRadius: "50%",
             display: "grid",
             placeItems: "center",
-            color: "white",
+            color: "#25005a",
             background: "var(--violet)",
             border: "3px solid var(--canvas)",
           }}

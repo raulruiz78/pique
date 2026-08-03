@@ -33,6 +33,9 @@ export const profileSchema = z.object({
   displayName: z.string().trim().min(2).max(60),
   timezone: timezoneSchema,
   locale: z.enum(["es", "en"]).default("es"),
+  profileVisibility: z
+    .enum(["PRIVATE", "FRIENDS", "PUBLIC"])
+    .default("FRIENDS"),
 });
 
 export const createCircleSchema = z.object({
@@ -46,6 +49,16 @@ export const createChallengeSchema = z
     title: z.string().trim().min(3).max(80),
     description: z.string().trim().max(500).default(""),
     type: z.enum(["DAILY", "FREQUENCY", "CUMULATIVE", "ONE_VS_ONE", "GROUP"]),
+    category: z.enum([
+      "TRAINING",
+      "HEALTH",
+      "HOME",
+      "FOCUS",
+      "SOCIAL",
+      "CREATIVE",
+      "OUTDOORS",
+      "OTHER",
+    ]),
     startAt: z.iso.datetime(),
     endAt: z.iso.datetime(),
     timezone: timezoneSchema,

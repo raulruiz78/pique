@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Detalle del Reto - Hoy toca dar la talla</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&amp;family=Inter:wght@400;500&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary": "#3f008e",
+                    "outline-variant": "#4a4455",
+                    "on-secondary-fixed": "#112000",
+                    "surface-container-highest": "#353534",
+                    "on-primary-fixed-variant": "#5a00c6",
+                    "secondary": "#bcff5f",
+                    "on-error-container": "#ffdad6",
+                    "tertiary": "#ffb3b0",
+                    "on-error": "#690005",
+                    "secondary-container": "#95e400",
+                    "tertiary-fixed": "#ffdad8",
+                    "surface-variant": "#353534",
+                    "on-surface": "#e5e2e1",
+                    "inverse-on-surface": "#313030",
+                    "tertiary-container": "#b9383c",
+                    "on-secondary": "#203600",
+                    "outline": "#958da1",
+                    "surface-dim": "#131313",
+                    "tertiary-fixed-dim": "#ffb3b0",
+                    "on-primary-container": "#ede0ff",
+                    "on-tertiary-fixed-variant": "#8c1520",
+                    "surface-container-high": "#2a2a2a",
+                    "surface-container": "#201f1f",
+                    "surface-bright": "#3a3939",
+                    "on-primary-fixed": "#25005a",
+                    "surface-tint": "#d2bbff",
+                    "on-surface-variant": "#ccc3d8",
+                    "on-secondary-container": "#3d6200",
+                    "primary-fixed": "#eaddff",
+                    "on-tertiary": "#68000f",
+                    "primary-container": "#7c3aed",
+                    "surface-container-low": "#1c1b1b",
+                    "surface": "#131313",
+                    "on-tertiary-fixed": "#410006",
+                    "on-secondary-fixed-variant": "#314f00",
+                    "inverse-primary": "#732ee4",
+                    "surface-container-lowest": "#0e0e0e",
+                    "background": "#131313",
+                    "secondary-fixed": "#a8f928",
+                    "inverse-surface": "#e5e2e1",
+                    "error-container": "#93000a",
+                    "error": "#ffb4ab",
+                    "on-tertiary-container": "#ffdfdd",
+                    "secondary-fixed-dim": "#8fdb00",
+                    "on-background": "#e5e2e1",
+                    "primary-fixed-dim": "#d2bbff",
+                    "primary": "#d2bbff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "24": "24px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "sm": "12px",
+                    "lg": "32px",
+                    "container-margin": "20px",
+                    "xl": "48px",
+                    "xs": "4px",
+                    "gutter": "16px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Sora"],
+                    "headline-md": ["Sora"],
+                    "body-md": ["Inter"],
+                    "stat-number": ["Sora"],
+                    "body-lg": ["Inter"],
+                    "label-caps": ["Space Grotesk"],
+                    "headline-lg": ["Sora"]
+            },
+            "fontSize": {
+                    "headline-sm": ["20px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "stat-number": ["28px", {"lineHeight": "1", "fontWeight": "800"}],
+                    "body-lg": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        .bg-glass {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .challenge-header {
+            background-image: linear-gradient(to bottom, rgba(19, 19, 19, 0) 0%, rgba(19, 19, 19, 1) 100%), url('https://lh3.googleusercontent.com/aida-public/AB6AXuDySXfcwHIcSHJBMZEzGlUSDxdGBvMEKSDghVsqvGCS5ZMdeKneEoEPwiIZjbTxEdSKOx1OLjsLl-fm8-00RApdSXonFq8nSDwqzqA4QwH89iE7WEHHWRNydkZEAkOepYZ1mJ2Op0PdWnVUB0xMoMWJntNSd0zqVJz8QtkBkf1D2vtGpwlgcUOxVZNoPRbyALR7LhPXPqD2_xqkcbPE2ijZNJti3EsyzZHpVfbOkmb6zR58bW_ibJvtzX8SmMdsJE_wc3k');
+            background-size: cover;
+            background-position: center;
+        }
+        .scroll-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-md flex justify-between items-center px-container-margin py-sm w-full">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border-2 border-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A profile photograph of a modern user with a tech-savvy look, featuring soft cinematic lighting against a dark minimalist studio background. The style is clean and high-end, using a palette of deep charcoal and subtle electric violet accents that align with the social gaming app's premium aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlhFZzoXFwqIZ3gdTxlxC19hN1YolnHPYnw-Yih9GxAktZdQ4vbsBZWsFay0k_iu7FvV1lUEFuBhjLIaqdo_WpDGeqq6EaTP6ghZX1AWD0d6sTwGjNy5bLyW-onObac6gVwNxmt9ZH7KWaJGQyKwsTbx1nCS1Cdi-zVkMaXg7ZI5Mr3qaFHIJZ3Qe6W44syUnG-hfy3Ppk2Ckg4rqZort18g74qWwnlvx7GF-pwH6erfkKxlGUfyq9SA"/>
+</div>
+<span class="font-headline-sm text-headline-sm text-primary">Hoy toca dar la talla.</span>
+</div>
+<div class="flex items-center gap-sm">
+<button class="text-on-surface hover:opacity-80 transition-all active:scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<main class="w-full pt-16">
+<!-- Hero Section -->
+<section class="challenge-header w-full h-[40vh] flex flex-col justify-end px-container-margin pb-md relative">
+<div class="inline-flex items-center gap-2 bg-secondary/20 border border-secondary/30 px-3 py-1 rounded-full w-fit mb-sm">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-label-caps text-label-caps text-secondary uppercase">Reto Activo</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Entrenar sin excusas</h1>
+<p class="text-on-surface-variant font-body-md max-w-xs">Demuestra que el esfuerzo diario no se negocia. Solo los mejores llegan al final.</p>
+</section>
+<div class="px-container-margin space-y-md -mt-4 relative z-10">
+<!-- Technical Summary Bento -->
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container rounded-24 p-md flex flex-col justify-between aspect-square border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary text-3xl">calendar_month</span>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">DURACIÓN</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">2/8 — 1/9</p>
+</div>
+</div>
+<div class="bg-surface-container rounded-24 p-md flex flex-col justify-between aspect-square border border-outline-variant/10">
+<span class="material-symbols-outlined text-secondary text-3xl">workspace_premium</span>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">PUNTUACIÓN</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">20 pt <span class="text-xs font-normal">/check</span></p>
+</div>
+</div>
+<div class="bg-surface-container rounded-24 p-md flex flex-col justify-between aspect-square border border-outline-variant/10">
+<span class="material-symbols-outlined text-tertiary text-3xl">photo_camera</span>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">EVIDENCIA</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">Foto privada</p>
+</div>
+</div>
+<div class="bg-surface-container rounded-24 p-md flex flex-col justify-between aspect-square border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary text-3xl">verified_user</span>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">VALIDACIÓN</p>
+<p class="font-headline-sm text-headline-sm text-on-surface">Por el rival</p>
+</div>
+</div>
+</div>
+<!-- Scoreboard -->
+<section class="bg-surface-container rounded-24 p-md border border-outline-variant/10">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-md uppercase">Ranking del Reto</h3>
+<div class="space-y-sm">
+<!-- Leader #1 -->
+<div class="flex items-center justify-between p-sm bg-secondary/10 rounded-xl border border-secondary/20">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-12 h-12 rounded-full border-2 border-secondary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A high-quality portrait of a determined male athlete in his late 20s, showing focus and energy. The lighting is dramatic and moody, utilizing high-contrast shadows typical of a cyberpunk fitness setting. The background is a dark, sleek gym environment with neon green glow that matches the UI's secondary color." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXRpBYRMSc5urdgFtgTFlziXlyyd3YTUU0jnukmsYV65EQq4o1421_OEdaMf9rP_ehCeeC9_-WWQ8oZzj1P-i22XV0qZzXKsbf4ULVxvoAXAVcWnugV5ZhVEQEGXdprV2DxIFExMFIkBA3LBr3PJIY-L-QskLl1nx-Yh-eWUMIo2l4xnMsCEPlQdJdsYMW90RTaIlodWLXL-5Ozqx9kVJa9OPrflgu7xRsrMJ4ADGJNOn81DlXZVZ9yA"/>
+</div>
+<div class="absolute -top-2 -left-2 bg-secondary text-on-secondary w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs">1</div>
+</div>
+<div>
+<p class="font-bold text-on-surface">Raúl</p>
+<p class="text-xs text-secondary font-medium uppercase">Aceptado</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-stat-number text-stat-number text-secondary">40</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant">PUNTOS</p>
+</div>
+</div>
+<!-- Follower #2 -->
+<div class="flex items-center justify-between p-sm bg-surface-variant/20 rounded-xl border border-outline-variant/10">
+<div class="flex items-center gap-3">
+<div class="relative">
+<div class="w-12 h-12 rounded-full border-2 border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a youthful energetic individual, ready for action, captured in a clean minimalist style. The lighting is soft and flattering with cool blue and grey tones to differentiate from the winner. The background is a deep charcoal texture that maintains the app's overall high-end social gaming aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3AohtGSWkuoQQs3vvRbqsPQiN3D2Mn9vIulHHGg8MQT0wGbwHAgjWLfmpp-7sbRRiDQJEwIraK8Sw-pRW9xFomZvlN9vP55Jc9saStMSon4qoEvgIn_AIYgXTFvLikj1hSpm4T4ZcXbblmny2D18rQckciHMAELVo6KdIuxl9S5UzyjcesxK2xPI9LHn7jcYrHcSn7qF30f3rhTQ5lLFk3dmEe5JjqwKVRqjN5gwL7N3f2bOVkRi6-Q"/>
+</div>
+<div class="absolute -top-2 -left-2 bg-surface-variant text-on-surface w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs">2</div>
+</div>
+<div>
+<p class="font-bold text-on-surface">Test User</p>
+<p class="text-xs text-on-surface-variant font-medium uppercase">Aceptado</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-stat-number text-stat-number text-on-surface-variant opacity-60">0</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant">PUNTOS</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Rules -->
+<section class="bg-surface-container rounded-24 p-md border border-outline-variant/10">
+<div class="flex items-center gap-2 mb-sm">
+<span class="material-symbols-outlined text-on-surface-variant">gavel</span>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase">Reglas aceptadas</h3>
+</div>
+<p class="text-on-surface font-body-md leading-relaxed">
+                    Cumplir el objetivo dentro de su ventana y aportar la evidencia acordada. Cualquier retraso o falta de prueba anulará el check-in.
+                </p>
+</section>
+<!-- Consequence (El Pique) -->
+<section class="bg-tertiary-container/20 rounded-24 p-md border border-tertiary-container/40 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 opacity-10">
+<span class="material-symbols-outlined text-[120px] text-tertiary">restaurant</span>
+</div>
+<div class="flex items-center gap-2 mb-sm">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<h3 class="font-label-caps text-label-caps text-tertiary uppercase">Consecuencia: El Pique</h3>
+</div>
+<p class="text-on-surface font-headline-sm text-headline-sm relative z-10 italic">
+                    "El perdedor invita a cenar"
+                </p>
+<div class="mt-md pt-md border-t border-tertiary-container/20">
+<button class="w-full bg-primary-container text-on-primary-container font-headline-sm py-4 rounded-xl active:scale-95 transition-all shadow-lg shadow-primary-container/20">
+                        Subir Evidencia
+                    </button>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-t border-outline-variant/20 rounded-t-3xl shadow-lg h-20 px-4 pb-safe flex justify-around items-center">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-300" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-caps text-label-caps mt-1">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-300" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-caps text-label-caps mt-1">Calendario</span>
+</a>
+<button class="flex flex-col items-center justify-center text-primary scale-110 -mt-8 bg-surface rounded-full p-2 border-4 border-background transition-all duration-300 hover:scale-125">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+</button>
+<a class="flex flex-col items-center justify-center text-primary font-bold transition-all duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-label-caps text-label-caps mt-1">Círculos</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-300" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-label-caps mt-1">Perfil</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for score items
+        document.querySelectorAll('.bg-surface-container').forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'scale(0.98)';
+                card.style.transition = 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+            });
+            card.addEventListener('touchend', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

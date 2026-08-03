@@ -1,17 +1,34 @@
 import { EmptyState } from "@/components/empty-state";
-import { calendarQuery } from "@/lib/queries";
-import { CalendarDays, Check, Clock3 } from "lucide-react";
+import { Avatar } from "@/components/avatar";
+import { CategoryBadge } from "@/components/challenge-category";
+import { InteractiveMonth } from "@/components/interactive-month";
+import { calendarQuery, dashboardQuery } from "@/lib/queries";
+import {
+  Bell,
+  CalendarDays,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Clock3,
+  Flame,
+} from "lucide-react";
+import Link from "next/link";
 
 const DAYS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
 export default async function CalendarPage() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const weekStart = new Date(today);
-  const daysSinceMonday = (today.getDay() + 6) % 7;
-  weekStart.setDate(today.getDate() - daysSinceMonday);
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  const queryStart = new Date(monthStart);
   const to = new Date(today);
   to.setDate(to.getDate() + 30);
-  const rawItems = (await calendarQuery(today, to)) as unknown as Array<{
+  if (monthEnd > to) to.setTime(monthEnd.getTime());
+  const [calendarData, dashboard] = await Promise.all([
+    calendarQuery(queryStart, to),
+    dashboardQuery(),
+  ]);
+  const rawItems = calendarData as unknown as Array<{
     id: string;
     starts_at: string;
     closes_at: string;
@@ -22,7 +39,7 @@ export default async function CalendarPage() {
       recurrence?: string;
       base_points?: number;
     };
-    challenges: { title?: string };
+    challenges: { title?: string; category?: string };
   }>;
   const grouped = new Map<
     string,
@@ -46,74 +63,159 @@ export default async function CalendarPage() {
     total: items.length,
     done: items.every((item) => item.status === "APPROVED"),
   }));
-  const week = Array.from({ length: 7 }, (_, index) => {
-    const value = new Date(weekStart);
+  const gridStart = new Date(monthStart);
+  gridStart.setDate(gridStart.getDate() - ((monthStart.getDay() + 6) % 7));
+  const monthDays = Array.from({ length: 42 }, (_, index) => {
+    const value = new Date(gridStart);
     value.setDate(value.getDate() + index);
     return value;
   });
+  const dateKey = (value: Date) =>
+    `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
+  const doneDates = new Set(
+    items
+      .filter((item) => item.done)
+      .map((item) => dateKey(new Date(item.starts_at))),
+  );
+  const profile = dashboard?.profile as {
+    display_name?: string;
+    avatar_path?: string | null;
+    total_points?: number;
+    current_streak?: number;
+  } | null;
+  const upcomingItems = items
+    .filter((item) => new Date(item.starts_at) >= today)
+    .slice(0, 12);
+  const level = Math.floor((profile?.total_points ?? 0) / 500) + 1;
   return (
     <main className="page">
-      <header>
-        <span className="eyebrow">Tu ritmo</span>
-        <h1 className="display" style={{ fontSize: 44, margin: "6px 0 8px" }}>
-          Calendario
+      <header style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <Avatar
+          name={profile?.display_name ?? "Pique"}
+          size={48}
+          src={
+            profile?.avatar_path && dashboard?.user.id
+              ? `/api/v1/media/profiles/${dashboard.user.id}`
+              : null
+          }
+        />
+        <h1
+          className="display"
+          style={{ color: "var(--violet)", fontSize: 26, margin: 0, flex: 1 }}
+        >
+          Hoy toca dar la talla.
         </h1>
-        <p className="muted" style={{ margin: 0 }}>
-          Lo que hiciste y lo que viene. Sin sorpresas.
-        </p>
+        <Link
+          href="/notificaciones"
+          className="button button-secondary"
+          aria-label="Notificaciones"
+          style={{ width: 48, padding: 0 }}
+        >
+          <Bell />
+        </Link>
       </header>
-      <section
-        className="card"
-        style={{
-          margin: "26px 0",
-          padding: 12,
-          display: "grid",
-          gridTemplateColumns: "repeat(7,1fr)",
-          gap: 5,
-        }}
-      >
-        {week.map((day) => {
-          const today = day.toDateString() === new Date().toDateString();
-          return (
-            <div
-              key={day.toISOString()}
-              style={{
-                minHeight: 67,
-                borderRadius: 15,
-                padding: "10px 3px",
-                textAlign: "center",
-                background: today ? "var(--violet)" : "transparent",
-                color: today ? "white" : "var(--ink)",
-              }}
+      <section style={{ marginTop: 40 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "end",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <span className="field-label muted">Tu racha actual</span>
+            <strong
+              className="display"
+              style={{ color: "var(--lime)", fontSize: 38 }}
             >
-              <small style={{ display: "block", opacity: 0.65 }}>
-                {DAYS[day.getDay()]}
-              </small>
-              <strong style={{ display: "block", fontSize: 19, marginTop: 5 }}>
-                {day.getDate()}
-              </strong>
-              {items.some(
-                (item) =>
-                  new Date(item.starts_at).toDateString() ===
-                  day.toDateString(),
-              ) && (
-                <i
-                  style={{
-                    display: "block",
-                    width: 5,
-                    height: 5,
-                    borderRadius: 5,
-                    background: today ? "var(--lime)" : "var(--violet)",
-                    margin: "5px auto",
-                  }}
-                />
-              )}
-            </div>
-          );
-        })}
+              <Flame
+                size={28}
+                style={{ display: "inline", verticalAlign: -4 }}
+              />{" "}
+              {profile?.current_streak ?? 0} días
+            </strong>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <span className="field-label muted">Nivel</span>
+            <strong style={{ fontSize: 22 }}>NIVEL {level}</strong>
+          </div>
+        </div>
+        <div className="wizard-progress-track" style={{ marginTop: 16 }}>
+          <div
+            className="wizard-progress-fill"
+            style={{
+              width: `${((profile?.total_points ?? 0) % 500) / 5}%`,
+              background: "var(--lime)",
+            }}
+          />
+        </div>
+      </section>
+      <section
+        className="stitch-card"
+        style={{ margin: "28px 0 36px", padding: "24px 18px 28px" }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 26,
+          }}
+        >
+          <h2 style={{ margin: 0, textTransform: "capitalize" }}>
+            {today.toLocaleDateString("es-ES", {
+              month: "long",
+              year: "numeric",
+            })}
+          </h2>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              className="button button-secondary"
+              disabled
+              aria-label="Mes anterior"
+              style={{ width: 44, minHeight: 44, padding: 0 }}
+            >
+              <ChevronLeft />
+            </button>
+            <button
+              className="button button-secondary"
+              disabled
+              aria-label="Mes siguiente"
+              style={{ width: 44, minHeight: 44, padding: 0 }}
+            >
+              <ChevronRight />
+            </button>
+          </div>
+        </div>
+        <div className="month-grid" style={{ marginBottom: 12 }}>
+          {["L", "M", "X", "J", "V", "S", "D"].map((label) => (
+            <b key={label} className="muted" style={{ fontSize: 12 }}>
+              {label}
+            </b>
+          ))}
+        </div>
+        <InteractiveMonth
+          days={monthDays.map((day) => {
+            const key = dateKey(day);
+            return {
+              key,
+              day: day.getDate(),
+              outside: day.getMonth() !== today.getMonth(),
+              today: day.toDateString() === today.toDateString(),
+              done: doneDates.has(key),
+              events: items
+                .filter((item) => dateKey(new Date(item.starts_at)) === key)
+                .map((item) => ({
+                  name: item.goals?.name ?? "Reto",
+                  challenge: item.challenges?.title ?? "Pique",
+                  points: item.goals?.base_points ?? 0,
+                })),
+            };
+          })}
+        />
       </section>
       <h2 style={{ marginBottom: 12 }}>Próximos 30 días</h2>
-      {items.length === 0 ? (
+      {upcomingItems.length === 0 ? (
         <EmptyState
           title="Calendario despejado"
           text="Las ocurrencias aparecerán cuando tus retos estén aceptados."
@@ -122,13 +224,13 @@ export default async function CalendarPage() {
         />
       ) : (
         <div style={{ display: "grid", gap: 10 }}>
-          {items.map((item) => {
+          {upcomingItems.map((item) => {
             const date = new Date(item.starts_at);
             const done = item.done;
             return (
               <article
                 key={item.id}
-                className="card"
+                className="stitch-card"
                 style={{
                   padding: 16,
                   display: "flex",
@@ -136,7 +238,18 @@ export default async function CalendarPage() {
                   gap: 14,
                 }}
               >
-                <div style={{ width: 48, textAlign: "center" }}>
+                <div
+                  style={{
+                    width: 62,
+                    padding: "10px 4px",
+                    borderRadius: 16,
+                    textAlign: "center",
+                    background:
+                      date.toDateString() === today.toDateString()
+                        ? "var(--violet-deep)"
+                        : "var(--surface-high)",
+                  }}
+                >
                   <b style={{ display: "block", fontSize: 20 }}>
                     {date.getDate()}
                   </b>
@@ -150,6 +263,7 @@ export default async function CalendarPage() {
                     borderRadius: 4,
                   }}
                 />
+                <CategoryBadge category={item.challenges?.category} size={44} />
                 <div style={{ flex: 1 }}>
                   <b>{item.goals?.name}</b>
                   <small

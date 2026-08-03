@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pique - Crear Reto</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&amp;family=Inter:wght@400;600&amp;family=Space+Grotesk:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .glass-card {
+            background: rgba(26, 26, 30, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(39, 39, 42, 0.5);
+        }
+
+        .pique-input:focus {
+            outline: none;
+            border-color: #d2bbff;
+            box-shadow: 0 0 0 2px rgba(210, 187, 255, 0.2);
+        }
+
+        .custom-checkbox:checked {
+            background-color: #bcff5f;
+            border-color: #bcff5f;
+        }
+
+        .progress-glow {
+            box-shadow: 0 0 15px rgba(210, 187, 255, 0.4);
+        }
+
+        /* Custom scrollbar for participants list */
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #27272A;
+            border-radius: 10px;
+        }
+    </style>
+<!-- Tailwind Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#d2bbff",
+                        "primary": "#d2bbff",
+                        "primary-fixed-dim": "#d2bbff",
+                        "on-secondary-fixed": "#112000",
+                        "secondary-fixed": "#a8f928",
+                        "inverse-surface": "#e5e2e1",
+                        "on-background": "#e5e2e1",
+                        "on-surface": "#e5e2e1",
+                        "error-container": "#93000a",
+                        "on-error-container": "#ffdad6",
+                        "primary-container": "#7c3aed",
+                        "tertiary-container": "#b9383c",
+                        "tertiary-fixed-dim": "#ffb3b0",
+                        "secondary-fixed-dim": "#8fdb00",
+                        "on-tertiary-fixed": "#410006",
+                        "surface": "#131313",
+                        "inverse-primary": "#732ee4",
+                        "surface-bright": "#3a3939",
+                        "primary-fixed": "#eaddff",
+                        "surface-dim": "#131313",
+                        "surface-container": "#201f1f",
+                        "on-primary": "#3f008e",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "inverse-on-surface": "#313030",
+                        "outline": "#958da1",
+                        "on-tertiary-fixed-variant": "#8c1520",
+                        "secondary-container": "#95e400",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-container-high": "#2a2a2a",
+                        "error": "#ffb4ab",
+                        "on-tertiary": "#68000f",
+                        "tertiary": "#ffb3b0",
+                        "secondary": "#bcff5f",
+                        "surface-variant": "#353534",
+                        "on-surface-variant": "#ccc3d8",
+                        "on-secondary-container": "#3d6200",
+                        "on-error": "#690005",
+                        "on-tertiary-container": "#ffdfdd",
+                        "background": "#131313",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary-fixed": "#ffdad8",
+                        "on-secondary": "#203600",
+                        "outline-variant": "#4a4455",
+                        "on-primary-fixed": "#25005a",
+                        "surface-container-highest": "#353534",
+                        "on-secondary-fixed-variant": "#314f00",
+                        "on-primary-container": "#ede0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "24px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "lg": "32px",
+                        "md": "24px",
+                        "xs": "4px",
+                        "gutter": "16px",
+                        "container-margin": "20px",
+                        "xl": "48px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Sora"],
+                        "stat-number": ["Sora"],
+                        "headline-lg": ["Sora"],
+                        "headline-sm": ["Sora"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "stat-number": ["28px", {"lineHeight": "1", "fontWeight": "800"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-sm": ["20px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased font-body-md text-on-surface bg-background min-h-screen pb-32">
+<!-- Top App Bar (Shared Component Strategy) -->
+<header class="bg-background fixed top-0 w-full z-50 flex justify-between items-center px-container-margin py-sm">
+<div class="flex items-center gap-base active:scale-95 transition-transform cursor-pointer" onclick="window.history.back()">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</div>
+<div class="font-headline-sm text-headline-sm text-primary">Pique</div>
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-outline-variant/30 active:scale-95 transition-transform">
+<img class="w-full h-full object-cover" data-alt="A futuristic professional portrait of a athletic user in a high-tech gym setting. Deep indigo and neon purple lighting effects illuminate the scene, consistent with a high-energy social gaming platform. Modern minimalist aesthetic with sharp focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBomkf4vGoPloL2Hmz-jNf6nx2DJg0nyxKV9T4MvJr_vu8WzuT729ISllXRzBAcEP1y5GDVM2GToe81OE9iroTDYR41rN37SyEyufGCw2gGagoQGAh2MaHCZY6HnVhs4eT6_KyN0a5VQZhT8EnnVbDt9FoEKK7p30T8F7kLTXMeHVwChvXs19fDPa5jYwEK9URDvBZaSkK_zDhQVoqsJelrxvGWx6nl7THT3HEdzdoJGd13yHoL4xiAJw"/>
+</div>
+</header>
+<main class="pt-20 px-container-margin max-w-lg mx-auto">
+<!-- Progress Stepper -->
+<div class="mb-lg">
+<div class="flex justify-between items-end mb-base">
+<span class="font-label-caps text-label-caps text-primary uppercase">Paso 2 de 4</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">50% Completado</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary progress-glow rounded-full transition-all duration-700 ease-out" style="width: 50%"></div>
+</div>
+</div>
+<!-- Page Headline -->
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile mb-md text-on-surface">Que quede clarísimo.</h1>
+<!-- Form Section -->
+<section class="space-y-md">
+<!-- Title Input -->
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant ml-1">TÍTULO DEL RETO</label>
+<input class="w-full h-14 bg-surface-container px-md rounded-2xl pique-input border-none text-body-lg placeholder:text-outline-variant transition-all" placeholder="ej. Entrenar sin excusas" type="text"/>
+</div>
+<!-- Description/Rules Textarea -->
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant ml-1">DESCRIPCIÓN Y REGLAS</label>
+<textarea class="w-full bg-surface-container p-md rounded-2xl pique-input border-none text-body-md placeholder:text-outline-variant transition-all resize-none" placeholder="¿Cómo se gana? ¿Hay multas si pierdes? Detalla aquí los términos de la rivalidad..." rows="4"></textarea>
+</div>
+<!-- Circle Selector -->
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant ml-1">PUBLICAR EN CÍRCULO</label>
+<div class="relative">
+<select class="w-full h-14 bg-surface-container px-md rounded-2xl pique-input border-none text-body-lg appearance-none cursor-pointer">
+<option value="crossfit-crew">🏋️‍♂️ CrossFit Crew</option>
+<option value="early-birds">🌅 Early Birds 5AM</option>
+<option value="poker-night">🃏 Poker Night Legends</option>
+<option value="startup-grind">🚀 Startup Grind</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-4 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Participants Checklist -->
+<div class="space-y-xs">
+<div class="flex justify-between items-center mb-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant ml-1 uppercase">Invitar participantes</label>
+<span class="text-[10px] bg-secondary-container/20 text-secondary px-2 py-0.5 rounded-full font-label-caps">MÍN. 1</span>
+</div>
+<div class="glass-card rounded-2xl overflow-hidden">
+<div class="max-h-64 overflow-y-auto custom-scroll p-sm space-y-sm">
+<!-- Participant Item -->
+<label class="flex items-center justify-between p-base bg-surface-container-low hover:bg-surface-container transition-colors rounded-xl cursor-pointer group">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full border-2 border-outline-variant/30 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a young male athlete, Raúl, in high-contrast neon lighting with a focused expression. Professional sports photography style, dark atmospheric background with lime green accents consistent with the UI palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuATid_ATMP9AY-0xJeNgKlCvFbhQhXHqlHnQNPXe4jWsXsoF7wnBvngSYxk-2PhIC6C3Qzvdtq50LmfWuffux2oCX2Jp1peJfT5AZrk0hy1SCFLlnmA96Ym5YvByYFts6QWVKRw8y0XXmvQjskXaiNnzwwpEuiKsph9fK2Dt2rpFW6maNc0N4qdL_hg9uuhqkJ7QjDMq0Fk52FqCCHMG_8K1eEC8EnazOV4ZTD8I9dz9-LuuWzSigHaJA"/>
+</div>
+<div>
+<p class="font-headline-sm text-[16px] text-on-surface">Raúl</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant">@raul_fit</p>
+</div>
+</div>
+<input checked="" class="w-6 h-6 rounded-lg bg-surface-container-highest border-none custom-checkbox transition-all" type="checkbox"/>
+</label>
+<!-- Participant Item -->
+<label class="flex items-center justify-between p-base bg-surface-container-low hover:bg-surface-container transition-colors rounded-xl cursor-pointer group">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full border-2 border-outline-variant/30 overflow-hidden bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl">person</span>
+</div>
+<div>
+<p class="font-headline-sm text-[16px] text-on-surface">Test User</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant">@tester_1</p>
+</div>
+</div>
+<input class="w-6 h-6 rounded-lg bg-surface-container-highest border-none custom-checkbox transition-all" type="checkbox"/>
+</label>
+<!-- Participant Item -->
+<label class="flex items-center justify-between p-base bg-surface-container-low hover:bg-surface-container transition-colors rounded-xl cursor-pointer group">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full border-2 border-outline-variant/30 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a confident female professional in a sleek modern aesthetic. The lighting features cyber-punk violets and deep shadow. High-end social gaming application vibe, extreme detail, 8k resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGwGe1liiIDdlyp1rVeLnQQZF_1_40QE4s9cYZ6PEFQAjYxWulIxHfdj2HLSzg48KUf4gdReMMXU_p94GPv2D5rZnG16EdzofU0wjrZshLtJ3BlsZSktyp_MWzvdGoeYIi5Lk72NEc2SgUc0n3YKhNrFWq72MiJ_pd5pFdk3CgU6Zpl3A5SzVfENDyr1SOKwCWy-8V3p5PKgvVcFwseb7jA2auJq7Ys77bGdKbQHvLBj5PLnc8Blrl5g"/>
+</div>
+<div>
+<p class="font-headline-sm text-[16px] text-on-surface">Elena G.</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant">@elena_grind</p>
+</div>
+</div>
+<input class="w-6 h-6 rounded-lg bg-surface-container-highest border-none custom-checkbox transition-all" type="checkbox"/>
+</label>
+<!-- Search/Add New -->
+<button class="w-full py-sm flex items-center justify-center gap-xs text-primary font-label-caps text-label-caps border border-dashed border-primary/30 rounded-xl active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">add</span>
+                            BUSCAR MÁS AMIGOS
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Fixed Bottom Action Area -->
+<div class="fixed bottom-0 w-full p-container-margin bg-gradient-to-t from-background via-background/95 to-transparent pb-10">
+<button class="w-full h-14 bg-primary text-on-primary rounded-2xl font-headline-sm text-headline-sm shadow-[0_0_20px_rgba(210,187,255,0.3)] hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-sm">
+            Siguiente
+            <span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('.pique-input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.querySelector('label')?.classList.add('text-primary');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.querySelector('label')?.classList.remove('text-primary');
+            });
+        });
+
+        // Add subtle interaction sound/haptic feedback simulation
+        document.querySelectorAll('button, label').forEach(btn => {
+            btn.addEventListener('touchstart', () => {
+                if ('vibrate' in navigator) navigator.vibrate(5);
+            });
+        });
+    </script>
+</body></html>

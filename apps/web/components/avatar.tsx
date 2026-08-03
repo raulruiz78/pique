@@ -27,12 +27,14 @@ export function Avatar({
         flex: `0 0 ${size}px`,
         display: "grid",
         placeItems: "center",
-        borderRadius: "38%",
+        borderRadius: "50%",
         background: accent,
         color: accent === "var(--lime)" ? "#16131d" : "white",
         fontSize: size * 0.32,
         fontWeight: 950,
         overflow: "hidden",
+        border: `2px solid ${accent}`,
+        boxShadow: `0 0 0 2px var(--canvas)`,
       }}
     >
       {src ? (

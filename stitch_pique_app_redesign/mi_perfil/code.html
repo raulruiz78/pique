@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Perfil - Hoy toca dar la talla</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&family=Inter:wght@400;500&family=Space+Grotesk:wght@700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Sora:wght@100..900&family=Space+Grotesk:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#3a3939",
+                        "on-primary": "#3f008e",
+                        "surface-tint": "#d2bbff",
+                        "outline-variant": "#4a4455",
+                        "secondary": "#bcff5f",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "primary-fixed": "#eaddff",
+                        "error": "#ffb4ab",
+                        "on-surface-variant": "#ccc3d8",
+                        "on-tertiary": "#68000f",
+                        "tertiary-fixed": "#ffdad8",
+                        "secondary-container": "#95e400",
+                        "tertiary": "#ffb3b0",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#410006",
+                        "on-primary-fixed": "#25005a",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#d2bbff",
+                        "tertiary-fixed-dim": "#ffb3b0",
+                        "on-tertiary-container": "#ffdfdd",
+                        "surface-variant": "#353534",
+                        "surface": "#131313",
+                        "surface-container": "#201f1f",
+                        "on-primary-container": "#ede0ff",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#314f00",
+                        "surface-dim": "#131313",
+                        "secondary-fixed-dim": "#8fdb00",
+                        "inverse-primary": "#732ee4",
+                        "on-secondary": "#203600",
+                        "on-secondary-container": "#3d6200",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#8c1520",
+                        "surface-container-highest": "#353534",
+                        "on-background": "#e5e2e1",
+                        "surface-container-high": "#2a2a2a",
+                        "on-secondary-fixed": "#112000",
+                        "primary-fixed-dim": "#d2bbff",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary-fixed": "#a8f928",
+                        "on-error": "#690005",
+                        "primary-container": "#7c3aed",
+                        "background": "#131313",
+                        "tertiary-container": "#b9383c",
+                        "outline": "#958da1",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-on-surface": "#313030"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "3xl": "2rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "32px",
+                        "md": "24px",
+                        "base": "8px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "xl": "48px",
+                        "gutter": "16px",
+                        "container-margin": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Sora"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Space Grotesk"],
+                        "headline-sm": ["Sora"],
+                        "headline-md": ["Sora"],
+                        "stat-number": ["Sora"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-sm": ["20px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "stat-number": ["28px", {"lineHeight": "1", "fontWeight": "800"}],
+                        "body-lg": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass-card {
+            background: #1A1A1E;
+            border: 1px solid rgba(39, 39, 42, 0.5);
+            border-radius: 24px;
+        }
+        .primary-glow {
+            box-shadow: 0 0 20px rgba(210, 187, 255, 0.15);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .nav-active {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="font-body-md bg-background min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="flex justify-between items-center px-container-margin py-sm w-full fixed top-0 bg-background/80 backdrop-blur-md z-50">
+<h1 class="font-headline-sm text-headline-sm text-primary">Perfil</h1>
+<div class="flex items-center gap-4">
+<button class="hover:opacity-80 active:scale-95 transition-transform text-primary">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A close-up high-resolution profile portrait of a confident young athlete in a dark, neon-lit cyberpunk environment. The person has subtle athletic wear and a focused expression. The lighting is dominated by electric violet and lime green highlights, creating a cinematic social gaming atmosphere with deep shadows and sharp contrasts." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMA8BX4tZy3vWEhT5w6cY4Oq-FSxgmiJC8fDqN5x9zlbUkCUOYpEQIr2wpnqgoFfTrH53Wo9VnSzMPS0bGbZejpp5WlsXQZ-1837Plb4q6osOOHeQJmtVFR1rYN9XIBW8T27a-wQRphcjithYtjBWrzQavlQbEVcC7A3cdT6I57v65OKsFyZ0IxwtWa4sEVqp-yRz-rlN7vyeh3Kxjo5FDm60UI0qNZXln4J14cm8-hAOWvwtXuOAIUA"/>
+</div>
+</div>
+</header>
+<main class="pt-20 px-container-margin space-y-md">
+<!-- Profile Hero Section -->
+<section class="flex flex-col items-center py-md">
+<div class="relative mb-4">
+<div class="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-primary via-secondary to-tertiary primary-glow">
+<div class="w-full h-full rounded-full bg-background p-1">
+<div class="w-full h-full rounded-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A cinematic, large profile avatar of a modern digital gamer with a sleek haircut and tech-influenced clothing. The background is a minimalist, deep black void with a soft electric violet halo. The lighting is dramatic and directional, accentuating the high-energy, premium cyberpunk aesthetic of the social competition platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAy3wXZQjQY5g6IaFTvoXRWfjRTPUDFccHoXl_hoLIzSXnsuOe5abtFJ8mDcPIosUnQ4Z9tdEaH_R6HSh0yMXwMsjO0-pKS-u5nOf0ogbdBf4S_ThUjFYgQIhhks7bBdRudcW70WvJjjhwCVXZ5FzlzZLeGTL8bd1PronneRiZa-kRi2r8LN9a7wbC63l9Z12C2y4xQjVhN3XnlwoVEWnLNw-m_qYT1IBG5ttZ5Jc1FcAQkLDy4srTM0w"/>
+</div>
+</div>
+</div>
+<div class="absolute bottom-0 right-0 bg-secondary text-on-secondary px-3 py-1 rounded-full text-label-caps font-label-caps flex items-center gap-1 shadow-lg">
+<span class="material-symbols-outlined text-[14px]" data-icon="local_fire_department" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                    PRO
+                </div>
+</div>
+<div class="text-center">
+<h2 class="font-headline-md text-headline-md-mobile text-on-surface">Alejandro Silva</h2>
+<p class="font-body-md text-on-surface-variant">@asilva_gaming</p>
+</div>
+</section>
+<!-- Stats Bento Grid -->
+<section class="grid grid-cols-2 gap-base">
+<div class="glass-card p-md flex flex-col items-center justify-center space-y-xs">
+<p class="font-label-caps text-label-caps text-on-surface-variant">RACHA HISTÓRICA</p>
+<div class="flex items-center gap-xs text-secondary">
+<span class="material-symbols-outlined font-stat-number text-stat-number" data-icon="local_fire_department" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="font-stat-number text-stat-number">42</span>
+</div>
+<p class="text-[10px] text-on-surface-variant/60">DÍAS SEGUIDOS</p>
+</div>
+<div class="glass-card p-md flex flex-col items-center justify-center space-y-xs border-primary/20">
+<p class="font-label-caps text-label-caps text-on-surface-variant">PUNTOS TOTALES</p>
+<div class="flex items-center gap-xs text-primary">
+<span class="material-symbols-outlined font-stat-number text-stat-number" data-icon="stars" style="font-variation-settings: 'FILL' 1;">stars</span>
+<span class="font-stat-number text-stat-number">12.5k</span>
+</div>
+<p class="text-[10px] text-on-surface-variant/60">TOP 5% GLOBAL</p>
+</div>
+</section>
+<!-- Achievements Horizontal Scroll -->
+<section class="space-y-sm">
+<div class="flex justify-between items-end">
+<h3 class="font-headline-sm text-on-surface">Logros y Medallas</h3>
+<button class="font-label-caps text-label-caps text-primary uppercase">Ver todos</button>
+</div>
+<div class="flex gap-md overflow-x-auto pb-4 -mx-container-margin px-container-margin no-scrollbar">
+<!-- Achievement Card 1 -->
+<div class="flex-shrink-0 w-32 glass-card p-sm flex flex-col items-center text-center space-y-2 border-secondary/20">
+<div class="w-16 h-16 rounded-2xl bg-secondary-container/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[32px]" data-icon="military_tech" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+</div>
+<span class="font-label-caps text-[10px] leading-tight text-on-surface uppercase">Early Adopter</span>
+</div>
+<!-- Achievement Card 2 -->
+<div class="flex-shrink-0 w-32 glass-card p-sm flex flex-col items-center text-center space-y-2 border-tertiary/20">
+<div class="w-16 h-16 rounded-2xl bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[32px]" data-icon="fitness_center">fitness_center</span>
+</div>
+<span class="font-label-caps text-[10px] leading-tight text-on-surface uppercase">Bestia Gym</span>
+</div>
+<!-- Achievement Card 3 -->
+<div class="flex-shrink-0 w-32 glass-card p-sm flex flex-col items-center text-center space-y-2">
+<div class="w-16 h-16 rounded-2xl bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[32px]" data-icon="groups">groups</span>
+</div>
+<span class="font-label-caps text-[10px] leading-tight text-on-surface uppercase">Líder Círculo</span>
+</div>
+<!-- Achievement Card 4 -->
+<div class="flex-shrink-0 w-32 glass-card p-sm flex flex-col items-center text-center space-y-2">
+<div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center text-on-surface-variant opacity-50">
+<span class="material-symbols-outlined text-[32px]" data-icon="lock">lock</span>
+</div>
+<span class="font-label-caps text-[10px] leading-tight text-on-surface-variant/50 uppercase">Bloqueado</span>
+</div>
+</div>
+</section>
+<!-- Privacy & Settings List -->
+<section class="space-y-sm pb-10">
+<h3 class="font-headline-sm text-on-surface">Configuración</h3>
+<div class="glass-card overflow-hidden divide-y divide-outline-variant/10">
+<div class="flex items-center justify-between p-md hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" data-icon="visibility">visibility</span>
+<div class="flex flex-col">
+<span class="font-body-lg text-on-surface">Perfil Público</span>
+<span class="font-body-md text-on-surface-variant text-[12px]">Cualquiera puede ver tu racha</span>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between p-md hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" data-icon="notifications">notifications</span>
+<div class="flex flex-col">
+<span class="font-body-lg text-on-surface">Notificaciones</span>
+<span class="font-body-md text-on-surface-variant text-[12px]">Alertas de retos y victorias</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-md hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" data-icon="shield">shield</span>
+<div class="flex flex-col">
+<span class="font-body-lg text-on-surface">Seguridad</span>
+<span class="font-body-md text-on-surface-variant text-[12px]">Autenticación en dos pasos</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-md hover:bg-white/10 transition-colors cursor-pointer text-error">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body-lg font-bold">Cerrar Sesión</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-3xl bg-surface/80 dark:bg-surface/80 backdrop-blur-xl border-t border-outline-variant/20 shadow-lg flex justify-around items-center h-20 px-4 pb-safe">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-caps text-label-caps mt-1">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-caps text-label-caps mt-1">Calendario</span>
+</a>
+<div class="relative -top-6">
+<button class="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-on-primary shadow-[0_0_20px_rgba(210,187,255,0.4)] active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined text-3xl" data-icon="add_circle" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+</button>
+</div>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-caps text-label-caps mt-1">Círculos</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-bold scale-110 transition-all duration-300" href="#">
+<span class="material-symbols-outlined nav-active" data-icon="person">person</span>
+<span class="font-label-caps text-label-caps mt-1">Perfil</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions and effects
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'scale(0.98)';
+                card.style.transition = 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            });
+            card.addEventListener('touchend', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+
+        // Toggle Switch Interaction
+        const toggle = document.querySelector('input[type="checkbox"]');
+        if (toggle) {
+            toggle.parentElement.addEventListener('click', (e) => {
+                // Prevent bubbling if needed, but here we let the checkbox handle it
+            });
+        }
+
+        // Haptic-like feedback for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.navigator.vibrate) {
+                    window.navigator.vibrate(10);
+                }
+            });
+        });
+    </script>
+</body></html>

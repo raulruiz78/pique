@@ -26,6 +26,9 @@ export async function PATCH(request: Request) {
         : { display_name: input.displayName }),
       ...(input.timezone === undefined ? {} : { timezone: input.timezone }),
       ...(input.locale === undefined ? {} : { locale: input.locale }),
+      ...(input.profileVisibility === undefined
+        ? {}
+        : { profile_visibility: input.profileVisibility }),
       updated_at: new Date().toISOString(),
     };
     const { data, error } = await auth.supabase

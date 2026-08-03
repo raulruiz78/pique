@@ -1,8 +1,17 @@
 import { Avatar } from "@/components/avatar";
 import { ChallengeActions } from "@/components/challenge-actions";
+import { CircleInviteButton } from "@/components/circle-invite-button";
+import { CircleAccessPanel } from "@/components/circle-access-panel";
+import { CategoryBadge } from "@/components/challenge-category";
 import { ImageUpload } from "@/components/image-upload";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { ChevronRight, Clock3, Trophy, UsersRound } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronRight,
+  Clock3,
+  Trophy,
+  UsersRound,
+} from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -32,7 +41,7 @@ export default async function CirclePage({
   const { data: circle } = await supabase
     .from("circles")
     .select(
-      "id,name,description,avatar_path,owner_id,circle_members(user_id,profiles(display_name,username,avatar_path)),challenges(id,title,status,start_at,end_at,challenge_participants(user_id,acceptance,score,current_streak,profiles(display_name,username,avatar_path)))",
+      "id,name,description,avatar_path,owner_id,circle_members(user_id,profiles(display_name,username,avatar_path)),challenges(id,title,category,status,start_at,end_at,challenge_participants(user_id,acceptance,score,current_streak,profiles(display_name,username,avatar_path)))",
     )
     .eq("id", circleId)
     .maybeSingle();
@@ -76,7 +85,31 @@ export default async function CirclePage({
 
   return (
     <main className="page">
-      <header style={{ display: "flex", alignItems: "center", gap: 15 }}>
+      <nav
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          marginBottom: 26,
+        }}
+      >
+        <Link
+          href="/circulos"
+          className="button button-secondary"
+          aria-label="Volver"
+          style={{ width: 48, minHeight: 48, padding: 0 }}
+        >
+          <ArrowLeft />
+        </Link>
+        <strong
+          className="display"
+          style={{ color: "var(--violet)", fontSize: 24, flex: 1 }}
+        >
+          {circle.name}
+        </strong>
+        <CircleInviteButton circleId={circle.id} compact />
+      </nav>
+      <header className="screen-header">
         {circle.owner_id === user?.id ? (
           <ImageUpload
             endpoint={`/api/v1/circles/${circle.id}/image`}
@@ -85,7 +118,7 @@ export default async function CirclePage({
           >
             <Avatar
               name={circle.name}
-              size={67}
+              size={58}
               accent="var(--lime)"
               src={
                 circle.avatar_path
@@ -97,7 +130,7 @@ export default async function CirclePage({
         ) : (
           <Avatar
             name={circle.name}
-            size={67}
+            size={58}
             accent="var(--lime)"
             src={
               circle.avatar_path
@@ -107,8 +140,8 @@ export default async function CirclePage({
           />
         )}
         <div>
-          <span className="eyebrow">Círculo</span>
-          <h1 className="display" style={{ fontSize: 42, margin: "6px 0 8px" }}>
+          <span className="eyebrow">Círculo privado</span>
+          <h1 className="display" style={{ fontSize: 30, margin: "5px 0" }}>
             {circle.name}
           </h1>
           <p className="muted" style={{ margin: 0 }}>
@@ -117,6 +150,9 @@ export default async function CirclePage({
           </p>
         </div>
       </header>
+      {circle.owner_id === user?.id && (
+        <CircleAccessPanel circleId={circle.id} />
+      )}
 
       {pending.length > 0 && (
         <section style={{ marginTop: 26 }}>
@@ -148,57 +184,156 @@ export default async function CirclePage({
       )}
 
       <section style={{ marginTop: 28 }}>
-        <span className="eyebrow">Total del círculo</span>
-        <h2 style={{ margin: "6px 0 12px" }}>Clasificación</h2>
-        <div className="card" style={{ padding: "5px 18px" }}>
+        <span className="eyebrow">Podio general</span>
+        <h2 style={{ margin: "6px 0 18px" }}>¿Quién manda?</h2>
+        <div className="stitch-card" style={{ padding: 20 }}>
           {ranking.length === 0 ? (
             <p className="muted">Aún no hay puntos en juego.</p>
           ) : (
-            ranking.map((player, index) => {
-              const difference = (ranking[0]?.score ?? 0) - player.score;
-              return (
-                <div
-                  key={player.userId}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 11,
-                    padding: "14px 0",
-                    borderBottom:
-                      index < ranking.length - 1 ? "1px solid var(--line)" : 0,
-                  }}
-                >
-                  <b
+            <>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3,1fr)",
+                  gap: 8,
+                  alignItems: "end",
+                  margin: "8px 0 22px",
+                }}
+              >
+                {[ranking[1], ranking[0], ranking[2]].map(
+                  (player, podiumIndex) => {
+                    if (!player) return <div key={`empty-${podiumIndex}`} />;
+                    const place = [2, 1, 3][podiumIndex];
+                    return (
+                      <div
+                        key={player.userId}
+                        style={{
+                          padding: place === 1 ? "24px 6px 18px" : "15px 6px",
+                          borderRadius: "20px 20px 8px 8px",
+                          textAlign: "center",
+                          color: place === 1 ? "#162000" : "var(--ink)",
+                          background:
+                            place === 1 ? "var(--lime)" : "var(--surface-high)",
+                        }}
+                      >
+                        <Avatar
+                          name={player.name}
+                          size={place === 1 ? 70 : 54}
+                          accent={place === 1 ? "var(--lime)" : "var(--violet)"}
+                          src={
+                            player.avatarPath
+                              ? `/api/v1/media/profiles/${player.userId}`
+                              : null
+                          }
+                        />
+                        <small style={{ display: "block", marginTop: 8 }}>
+                          #{place}
+                        </small>
+                        <b
+                          style={{
+                            display: "block",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {player.name}
+                        </b>
+                        <strong
+                          style={{
+                            display: "block",
+                            fontSize: place === 1 ? 27 : 21,
+                          }}
+                        >
+                          {player.score}
+                        </strong>
+                      </div>
+                    );
+                  },
+                )}
+              </div>
+              {ranking.slice(3).map((player, offset) => {
+                const index = offset + 3;
+                const difference = (ranking[0]?.score ?? 0) - player.score;
+                return (
+                  <div
+                    key={player.userId}
                     style={{
-                      width: 23,
-                      color: index === 0 ? "var(--gold)" : "var(--muted)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 11,
+                      padding: "14px 0",
+                      borderBottom:
+                        index < ranking.length - 1
+                          ? "1px solid var(--line)"
+                          : 0,
                     }}
                   >
-                    #{index + 1}
-                  </b>
-                  <Avatar
-                    name={player.name}
-                    size={38}
-                    accent={index === 0 ? "var(--lime)" : "var(--violet)"}
-                    src={
-                      player.avatarPath
-                        ? `/api/v1/media/profiles/${player.userId}`
-                        : null
-                    }
-                  />
-                  <div style={{ flex: 1 }}>
-                    <b>{player.name}</b>
-                    <small className="muted" style={{ display: "block" }}>
-                      {difference === 0
-                        ? `${player.streak} de racha`
-                        : `a ${difference} pt del líder`}
-                    </small>
+                    <b
+                      style={{
+                        width: 23,
+                        color: index === 0 ? "var(--gold)" : "var(--muted)",
+                      }}
+                    >
+                      #{index + 1}
+                    </b>
+                    <Avatar
+                      name={player.name}
+                      size={38}
+                      accent={index === 0 ? "var(--lime)" : "var(--violet)"}
+                      src={
+                        player.avatarPath
+                          ? `/api/v1/media/profiles/${player.userId}`
+                          : null
+                      }
+                    />
+                    <div style={{ flex: 1 }}>
+                      <b>{player.name}</b>
+                      <small className="muted" style={{ display: "block" }}>
+                        {difference === 0
+                          ? `${player.streak} de racha`
+                          : `a ${difference} pt del líder`}
+                      </small>
+                    </div>
+                    <strong>{player.score} pt</strong>
                   </div>
-                  <strong>{player.score} pt</strong>
-                </div>
-              );
-            })
+                );
+              })}
+            </>
           )}
+        </div>
+      </section>
+      <section
+        className="stitch-card"
+        style={{
+          marginTop: 32,
+          padding: 22,
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          borderStyle: "dashed",
+        }}
+      >
+        <span
+          style={{
+            width: 58,
+            height: 58,
+            flex: "0 0 auto",
+            borderRadius: "50%",
+            display: "grid",
+            placeItems: "center",
+            border: "2px dashed var(--violet)",
+          }}
+        >
+          <UsersRound color="var(--violet)" />
+        </span>
+        <div style={{ flex: 1 }}>
+          <b style={{ fontSize: 18 }}>¡Invita a tu equipo!</b>
+          <small className="muted" style={{ display: "block" }}>
+            Más gente, más competitividad.
+          </small>
+        </div>
+        <div style={{ width: 105 }}>
+          <CircleInviteButton circleId={circle.id} />
         </div>
       </section>
 
@@ -213,15 +348,23 @@ export default async function CirclePage({
             const lead =
               (players[0]?.score ?? 0) -
               (players[1]?.score ?? players[0]?.score ?? 0);
+            const progress =
+              challenge.status === "COMPLETED"
+                ? 100
+                : Math.min(
+                    100,
+                    Math.max(0, ...players.map((player) => player.score)),
+                  );
             return (
               <Link
                 key={challenge.id}
                 href={`/retos/${challenge.id}`}
-                className="card"
-                style={{ padding: 17, color: "inherit" }}
+                className="stitch-card"
+                style={{ padding: 20, color: "inherit" }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
                   <Trophy color="var(--violet)" />
+                  <CategoryBadge category={challenge.category} size={44} />
                   <div style={{ flex: 1 }}>
                     <b>{challenge.title}</b>
                     <small
@@ -234,6 +377,29 @@ export default async function CirclePage({
                     </small>
                   </div>
                   <ChevronRight />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginTop: 16,
+                  }}
+                >
+                  <small className="field-label muted" style={{ margin: 0 }}>
+                    Progreso
+                  </small>
+                  <small style={{ color: "var(--violet)", fontWeight: 800 }}>
+                    {progress}%
+                  </small>
+                </div>
+                <div
+                  className="wizard-progress-track"
+                  style={{ height: 7, marginTop: 7 }}
+                >
+                  <div
+                    className="wizard-progress-fill"
+                    style={{ width: `${progress}%` }}
+                  />
                 </div>
               </Link>
             );

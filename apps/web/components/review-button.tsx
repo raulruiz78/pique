@@ -24,19 +24,22 @@ export function ReviewButtons({ checkInId }: { checkInId: string }) {
     router.refresh();
   }
   return (
-    <div style={{ display: "flex", gap: 8 }}>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1.35fr",
+        gap: 10,
+        width: "100%",
+      }}
+    >
       <button
         aria-label="Rechazar"
         className="button button-secondary"
-        style={{ width: 46, padding: 0 }}
         onClick={() => review("REJECTED")}
       >
-        <X size={18} />
+        <X size={18} /> Rechazar
       </button>
-      <button
-        className="button button-primary"
-        onClick={() => review("APPROVED")}
-      >
+      <button className="button button-lime" onClick={() => review("APPROVED")}>
         <Check size={18} /> Validar
       </button>
     </div>

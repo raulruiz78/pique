@@ -13,6 +13,10 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import {
+  challengeCategories,
+  type ChallengeCategory,
+} from "./challenge-category";
 
 interface Member {
   user_id: string;
@@ -23,22 +27,6 @@ interface Circle {
   name: string;
   circle_members: Member[];
 }
-const templates = [
-  { title: "Entrenar sin excusas", emoji: "🏋️", days: "MO,WE,FR", points: 10 },
-  {
-    title: "Leer cada día",
-    emoji: "📚",
-    days: "MO,TU,WE,TH,FR,SA,SU",
-    points: 8,
-  },
-  {
-    title: "Cero comida basura",
-    emoji: "🥗",
-    days: "MO,TU,WE,TH,FR",
-    points: 10,
-  },
-  { title: "Reto libre", emoji: "⚡", days: "MO,WE,FR", points: 10 },
-];
 const weekdays = [
   { value: "MO", label: "L", name: "Lunes" },
   { value: "TU", label: "M", name: "Martes" },
@@ -62,6 +50,7 @@ export function ChallengeWizard({
   const [form, setForm] = useState({
     circleId: "",
     title: "",
+    category: "TRAINING" as ChallengeCategory,
     description: "",
     type: "FREQUENCY",
     startDate,
@@ -105,13 +94,10 @@ export function ChallengeWizard({
       Number(form.points) <= 10_000,
     [form],
   );
-  function chooseTemplate(template: (typeof templates)[number]) {
+  function chooseCategory(category: ChallengeCategory) {
     setForm((current) => ({
       ...current,
-      title: template.title,
-      scheduleMode: "fixed",
-      days: template.days,
-      points: String(template.points),
+      category,
     }));
     setStep(2);
   }
@@ -136,6 +122,7 @@ export function ChallengeWizard({
       body: JSON.stringify({
         circleId: form.circleId,
         title: form.title,
+        category: form.category,
         description: form.description,
         type: form.type,
         startAt: new Date(`${form.startDate}T08:00:00`).toISOString(),
@@ -167,54 +154,44 @@ export function ChallengeWizard({
   }
   return (
     <div>
-      <div
-        aria-label={`Paso ${step} de 4`}
-        style={{ display: "flex", gap: 6, margin: "20px 0 28px" }}
-      >
-        {[1, 2, 3, 4].map((value) => (
-          <i
-            key={value}
-            style={{
-              height: 6,
-              flex: 1,
-              borderRadius: 6,
-              background: value <= step ? "var(--violet)" : "var(--line)",
-            }}
+      <div className="wizard-progress" aria-label={`Paso ${step} de 4`}>
+        <div className="wizard-progress-labels">
+          <span>Paso {step} de 4</span>
+          <span>
+            {step === 4 ? "Listo para enviar" : `${step * 25}% completado`}
+          </span>
+        </div>
+        <div className="wizard-progress-track">
+          <div
+            className="wizard-progress-fill"
+            style={{ width: `${step * 25}%` }}
           />
-        ))}
+        </div>
       </div>
       {step === 1 && (
         <section>
-          <span className="eyebrow">Paso 1 · Elige la chispa</span>
-          <h2
-            className="display"
-            style={{ fontSize: 36, margin: "8px 0 20px" }}
-          >
+          <h2 className="display" style={{ fontSize: 40, margin: "8px 0 8px" }}>
             ¿A qué os vais a picar?
           </h2>
-          <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}
+          <p
+            className="muted"
+            style={{ fontSize: 20, lineHeight: 1.45, margin: "0 0 30px" }}
           >
-            {templates.map((template) => (
+            Elige una categoría. Solo define su identidad visual; las reglas las
+            marcas tú.
+          </p>
+          <div className="template-grid">
+            {challengeCategories.map((category) => (
               <button
-                key={template.title}
-                onClick={() => chooseTemplate(template)}
-                className="card"
-                style={{
-                  border: "1px solid var(--line)",
-                  color: "var(--ink)",
-                  textAlign: "left",
-                  padding: 18,
-                  cursor: "pointer",
-                  minHeight: 130,
-                }}
+                key={category.value}
+                onClick={() => chooseCategory(category.value)}
+                className="stitch-card template-card"
               >
-                <span style={{ fontSize: 27 }}>{template.emoji}</span>
-                <b
-                  style={{ display: "block", marginTop: 17, lineHeight: 1.25 }}
-                >
-                  {template.title}
+                <span className="template-icon">{category.emoji}</span>
+                <b style={{ display: "block", fontSize: 25, lineHeight: 1.15 }}>
+                  {category.label}
                 </b>
+                <small className="muted">{category.examples}</small>
               </button>
             ))}
           </div>
@@ -222,10 +199,9 @@ export function ChallengeWizard({
       )}
       {step === 2 && (
         <section>
-          <span className="eyebrow">Paso 2 · Las reglas</span>
           <h2
             className="display"
-            style={{ fontSize: 36, margin: "8px 0 20px" }}
+            style={{ fontSize: 38, margin: "8px 0 28px" }}
           >
             Que quede clarísimo.
           </h2>
@@ -288,7 +264,7 @@ export function ChallengeWizard({
             )}
             <div>
               <span className="field-label">Participantes</span>
-              <div className="card" style={{ padding: 12 }}>
+              <div className="stitch-card" style={{ padding: 12 }}>
                 {circle?.circle_members.map((member) => (
                   <label
                     key={member.user_id}
@@ -327,10 +303,9 @@ export function ChallengeWizard({
       )}
       {step === 3 && (
         <section>
-          <span className="eyebrow">Paso 3 · Ritmo y puntos</span>
           <h2
             className="display"
-            style={{ fontSize: 36, margin: "8px 0 20px" }}
+            style={{ fontSize: 38, margin: "8px 0 28px" }}
           >
             Marca el terreno.
           </h2>
@@ -368,11 +343,12 @@ export function ChallengeWizard({
             <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
               <legend className="field-label">Ritmo semanal</legend>
               <div
+                className="stitch-card"
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                  gap: 8,
-                  marginBottom: 10,
+                  gap: 10,
+                  padding: 18,
+                  marginBottom: 14,
                 }}
               >
                 {(
@@ -388,10 +364,20 @@ export function ChallengeWizard({
                       key={value}
                       type="button"
                       aria-pressed={selected}
-                      className={`button ${selected ? "button-primary" : "button-secondary"}`}
+                      className="choice-card"
                       onClick={() => setForm({ ...form, scheduleMode: value })}
                     >
-                      {label}
+                      <span className="choice-dot" />
+                      <span>
+                        <b>{label}</b>
+                        <small className="muted" style={{ display: "block" }}>
+                          {value === "fixed"
+                            ? "Siempre los mismos días."
+                            : value === "flexible"
+                              ? "Tú eliges cuándo, cumple el total."
+                              : "Para los que van a por todas."}
+                        </small>
+                      </span>
                     </button>
                   );
                 })}
@@ -422,7 +408,7 @@ export function ChallengeWizard({
                           background: selected
                             ? "var(--violet)"
                             : "var(--surface)",
-                          color: selected ? "white" : "var(--ink)",
+                          color: selected ? "#25005a" : "var(--ink)",
                           font: "inherit",
                           fontWeight: 800,
                           cursor: "pointer",
@@ -502,7 +488,7 @@ export function ChallengeWizard({
               />
             </label>
             <label
-              className="card"
+              className="stitch-card"
               style={{
                 padding: 16,
                 display: "flex",
@@ -543,13 +529,12 @@ export function ChallengeWizard({
       )}
       {step === 4 && (
         <section>
-          <span className="eyebrow">Paso 4 · Pacto final</span>
-          <h2
-            className="display"
-            style={{ fontSize: 36, margin: "8px 0 20px" }}
-          >
-            ¿Trato hecho?
+          <h2 className="display" style={{ fontSize: 38, margin: "8px 0 6px" }}>
+            Resumen del Pacto
           </h2>
+          <p className="muted" style={{ fontSize: 18, margin: "0 0 24px" }}>
+            Revisa los términos antes de comprometerte.
+          </p>
           <label>
             <span className="field-label">Consecuencia opcional</span>
             <input
@@ -561,7 +546,7 @@ export function ChallengeWizard({
               }
             />
           </label>
-          <div className="card" style={{ marginTop: 18, padding: 20 }}>
+          <div className="stitch-card" style={{ marginTop: 18, padding: 20 }}>
             <div style={{ display: "grid", gap: 15 }}>
               <Summary Icon={Trophy} label="Reto" value={form.title} />
               <Summary

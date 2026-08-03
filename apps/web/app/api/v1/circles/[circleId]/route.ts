@@ -2,6 +2,44 @@ import { fail, fromError, ok, requestId, requireUser } from "@/lib/api";
 import { uuidSchema } from "@pique/validation";
 import { NextResponse } from "next/server";
 
+export async function PATCH(
+  request: Request,
+  context: { params: Promise<{ circleId: string }> },
+) {
+  const id = requestId(request);
+  try {
+    const auth = await requireUser(id);
+    if (auth instanceof NextResponse) return auth;
+    const { circleId } = await context.params;
+    const parsedCircleId = uuidSchema.parse(circleId);
+    const body = (await request.json()) as { visibility?: string };
+    if (!["PRIVATE", "PUBLIC"].includes(body.visibility ?? "")) {
+      return fail("INVALID_VISIBILITY", "Visibilidad no válida.", id, 422);
+    }
+    const { data, error } = await auth.supabase
+      .from("circles")
+      .update({
+        visibility: body.visibility,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", parsedCircleId)
+      .eq("owner_id", auth.user.id)
+      .select("id,visibility")
+      .maybeSingle();
+    if (error) throw error;
+    if (!data)
+      return fail(
+        "CIRCLE_NOT_FOUND",
+        "No puedes editar este círculo.",
+        id,
+        404,
+      );
+    return ok(data);
+  } catch (error) {
+    return fromError(error, id);
+  }
+}
+
 export async function DELETE(
   request: Request,
   context: { params: Promise<{ circleId: string }> },

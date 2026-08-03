@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function AuthLayout({
   children,
@@ -7,6 +8,7 @@ export default function AuthLayout({
 }) {
   return (
     <main
+      className="ambient-background"
       style={{
         minHeight: "100dvh",
         display: "grid",
@@ -19,16 +21,29 @@ export default function AuthLayout({
           href="/"
           className="display"
           style={{
-            display: "block",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12,
             textDecoration: "none",
             color: "var(--ink)",
-            fontSize: 31,
-            marginBottom: 28,
+            fontSize: 27,
+            marginBottom: 26,
           }}
         >
-          pi<span style={{ color: "var(--violet)" }}>que</span>.
+          <Image src="/icon.svg" alt="" width={58} height={58} priority />
+          <span className="brand-word">
+            pi<span>que</span>.
+          </span>
         </Link>
-        <div className="card" style={{ padding: "32px 26px" }}>
+        <div
+          className="card"
+          style={{
+            padding: "32px 26px",
+            background: "rgb(28 27 27 / 82%)",
+            backdropFilter: "blur(20px)",
+          }}
+        >
           {children}
         </div>
       </section>
