@@ -56,7 +56,7 @@ test("A crea → B acepta → A cumple → B valida → ranking cambia", async (
     await expect(objectiveA).toBeVisible({ timeout: 15_000 });
     await objectiveA.getByRole("button", { name: "Hecho" }).click();
     await pageA.getByLabel("Nota opcional").fill("Veinte minutos terminados.");
-    await pageA.getByRole("button", { name: /Enviar check-in/ }).click();
+    await pageA.getByRole("button", { name: /Confirmar hecho/ }).click();
     await expect(pageA.getByText(/Check-in enviado/)).toBeVisible();
     await pageB.goto("/hoy");
     const pending = pageB
