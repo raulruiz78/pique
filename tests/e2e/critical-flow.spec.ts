@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-test.setTimeout(90_000);
+// El primer arranque de Next.js en CI compila varias rutas bajo demanda.
+// Dejamos margen al flujo completo sin relajar los timeouts de cada aserción.
+test.setTimeout(180_000);
 
 async function login(page: import("@playwright/test").Page, email: string) {
   for (let attempt = 0; attempt < 3; attempt += 1) {
@@ -69,7 +71,6 @@ test("A crea → B acepta → A cumple → B valida → ranking cambia", async (
     await pageA.goto("/ranking");
     await expect(pageA.getByText("Raúl").first()).toBeVisible();
   } finally {
-    await a.close();
-    await b.close();
+    await Promise.allSettled([a.close(), b.close()]);
   }
 });
