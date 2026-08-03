@@ -71,6 +71,8 @@ test("A crea → B acepta → A cumple → B valida → ranking cambia", async (
     await pageA.goto("/ranking");
     await expect(pageA.getByText("Raúl").first()).toBeVisible();
   } finally {
-    await Promise.allSettled([a.close(), b.close()]);
+    // No dejamos que un cierre lento de WebKit oculte el fallo original.
+    void a.close().catch(() => undefined);
+    void b.close().catch(() => undefined);
   }
 });

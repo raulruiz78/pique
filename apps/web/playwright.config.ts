@@ -6,6 +6,7 @@ export default defineConfig({
   reporter: process.env.CI ? "github" : "list",
   use: {
     baseURL: "http://localhost:3000",
+    actionTimeout: 15_000,
     trace: "on-first-retry",
     ...devices["iPhone 13"],
   },
