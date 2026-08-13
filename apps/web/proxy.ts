@@ -31,7 +31,7 @@ export async function proxy(request: NextRequest) {
   );
   const { data } = await supabase.auth.getClaims();
   const protectedPath =
-    /^\/(hoy|calendario|crear|ranking|perfil|retos|circulos|notificaciones)/.test(
+    /^\/(hoy|calendario|crear|ranking|perfil|retos|circulos|notificaciones|amigos)/.test(
       request.nextUrl.pathname,
     );
   if (!data?.claims && protectedPath) {

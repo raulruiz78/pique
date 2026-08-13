@@ -46,8 +46,7 @@ export default async function FriendsPage() {
       id: row.id,
       status: row.status as "PENDING" | "ACCEPTED" | "REJECTED",
       direction: (isRequester ? "OUTGOING" : "INCOMING") as
-        | "OUTGOING"
-        | "INCOMING",
+        "OUTGOING" | "INCOMING",
       profile: profileById.get(otherId) ?? null,
     };
   });

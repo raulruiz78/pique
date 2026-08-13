@@ -56,9 +56,19 @@ export async function POST(request: Request) {
       if (error.message?.includes("USER_NOT_FOUND"))
         return fail("USER_NOT_FOUND", "No existe ese usuario.", id, 404);
       if (error.message?.includes("USER_BLOCKED"))
-        return fail("USER_BLOCKED", "No es posible enviar la solicitud.", id, 403);
+        return fail(
+          "USER_BLOCKED",
+          "No es posible enviar la solicitud.",
+          id,
+          403,
+        );
       if (error.message?.includes("INVALID_REQUEST"))
-        return fail("INVALID_REQUEST", "No puedes añadirte a ti mismo.", id, 422);
+        return fail(
+          "INVALID_REQUEST",
+          "No puedes añadirte a ti mismo.",
+          id,
+          422,
+        );
       throw error;
     }
     return ok(data, 201);

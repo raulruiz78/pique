@@ -97,7 +97,11 @@ export function FriendsManager({ items }: { items: FriendItem[] }) {
           className="button button-primary"
           disabled={sending || !username.trim()}
         >
-          {sending ? <LoaderCircle className="animate-spin" /> : <Plus size={18} />}
+          {sending ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <Plus size={18} />
+          )}
         </button>
       </form>
 
