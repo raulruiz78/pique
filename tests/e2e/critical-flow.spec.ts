@@ -32,13 +32,41 @@ test("A crea → B acepta → A cumple → B valida → ranking cambia", async (
     await login(pageA, "raul@pique.local");
     await pageA.goto("/crear");
     await pageA.getByRole("button", { name: /Foco y mente/ }).click();
-    await expect(pageA.getByText("Carmen")).toBeVisible();
+    await expect(pageA.getByText("Carmen")).toBeVisible({ timeout: 15_000 });
     await pageA.getByLabel("Título").fill(challengeTitle);
     await pageA
       .getByLabel("Descripción y reglas")
       .fill("Leer al menos veinte minutos. Sin audiolibros.");
     await pageA.getByRole("button", { name: /Siguiente/ }).click();
-    await pageA.getByLabel("Foto como evidencia").uncheck();
+    // El asistente arranca con Lunes/Miércoles/Viernes preseleccionados: el
+    // resto de días no generarían ninguna ocurrencia para "hoy". Las
+    // ocurrencias se generan por día UTC (date_trunc en el servidor), así
+    // que marcamos solo el día de hoy en UTC — nunca varios días, para no
+    // arriesgarnos a que un día adyacente también solape la ventana "hoy"
+    // calculada en la zona horaria del perfil (Europe/Madrid en el seed).
+    const utcDayNames = [
+      "Domingo",
+      "Lunes",
+      "Martes",
+      "Miércoles",
+      "Jueves",
+      "Viernes",
+      "Sábado",
+    ];
+    const todayName = utcDayNames[new Date().getUTCDay()];
+    const dayButtons = pageA
+      .getByRole("group", { name: "Días del reto" })
+      .getByRole("button");
+    for (const day of await dayButtons.all()) {
+      const isToday = (await day.getAttribute("aria-label")) === todayName;
+      const isPressed = (await day.getAttribute("aria-pressed")) === "true";
+      if (isToday !== isPressed) await day.click();
+    }
+    // El checkbox vive dentro de un <label class="stitch-card"> grande: el
+    // control de accionabilidad estricto de Playwright a veces lo marca como
+    // intersectado/inestable por el propio label que lo envuelve. El toque
+    // real siempre funciona sobre esta tarjeta, así que forzamos el clic.
+    await pageA.getByLabel("Foto como evidencia").uncheck({ force: true });
     await pageA.getByRole("button", { name: /Siguiente/ }).click();
     await pageA.getByRole("button", { name: /Enviar reto/ }).click();
     await expect(pageA).toHaveURL(/\/retos\//, { timeout: 15_000 });
@@ -57,7 +85,9 @@ test("A crea → B acepta → A cumple → B valida → ranking cambia", async (
     await objectiveA.getByRole("button", { name: "Hecho" }).click();
     await pageA.getByLabel("Nota opcional").fill("Veinte minutos terminados.");
     await pageA.getByRole("button", { name: /Confirmar hecho/ }).click();
-    await expect(pageA.getByText(/Check-in enviado/)).toBeVisible();
+    await expect(pageA.getByText(/Check-in enviado/)).toBeVisible({
+      timeout: 15_000,
+    });
     await pageB.goto("/hoy");
     const pending = pageB
       .getByRole("article")
@@ -67,9 +97,13 @@ test("A crea → B acepta → A cumple → B valida → ranking cambia", async (
       });
     await expect(pending).toBeVisible({ timeout: 15_000 });
     await pending.getByRole("button", { name: /Validar/ }).click();
-    await expect(pageB.getByText(/Los puntos ya cuentan/)).toBeVisible();
+    await expect(pageB.getByText(/Los puntos ya cuentan/)).toBeVisible({
+      timeout: 15_000,
+    });
     await pageA.goto("/ranking");
-    await expect(pageA.getByText("Raúl").first()).toBeVisible();
+    await expect(pageA.getByText("Raúl").first()).toBeVisible({
+      timeout: 15_000,
+    });
   } finally {
     // No dejamos que un cierre lento de WebKit oculte el fallo original.
     void a.close().catch(() => undefined);

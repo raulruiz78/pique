@@ -42,12 +42,19 @@ export function fromError(error: unknown, id: string) {
       422,
       error.flatten() as unknown as Json,
     );
+  const details =
+    error && typeof error === "object"
+      ? (error as { message?: unknown; code?: unknown })
+      : null;
   console.error(
     JSON.stringify({
       level: "error",
       requestId: id,
       event: "api_error",
       error: error instanceof Error ? error.name : "unknown",
+      message:
+        typeof details?.message === "string" ? details.message : undefined,
+      code: typeof details?.code === "string" ? details.code : undefined,
     }),
   );
   return fail(
