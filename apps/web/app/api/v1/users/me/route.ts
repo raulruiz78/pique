@@ -29,6 +29,9 @@ export async function PATCH(request: Request) {
       ...(input.profileVisibility === undefined
         ? {}
         : { profile_visibility: input.profileVisibility }),
+      ...(input.notificationPreferences === undefined
+        ? {}
+        : { notification_preferences: input.notificationPreferences }),
       updated_at: new Date().toISOString(),
     };
     const { data, error } = await auth.supabase
