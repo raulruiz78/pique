@@ -5,6 +5,7 @@ import { ProfileForm } from "@/components/profile-form";
 import { ImageUpload } from "@/components/image-upload";
 import { SignOutButton } from "@/components/sign-out";
 import { createServerSupabase } from "@/lib/supabase/server";
+import Link from "next/link";
 import {
   Bell,
   BookOpen,
@@ -250,31 +251,44 @@ export default async function ProfilePage() {
       )}
       <h2 style={{ marginTop: 30 }}>Configuración</h2>
       <div className="stitch-card" style={{ padding: "4px 17px" }}>
-        {[
-          [Eye, "Privacidad del perfil"],
-          [Bell, "Notificaciones y horas silenciosas"],
-          [ShieldCheck, "Seguridad, bloqueos y denuncias"],
-        ].map(([Icon, label], index) => {
-          const Comp = Icon as typeof Bell;
-          return (
-            <button
-              key={String(label)}
-              className="button"
-              style={{
-                width: "100%",
-                justifyContent: "start",
-                padding: "0 3px",
-                borderRadius: 0,
-                background: "transparent",
-                color: "var(--ink)",
-                borderBottom: index < 2 ? "1px solid var(--line)" : 0,
-              }}
-            >
-              <Comp size={18} color="var(--violet)" />
-              <span style={{ flex: 1, textAlign: "left" }}>
-                {String(label)}
-              </span>
+        {(
+          [
+            { icon: UsersRound, label: "Amigos", href: "/amigos" },
+            { icon: Eye, label: "Privacidad del perfil" },
+            { icon: Bell, label: "Notificaciones y horas silenciosas" },
+            { icon: ShieldCheck, label: "Seguridad, bloqueos y denuncias" },
+          ] as const
+        ).map((item, index, array) => {
+          const Icon = item.icon;
+          const style = {
+            width: "100%",
+            justifyContent: "start" as const,
+            padding: "0 3px",
+            borderRadius: 0,
+            background: "transparent",
+            color: "var(--ink)",
+            borderBottom:
+              index < array.length - 1 ? "1px solid var(--line)" : 0,
+          };
+          const content = (
+            <>
+              <Icon size={18} color="var(--violet)" />
+              <span style={{ flex: 1, textAlign: "left" }}>{item.label}</span>
               <ChevronRight size={18} />
+            </>
+          );
+          return "href" in item ? (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="button"
+              style={style}
+            >
+              {content}
+            </Link>
+          ) : (
+            <button key={item.label} className="button" style={style}>
+              {content}
             </button>
           );
         })}

@@ -2,6 +2,25 @@
 
 Este proyecto sigue [versionado semántico](https://semver.org/lang/es/): `MAJOR.MINOR.PATCH`.
 
+## 0.5.0 — 2026-08-14
+
+### Añadido
+
+- Notificaciones push mediante Web Push estándar (VAPID) sobre la tabla `devices` existente; sin credenciales, el adaptador cae a no-op.
+- Nuevos tipos de notificación de retos: reto aceptado, reto finalizado, racha en riesgo, objetivo pendiente y rival adelantado.
+- Preferencias de notificación (in-app, push, correo, horas silenciosas) gestionables desde el perfil, con suscripción real al Service Worker.
+- Sistema de amistad: solicitudes por alias, aceptación o rechazo, notificaciones asociadas y página dedicada `/amigos`.
+
+### Cambiado
+
+- El job de mantenimiento periódico calcula los eventos de notificación derivados y reparte el push pendiente además de sus tareas habituales.
+- Los eventos de notificaciones de retos y amistad se disparan en línea desde los endpoints correspondientes para reducir la latencia frente al ciclo del cron.
+
+### Seguridad
+
+- Solo quien recibe una solicitud de amistad puede aceptarla o rechazarla; quien la envía no puede autoaprobarla.
+- Nueva política de lectura de perfiles limitada a relaciones de amistad activas o pendientes, sin exponer perfiles fuera de círculos ni amistades compartidas.
+
 ## 0.4.0 — 2026-08-13
 
 ### Añadido

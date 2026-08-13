@@ -104,4 +104,12 @@ export const validationDecisionSchema = z.object({
   reason: z.string().trim().max(500).optional(),
 });
 
+export const sendFriendRequestSchema = z.object({
+  username: usernameSchema,
+});
+
+export const respondFriendRequestSchema = z.object({
+  response: z.enum(["ACCEPTED", "REJECTED"]),
+});
+
 export type CreateChallengeInput = z.infer<typeof createChallengeSchema>;
