@@ -1,4 +1,4 @@
-import type { ScoreBreakdown } from "./types.js";
+import type { ScoreBreakdown } from "./types";
 
 export interface ScoreInput {
   base: number;
