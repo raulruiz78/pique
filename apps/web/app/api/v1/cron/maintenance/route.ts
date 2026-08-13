@@ -1,3 +1,4 @@
+import { flushPendingPush } from "@/lib/notifications";
 import { createAdminSupabase } from "@/lib/supabase/admin";
 import { fail, ok, requestId } from "@/lib/api";
 async function runMaintenance(request: Request) {
@@ -47,10 +48,22 @@ async function runMaintenance(request: Request) {
     .lte("available_at", now)
     .select("id")
     .limit(100);
+
+  const streakAtRisk = await admin.rpc("notify_streak_at_risk");
+  const occurrencePending = await admin.rpc("notify_occurrence_pending");
+  const rivalAhead = await admin.rpc("notify_rival_ahead");
+  const { pushed } = await flushPendingPush(admin);
+
   return ok({
     expired: expired.data?.length ?? 0,
     completed,
     outbox: outbox.data?.length ?? 0,
+    derived: {
+      streakAtRisk: streakAtRisk.data ?? 0,
+      occurrencePending: occurrencePending.data ?? 0,
+      rivalAhead: rivalAhead.data ?? 0,
+    },
+    pushed,
   });
 }
 

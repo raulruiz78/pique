@@ -28,6 +28,18 @@ export const timezoneSchema = z
     }
   }, "Zona horaria inválida");
 
+const timeOfDaySchema = z
+  .string()
+  .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Hora inválida (HH:MM)");
+
+export const notificationPreferencesSchema = z.object({
+  inApp: z.boolean(),
+  push: z.boolean(),
+  email: z.boolean(),
+  quietStart: timeOfDaySchema,
+  quietEnd: timeOfDaySchema,
+});
+
 export const profileSchema = z.object({
   username: usernameSchema,
   displayName: z.string().trim().min(2).max(60),
@@ -36,6 +48,13 @@ export const profileSchema = z.object({
   profileVisibility: z
     .enum(["PRIVATE", "FRIENDS", "PUBLIC"])
     .default("FRIENDS"),
+  notificationPreferences: notificationPreferencesSchema.optional(),
+});
+
+export const deviceSubscriptionSchema = z.object({
+  endpoint: z.url().max(2048),
+  publicKey: z.string().min(1).max(512),
+  authSecret: z.string().min(1).max(512),
 });
 
 export const createCircleSchema = z.object({

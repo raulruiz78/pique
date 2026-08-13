@@ -22,11 +22,13 @@
     "db:reset": "supabase db reset",
     "db:stop": "supabase stop",
     "db:types": "supabase gen types typescript --local > packages/database/src/database.types.ts",
-    "smoke": "bash scripts/smoke.sh"
+    "smoke": "bash scripts/smoke.sh",
+    "generate:splash": "node scripts/generate-splash.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",
     "prettier": "^3.6.2",
+    "sharp": "^0.34.5",
     "supabase": "^2.48.3",
     "typescript": "^5.9.3"
   }

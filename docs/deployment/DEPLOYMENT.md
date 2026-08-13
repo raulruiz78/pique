@@ -57,7 +57,7 @@ Los avisos de seguridad adicionales están desactivados y la aplicación no usa 
 
 ## 8. Integraciones opcionales
 
-- Push: guarda suscripciones en `devices` y conecta Web Push/FCM al adaptador.
+- Push: Web Push estándar (VAPID) sobre `devices`. Genera el par de claves una vez con `npx web-push generate-vapid-keys` y define `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/`VAPID_SUBJECT` (servidor) y `NEXT_PUBLIC_VAPID_PUBLIC_KEY` (cliente, misma clave pública). Sin estas variables el adaptador cae a no-op.
 - Email social: reutiliza Brevo solo cuando se definan preferencias, límites y plantillas para retos/círculos.
 - Sentry: añade DSN solo servidor y source maps protegidos.
 - PostHog: usa host UE, consentimiento y minimización de datos.

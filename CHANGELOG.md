@@ -21,6 +21,21 @@ Este proyecto sigue [versionado semántico](https://semver.org/lang/es/): `MAJOR
 - Solo quien recibe una solicitud de amistad puede aceptarla o rechazarla; quien la envía no puede autoaprobarla.
 - Nueva política de lectura de perfiles limitada a relaciones de amistad activas o pendientes, sin exponer perfiles fuera de círculos ni amistades compartidas.
 
+## 0.4.0 — 2026-08-13
+
+### Añadido
+
+- Safe Areas completas (notch y Dynamic Island): variables CSS compartidas para el navegador inferior y el contenedor de la app.
+- Splash screen para iOS generada a partir del icono de la app (`pnpm generate:splash`).
+- Instalación guiada de la PWA: banner con prompt nativo en Chrome/Android e instrucciones manuales en iOS Safari.
+- Detección de PWA instalada mediante `display-mode: standalone`.
+- Mejor comportamiento del teclado móvil (`interactiveWidget: resizes-content`, inputs sin auto-zoom en iOS).
+
+### Cambiado
+
+- El color de fondo y tema del manifest ahora coincide con la identidad visual oscura real de la app.
+- La navegación inferior y el contenedor principal usan variables de área segura en vez de valores fijos.
+
 ## 0.3.0 — 2026-08-03
 
 ### Añadido

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { transitionChallenge } from "./challenge.js";
 import { assertReviewer, transitionCheckIn } from "./check-in.js";
 import { rankParticipants } from "./leaderboard.js";
+import { isWithinQuietHours, shouldSendPush } from "./notifications.js";
 import { generateOccurrences } from "./occurrences.js";
 import { calculateScore, scoreIdempotencyKey } from "./scoring.js";
 import { calculateDailyStreak } from "./streaks.js";
@@ -68,6 +69,48 @@ describe("motor de dominio", () => {
         [1, 3, 5].includes(item.startsAt.getUTCDay()),
       ),
     ).toBe(true);
+  });
+
+  it("detecta horas silenciosas que cruzan medianoche", () => {
+    expect(
+      isWithinQuietHours(
+        "2026-08-02T23:30:00Z",
+        "22:00",
+        "08:00",
+        "Europe/Madrid",
+      ),
+    ).toBe(true);
+    expect(
+      isWithinQuietHours(
+        "2026-08-02T10:00:00Z",
+        "22:00",
+        "08:00",
+        "Europe/Madrid",
+      ),
+    ).toBe(false);
+  });
+
+  it("no envía push fuera de preferencia ni en horas silenciosas", () => {
+    const preferences = {
+      inApp: true,
+      push: true,
+      email: false,
+      quietStart: "22:00",
+      quietEnd: "08:00",
+    };
+    expect(
+      shouldSendPush(preferences, "2026-08-02T10:00:00Z", "Europe/Madrid"),
+    ).toBe(true);
+    expect(
+      shouldSendPush(preferences, "2026-08-02T23:30:00Z", "Europe/Madrid"),
+    ).toBe(false);
+    expect(
+      shouldSendPush(
+        { ...preferences, push: false },
+        "2026-08-02T10:00:00Z",
+        "Europe/Madrid",
+      ),
+    ).toBe(false);
   });
 
   it("desempata por check-ins, momento y usuario", () => {

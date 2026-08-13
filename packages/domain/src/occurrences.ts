@@ -1,4 +1,4 @@
-import { DomainError } from "./challenge.js";
+import { DomainError } from "./challenge";
 
 const DAY_CODES = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"] as const;
 

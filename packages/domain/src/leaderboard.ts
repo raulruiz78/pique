@@ -1,4 +1,4 @@
-import type { RankedEntry, RankingEntry } from "./types.js";
+import type { RankedEntry, RankingEntry } from "./types";
 
 export function rankParticipants(
   entries: readonly RankingEntry[],

@@ -1,5 +1,5 @@
-import { DomainError } from "./challenge.js";
-import type { CheckInStatus } from "./types.js";
+import { DomainError } from "./challenge";
+import type { CheckInStatus } from "./types";
 
 const transitions: Readonly<Record<CheckInStatus, readonly CheckInStatus[]>> = {
   PENDING_REVIEW: ["APPROVED", "REJECTED", "DISPUTED", "EXPIRED"],

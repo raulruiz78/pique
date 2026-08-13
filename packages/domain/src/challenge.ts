@@ -1,4 +1,4 @@
-import type { ChallengeStatus } from "./types.js";
+import type { ChallengeStatus } from "./types";
 
 const transitions: Readonly<
   Record<ChallengeStatus, readonly ChallengeStatus[]>

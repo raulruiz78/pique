@@ -1,5 +1,6 @@
 import { Avatar } from "@/components/avatar";
 import { EmptyState } from "@/components/empty-state";
+import { NotificationPreferencesForm } from "@/components/notification-preferences-form";
 import { ProfileForm } from "@/components/profile-form";
 import { ImageUpload } from "@/components/image-upload";
 import { SignOutButton } from "@/components/sign-out";
@@ -37,7 +38,7 @@ export default async function ProfilePage() {
   const profile = await supabase
     .from("profiles")
     .select(
-      "username,display_name,avatar_path,timezone,locale,profile_visibility,total_points,current_streak",
+      "username,display_name,avatar_path,timezone,locale,profile_visibility,total_points,current_streak,notification_preferences",
     )
     .eq("id", user!.id)
     .single();
@@ -234,6 +235,20 @@ export default async function ProfilePage() {
       </section>
       <h2>Tu perfil</h2>
       {value && <ProfileForm profile={value} />}
+      <h2 style={{ marginTop: 30 }}>Notificaciones</h2>
+      {value && (
+        <NotificationPreferencesForm
+          preferences={
+            value.notification_preferences as {
+              inApp: boolean;
+              push: boolean;
+              email: boolean;
+              quietStart: string;
+              quietEnd: string;
+            }
+          }
+        />
+      )}
       <h2 style={{ marginTop: 30 }}>Configuración</h2>
       <div className="stitch-card" style={{ padding: "4px 17px" }}>
         {(

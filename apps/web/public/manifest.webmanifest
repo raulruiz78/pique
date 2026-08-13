@@ -4,8 +4,8 @@
   "description": "Retos privados con reglas claras, evidencias y puntos.",
   "start_url": "/hoy",
   "display": "standalone",
-  "background_color": "#f5f3ed",
-  "theme_color": "#6d35ff",
+  "background_color": "#131313",
+  "theme_color": "#131313",
   "lang": "es",
   "orientation": "portrait-primary",
   "icons": [
