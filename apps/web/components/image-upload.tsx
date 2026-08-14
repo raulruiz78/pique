@@ -5,6 +5,7 @@ import { Camera, LoaderCircle, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useRef, useState } from "react";
 import { toast } from "sonner";
+import { ImageCropModal } from "./image-crop-modal";
 
 export function ImageUpload({
   endpoint,
@@ -20,8 +21,9 @@ export function ImageUpload({
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
-  async function upload(file?: File) {
+  function selectFile(file?: File) {
     if (!file) return;
     if (
       !(["image/jpeg", "image/png", "image/webp"] as string[]).includes(
@@ -31,6 +33,10 @@ export function ImageUpload({
       return toast.error("Usa una imagen JPG, PNG o WebP.");
     if (file.size > 5 * 1024 * 1024)
       return toast.error("La imagen no puede superar 5 MB.");
+    setPendingFile(file);
+  }
+
+  async function upload(blob: Blob) {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
     if (!url || !key) return toast.error("Supabase no está configurado.");
@@ -39,7 +45,7 @@ export function ImageUpload({
       const prepare = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mimeType: file.type, sizeBytes: file.size }),
+        body: JSON.stringify({ mimeType: blob.type, sizeBytes: blob.size }),
       });
       const body = (await prepare.json()) as {
         data?: { path: string; token: string };
@@ -50,8 +56,8 @@ export function ImageUpload({
       const supabase = createBrowserClient(url, key);
       const { error } = await supabase.storage
         .from("profile-images")
-        .uploadToSignedUrl(body.data.path, body.data.token, file, {
-          contentType: file.type,
+        .uploadToSignedUrl(body.data.path, body.data.token, blob, {
+          contentType: blob.type,
         });
       if (error) throw error;
       const finalize = await fetch(endpoint, {
@@ -102,8 +108,21 @@ export function ImageUpload({
         type="file"
         accept="image/jpeg,image/png,image/webp"
         hidden
-        onChange={(event) => upload(event.target.files?.[0])}
+        onChange={(event) => {
+          selectFile(event.target.files?.[0]);
+          if (input.current) input.current.value = "";
+        }}
       />
+      {pendingFile && (
+        <ImageCropModal
+          file={pendingFile}
+          onCancel={() => setPendingFile(null)}
+          onConfirm={(blob) => {
+            setPendingFile(null);
+            void upload(blob);
+          }}
+        />
+      )}
       <button
         type="button"
         disabled={loading}
