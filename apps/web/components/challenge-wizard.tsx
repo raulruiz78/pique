@@ -17,6 +17,10 @@ import {
   challengeCategories,
   type ChallengeCategory,
 } from "./challenge-category";
+import {
+  challengeTemplates,
+  type ChallengeTemplate,
+} from "./challenge-templates";
 
 interface Member {
   user_id: string;
@@ -45,6 +49,7 @@ export function ChallengeWizard({
 }) {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [customMode, setCustomMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [circles, setCircles] = useState<Circle[]>([]);
   const [form, setForm] = useState({
@@ -98,6 +103,23 @@ export function ChallengeWizard({
     setForm((current) => ({
       ...current,
       category,
+    }));
+    setStep(2);
+  }
+  function applyTemplate(template: ChallengeTemplate) {
+    setForm((current) => ({
+      ...current,
+      category: template.category,
+      title: template.title,
+      description: template.description,
+      scheduleMode: template.scheduleMode,
+      days: template.days,
+      weeklyTarget: template.weeklyTarget,
+      dailyTarget: template.dailyTarget,
+      points: String(template.points),
+      evidenceRequired: template.evidenceRequired,
+      validationType: template.validationType,
+      consequence: template.consequence,
     }));
     setStep(2);
   }
@@ -174,7 +196,60 @@ export function ChallengeWizard({
           />
         </div>
       </div>
-      {step === 1 && (
+      {step === 1 && !customMode && (
+        <section>
+          <h2 className="display" style={{ fontSize: 40, margin: "8px 0 8px" }}>
+            ¿A qué os vais a picar?
+          </h2>
+          <p
+            className="muted"
+            style={{ fontSize: 20, lineHeight: 1.45, margin: "0 0 24px" }}
+          >
+            Elige una plantilla ya lista o empieza desde cero.
+          </p>
+          <div style={{ display: "grid", gap: 10 }}>
+            {challengeTemplates.map((template) => (
+              <button
+                key={template.id}
+                type="button"
+                onClick={() => applyTemplate(template)}
+                className="stitch-card"
+                style={{
+                  padding: 16,
+                  display: "flex",
+                  gap: 14,
+                  alignItems: "center",
+                  textAlign: "left",
+                  color: "inherit",
+                  cursor: "pointer",
+                }}
+              >
+                <span style={{ fontSize: 28, flex: "0 0 auto" }}>
+                  {template.emoji}
+                </span>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <b style={{ display: "block", fontSize: 17 }}>
+                    {template.title}
+                  </b>
+                  <small className="muted" style={{ display: "block" }}>
+                    {template.tagline}
+                  </small>
+                </span>
+                <ChevronRight size={18} />
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setCustomMode(true)}
+            className="button button-secondary"
+            style={{ width: "100%", marginTop: 18 }}
+          >
+            Empezar desde cero
+          </button>
+        </section>
+      )}
+      {step === 1 && customMode && (
         <section>
           <h2 className="display" style={{ fontSize: 40, margin: "8px 0 8px" }}>
             ¿A qué os vais a picar?
@@ -201,6 +276,15 @@ export function ChallengeWizard({
               </button>
             ))}
           </div>
+          <button
+            type="button"
+            onClick={() => setCustomMode(false)}
+            className="button button-secondary"
+            style={{ width: "100%", marginTop: 18 }}
+          >
+            <ChevronLeft size={18} />
+            Ver plantillas
+          </button>
         </section>
       )}
       {step === 2 && (
