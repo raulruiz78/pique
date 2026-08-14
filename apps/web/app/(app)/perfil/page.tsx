@@ -1,7 +1,5 @@
 import { Avatar } from "@/components/avatar";
 import { EmptyState } from "@/components/empty-state";
-import { NotificationPreferencesForm } from "@/components/notification-preferences-form";
-import { ProfileForm } from "@/components/profile-form";
 import { ImageUpload } from "@/components/image-upload";
 import { SignOutButton } from "@/components/sign-out";
 import { createServerSupabase } from "@/lib/supabase/server";
@@ -37,9 +35,7 @@ export default async function ProfilePage() {
   } = await supabase.auth.getUser();
   const profile = await supabase
     .from("profiles")
-    .select(
-      "username,display_name,avatar_path,timezone,locale,profile_visibility,total_points,current_streak,notification_preferences",
-    )
+    .select("username,display_name,avatar_path,total_points,current_streak")
     .eq("id", user!.id)
     .single();
   const value = profile.data;
@@ -81,7 +77,14 @@ export default async function ProfilePage() {
         <h1 style={{ color: "var(--violet)", fontSize: 25, margin: 0 }}>
           Perfil
         </h1>
-        <Settings color="var(--violet)" />
+        <Link
+          href="/perfil/editar"
+          aria-label="Editar perfil"
+          className="button button-secondary"
+          style={{ width: 42, height: 42, padding: 0 }}
+        >
+          <Settings size={18} />
+        </Link>
       </div>
       <header
         style={{
@@ -233,29 +236,22 @@ export default async function ProfilePage() {
           })}
         </div>
       </section>
-      <h2>Tu perfil</h2>
-      {value && <ProfileForm profile={value} />}
-      <h2 style={{ marginTop: 30 }}>Notificaciones</h2>
-      {value && (
-        <NotificationPreferencesForm
-          preferences={
-            value.notification_preferences as {
-              inApp: boolean;
-              push: boolean;
-              email: boolean;
-              quietStart: string;
-              quietEnd: string;
-            }
-          }
-        />
-      )}
       <h2 style={{ marginTop: 30 }}>Configuración</h2>
       <div className="stitch-card" style={{ padding: "4px 17px" }}>
         {(
           [
+            { icon: Settings, label: "Editar perfil", href: "/perfil/editar" },
             { icon: UsersRound, label: "Amigos", href: "/amigos" },
-            { icon: Eye, label: "Privacidad del perfil" },
-            { icon: Bell, label: "Notificaciones y horas silenciosas" },
+            {
+              icon: Eye,
+              label: "Privacidad del perfil",
+              href: "/perfil/privacidad",
+            },
+            {
+              icon: Bell,
+              label: "Notificaciones y horas silenciosas",
+              href: "/perfil/notificaciones",
+            },
             { icon: ShieldCheck, label: "Seguridad, bloqueos y denuncias" },
           ] as const
         ).map((item, index, array) => {

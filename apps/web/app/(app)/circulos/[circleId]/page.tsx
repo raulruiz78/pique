@@ -82,6 +82,9 @@ export default async function CirclePage({
     }
   }
   const ranking = [...totals.values()].sort((a, b) => b.score - a.score);
+  const podiumSize = Math.min(ranking.length, 3);
+  const podiumOrder =
+    podiumSize === 3 ? [2, 1, 3] : podiumSize === 2 ? [2, 1] : [1];
 
   return (
     <main className="page">
@@ -194,62 +197,64 @@ export default async function CirclePage({
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(3,1fr)",
+                  gridTemplateColumns: `repeat(${podiumOrder.length}, minmax(0,1fr))`,
                   gap: 8,
                   alignItems: "end",
                   margin: "8px 0 22px",
+                  maxWidth:
+                    podiumOrder.length < 3
+                      ? podiumOrder.length * 120 + (podiumOrder.length - 1) * 8
+                      : undefined,
+                  marginInline: podiumOrder.length < 3 ? "auto" : undefined,
                 }}
               >
-                {[ranking[1], ranking[0], ranking[2]].map(
-                  (player, podiumIndex) => {
-                    if (!player) return <div key={`empty-${podiumIndex}`} />;
-                    const place = [2, 1, 3][podiumIndex];
-                    return (
-                      <div
-                        key={player.userId}
+                {podiumOrder.map((place) => {
+                  const player = ranking[place - 1]!;
+                  return (
+                    <div
+                      key={player.userId}
+                      style={{
+                        padding: place === 1 ? "24px 6px 18px" : "15px 6px",
+                        borderRadius: "20px 20px 8px 8px",
+                        textAlign: "center",
+                        color: place === 1 ? "#162000" : "var(--ink)",
+                        background:
+                          place === 1 ? "var(--lime)" : "var(--surface-high)",
+                      }}
+                    >
+                      <Avatar
+                        name={player.name}
+                        size={place === 1 ? 70 : 54}
+                        accent={place === 1 ? "var(--lime)" : "var(--violet)"}
+                        src={
+                          player.avatarPath
+                            ? `/api/v1/media/profiles/${player.userId}`
+                            : null
+                        }
+                      />
+                      <small style={{ display: "block", marginTop: 8 }}>
+                        #{place}
+                      </small>
+                      <b
                         style={{
-                          padding: place === 1 ? "24px 6px 18px" : "15px 6px",
-                          borderRadius: "20px 20px 8px 8px",
-                          textAlign: "center",
-                          color: place === 1 ? "#162000" : "var(--ink)",
-                          background:
-                            place === 1 ? "var(--lime)" : "var(--surface-high)",
+                          display: "block",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
                         }}
                       >
-                        <Avatar
-                          name={player.name}
-                          size={place === 1 ? 70 : 54}
-                          accent={place === 1 ? "var(--lime)" : "var(--violet)"}
-                          src={
-                            player.avatarPath
-                              ? `/api/v1/media/profiles/${player.userId}`
-                              : null
-                          }
-                        />
-                        <small style={{ display: "block", marginTop: 8 }}>
-                          #{place}
-                        </small>
-                        <b
-                          style={{
-                            display: "block",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {player.name}
-                        </b>
-                        <strong
-                          style={{
-                            display: "block",
-                            fontSize: place === 1 ? 27 : 21,
-                          }}
-                        >
-                          {player.score}
-                        </strong>
-                      </div>
-                    );
-                  },
-                )}
+                        {player.name}
+                      </b>
+                      <strong
+                        style={{
+                          display: "block",
+                          fontSize: place === 1 ? 27 : 21,
+                        }}
+                      >
+                        {player.score}
+                      </strong>
+                    </div>
+                  );
+                })}
               </div>
               {ranking.slice(3).map((player, offset) => {
                 const index = offset + 3;

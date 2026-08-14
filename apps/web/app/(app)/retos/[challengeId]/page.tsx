@@ -13,17 +13,23 @@ import {
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-const DAY_LABELS: Record<string, string> = {
-  MO: "lunes",
-  TU: "martes",
-  WE: "miércoles",
-  TH: "jueves",
-  FR: "viernes",
-  SA: "sábado",
-  SU: "domingo",
+const WEEK_CODES = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
+const DAY_LETTERS: Record<string, string> = {
+  MO: "L",
+  TU: "M",
+  WE: "X",
+  TH: "J",
+  FR: "V",
+  SA: "S",
+  SU: "D",
 };
 
-function describeRhythm(recurrence: string): string {
+type Rhythm =
+  | { kind: "multiple"; badge: string; headline: string }
+  | { kind: "flexible"; badge: string; headline: string }
+  | { kind: "fixed"; badge: string; headline: string; activeDays: string[] };
+
+function describeRhythm(recurrence: string): Rhythm {
   const parts = Object.fromEntries(
     recurrence
       .split(";")
@@ -33,22 +39,56 @@ function describeRhythm(recurrence: string): string {
 
   if (parts.DAILYCOUNT) {
     const count = Number(parts.DAILYCOUNT);
-    return `${count} ${count === 1 ? "vez" : "veces"} al día, cualquier día`;
+    return {
+      kind: "multiple",
+      badge: "MÚLTIPLE AL DÍA",
+      headline: `${count} ${count === 1 ? "vez" : "veces"} cada día`,
+    };
   }
   if (parts.FLEX) {
     const count = Number(parts.FLEX);
-    return `${count} ${count === 1 ? "vez" : "veces"} por semana, tú eliges cuándo (flexible)`;
+    return {
+      kind: "flexible",
+      badge: "FLEXIBLE",
+      headline: `${count} ${count === 1 ? "vez" : "veces"} por semana, vosotros elegís cuándo`,
+    };
   }
-  if (parts.FREQ === "DAILY") return "Todos los días";
+  if (parts.FREQ === "DAILY") {
+    return {
+      kind: "fixed",
+      badge: "FIJO",
+      headline: "Todos los días",
+      activeDays: WEEK_CODES,
+    };
+  }
   if (parts.BYDAY) {
-    const days = parts.BYDAY.split(",")
-      .filter(Boolean)
-      .map((code) => DAY_LABELS[code] ?? code);
-    if (days.length === 0) return "Ritmo fijo";
-    if (days.length === 1) return `Solo ${days[0]}`;
-    return `${days.slice(0, -1).join(", ")} y ${days.at(-1)}`;
+    const activeDays = parts.BYDAY.split(",").filter(
+      (code): code is string => Boolean(code) && code in DAY_LETTERS,
+    );
+    if (activeDays.length === WEEK_CODES.length) {
+      return {
+        kind: "fixed",
+        badge: "FIJO",
+        headline: "Todos los días",
+        activeDays: WEEK_CODES,
+      };
+    }
+    return {
+      kind: "fixed",
+      badge: "FIJO",
+      headline:
+        activeDays.length === 1
+          ? "Un día fijo a la semana"
+          : `${activeDays.length} días fijos a la semana`,
+      activeDays,
+    };
   }
-  return "Ritmo fijo";
+  return {
+    kind: "fixed",
+    badge: "FIJO",
+    headline: "Ritmo fijo",
+    activeDays: [],
+  };
 }
 export default async function ChallengePage({
   params,
@@ -110,19 +150,13 @@ export default async function ChallengePage({
             <ChallengeActions challengeId={challengeId} />
           </div>
         )}
+      <RhythmCard rhythm={describeRhythm(data.goals[0]?.recurrence ?? "")} />
       <section className="metric-grid" style={{ margin: "22px 0" }}>
         <div className="stitch-card metric-card">
           <Row
             Icon={CalendarDays}
             label="Fechas"
             value={`${new Date(data.start_at).toLocaleDateString("es")} — ${new Date(data.end_at).toLocaleDateString("es")}`}
-          />
-        </div>
-        <div className="stitch-card metric-card">
-          <Row
-            Icon={Repeat}
-            label="Ritmo"
-            value={describeRhythm(data.goals[0]?.recurrence ?? "")}
           />
         </div>
         <div className="stitch-card metric-card">
@@ -229,6 +263,49 @@ export default async function ChallengePage({
         </Link>
       )}
     </main>
+  );
+}
+function RhythmCard({ rhythm }: { rhythm: Rhythm }) {
+  return (
+    <section className="stitch-card" style={{ padding: 20, margin: "22px 0" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 14,
+        }}
+      >
+        <Repeat size={20} color="var(--violet)" />
+        <span className="pill pill-violet">{rhythm.badge}</span>
+      </div>
+      <b style={{ fontSize: 18, display: "block" }}>{rhythm.headline}</b>
+      {rhythm.kind === "fixed" && rhythm.activeDays.length > 0 && (
+        <div style={{ display: "flex", gap: 6, marginTop: 16 }}>
+          {WEEK_CODES.map((code) => {
+            const active = rhythm.activeDays.includes(code);
+            return (
+              <span
+                key={code}
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: "50%",
+                  display: "grid",
+                  placeItems: "center",
+                  fontSize: 13,
+                  fontWeight: 800,
+                  background: active ? "var(--lime)" : "var(--surface-high)",
+                  color: active ? "#16131d" : "var(--muted)",
+                }}
+              >
+                {DAY_LETTERS[code]}
+              </span>
+            );
+          })}
+        </div>
+      )}
+    </section>
   );
 }
 function Row({
