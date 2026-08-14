@@ -53,6 +53,17 @@ export default async function CirclePage({
         player.user_id === user?.id && player.acceptance === "PENDING",
     ),
   );
+  const waitingOnOthers = circle.challenges.filter(
+    (challenge) =>
+      challenge.status === "PENDING_ACCEPTANCE" &&
+      challenge.challenge_participants.some(
+        (player) =>
+          player.user_id === user?.id && player.acceptance === "ACCEPTED",
+      ) &&
+      challenge.challenge_participants.some(
+        (player) => player.acceptance === "PENDING",
+      ),
+  );
   const playable = circle.challenges.filter((challenge) =>
     ["ACTIVE", "SCHEDULED", "COMPLETED"].includes(challenge.status),
   );
@@ -182,6 +193,46 @@ export default async function CirclePage({
                 <ChallengeActions challengeId={challenge.id} />
               </article>
             ))}
+          </div>
+        </section>
+      )}
+
+      {waitingOnOthers.length > 0 && (
+        <section style={{ marginTop: 26 }}>
+          <span className="eyebrow">Propuestos por ti</span>
+          <div style={{ display: "grid", gap: 11, marginTop: 10 }}>
+            {waitingOnOthers.map((challenge) => {
+              const waitingNames = (
+                challenge.challenge_participants as Player[]
+              )
+                .filter((player) => player.acceptance === "PENDING")
+                .map(
+                  (player) =>
+                    player.profiles?.display_name ??
+                    player.profiles?.username ??
+                    "tu rival",
+                );
+              return (
+                <article
+                  key={challenge.id}
+                  className="card"
+                  style={{ padding: 18, borderLeft: "5px solid var(--violet)" }}
+                >
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <Clock3 color="var(--violet)" />
+                    <div>
+                      <b>{challenge.title}</b>
+                      <small
+                        className="muted"
+                        style={{ display: "block", marginTop: 3 }}
+                      >
+                        Esperando respuesta de {waitingNames.join(", ")}.
+                      </small>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </section>
       )}
