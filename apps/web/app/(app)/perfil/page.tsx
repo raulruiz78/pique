@@ -35,7 +35,9 @@ export default async function ProfilePage() {
   } = await supabase.auth.getUser();
   const profile = await supabase
     .from("profiles")
-    .select("username,display_name,avatar_path,total_points,current_streak")
+    .select(
+      "username,display_name,avatar_path,total_points,current_streak,best_streak",
+    )
     .eq("id", user!.id)
     .single();
   const value = profile.data;
@@ -52,6 +54,7 @@ export default async function ProfilePage() {
   ]);
   const points = value?.total_points ?? 0;
   const streak = value?.current_streak ?? 0;
+  const bestStreak = Math.max(value?.best_streak ?? 0, streak);
   const level = Math.floor(points / 500) + 1;
   const tierNames = [
     "Novato",
@@ -169,6 +172,9 @@ export default async function ProfilePage() {
           >
             {streak} días
           </strong>
+          <small className="muted" style={{ display: "block", marginTop: 6 }}>
+            Récord: {bestStreak} días
+          </small>
         </div>
         <div
           className="stitch-card"
