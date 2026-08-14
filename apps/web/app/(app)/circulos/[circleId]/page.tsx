@@ -216,6 +216,9 @@ export default async function CirclePage({
                       style={{
                         padding: place === 1 ? "24px 6px 18px" : "15px 6px",
                         borderRadius: "20px 20px 8px 8px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
                         textAlign: "center",
                         color: place === 1 ? "#162000" : "var(--ink)",
                         background:
@@ -238,8 +241,10 @@ export default async function CirclePage({
                       <b
                         style={{
                           display: "block",
+                          width: "100%",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
                         }}
                       >
                         {player.name}
