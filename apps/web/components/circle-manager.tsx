@@ -7,6 +7,7 @@ import {
   Plus,
   Trash2,
   Users,
+  Zap,
 } from "lucide-react";
 import { Avatar } from "./avatar";
 import { useRouter } from "next/navigation";
@@ -180,22 +181,23 @@ export function CircleManager({
                 router.push(`/circulos/${circle.id}`);
               }
             }}
-            style={{ padding: 24, cursor: "pointer", minHeight: 190 }}
+            style={{ padding: 24, cursor: "pointer" }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               {circle.imageSrc ? (
                 <Avatar
                   name={circle.name}
                   src={circle.imageSrc}
-                  size={68}
+                  size={56}
                   accent="var(--lime)"
                 />
               ) : (
                 <span
                   style={{
-                    width: 68,
-                    height: 68,
-                    borderRadius: 22,
+                    width: 56,
+                    height: 56,
+                    flexShrink: 0,
+                    borderRadius: 18,
                     display: "grid",
                     placeItems: "center",
                     background: "var(--lime)",
@@ -206,53 +208,97 @@ export function CircleManager({
                 </span>
               )}
               <div style={{ flex: 1, color: "inherit", minWidth: 0 }}>
-                <b style={{ fontSize: 21 }}>{circle.name}</b>
+                <b style={{ fontSize: 20 }}>{circle.name}</b>
                 <small
                   className="muted"
-                  style={{ display: "block", marginTop: 3 }}
+                  style={{ display: "block", marginTop: 2 }}
                 >
-                  {circle.memberCount} miembros · {circle.activeCount ?? 0}{" "}
-                  retos en juego
+                  {circle.memberCount} miembros
                 </small>
               </div>
-              <span className="pill pill-violet">
-                {circle.activeCount ?? 0} retos activos
-              </span>
               <button
                 aria-label={`Invitar a ${circle.name}`}
                 className="button button-secondary"
-                style={{ width: 45, padding: 0 }}
+                style={{ width: 42, padding: 0 }}
                 onClick={(event) => invite(event, circle.id)}
                 onKeyDown={(event) => event.stopPropagation()}
               >
-                <Copy size={17} />
+                <Copy size={16} />
               </button>
               {circle.isOwner && (
                 <button
                   aria-label={`Eliminar ${circle.name}`}
-                  className="button button-danger"
                   disabled={deletingId === circle.id}
-                  style={{ width: 45, padding: 0 }}
                   onClick={(event) => remove(event, circle)}
                   onKeyDown={(event) => event.stopPropagation()}
+                  style={{
+                    width: 42,
+                    height: 42,
+                    padding: 0,
+                    flexShrink: 0,
+                    border: 0,
+                    borderRadius: "50%",
+                    display: "grid",
+                    placeItems: "center",
+                    background: "var(--danger)",
+                    color: "#690005",
+                    cursor: "pointer",
+                  }}
                 >
                   {deletingId === circle.id ? (
-                    <LoaderCircle className="animate-spin" size={17} />
+                    <LoaderCircle className="animate-spin" size={16} />
                   ) : (
-                    <Trash2 size={17} />
+                    <Trash2 size={16} />
                   )}
                 </button>
               )}
-              <ChevronRight color="var(--violet)" aria-hidden="true" />
             </div>
             {circle.description && (
               <p
                 className="muted"
-                style={{ margin: "22px 2px 2px", fontSize: 13 }}
+                style={{ margin: "14px 2px 0", fontSize: 13 }}
               >
                 {circle.description}
               </p>
             )}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginTop: 18,
+                paddingTop: 16,
+                borderTop: "1px solid var(--line)",
+              }}
+            >
+              <span
+                className="muted"
+                style={{ display: "flex", alignItems: "center", gap: 8 }}
+              >
+                <Zap size={16} color="var(--lime)" />
+                {circle.activeCount ?? 0}{" "}
+                {circle.activeCount === 1 ? "reto en juego" : "retos en juego"}
+              </span>
+              <span
+                className="pill"
+                style={{
+                  background:
+                    (circle.activeCount ?? 0) > 0
+                      ? "rgb(188 255 95 / 14%)"
+                      : "var(--surface-high)",
+                  color:
+                    (circle.activeCount ?? 0) > 0
+                      ? "var(--lime)"
+                      : "var(--muted)",
+                }}
+              >
+                {(circle.activeCount ?? 0) > 0
+                  ? circle.activeCount === 1
+                    ? "1 ACTIVO"
+                    : `${circle.activeCount} ACTIVOS`
+                  : "SIN RETOS"}
+              </span>
+            </div>
           </article>
         ))}
       <div

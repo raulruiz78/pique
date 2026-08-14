@@ -1,8 +1,6 @@
 import { CircleManager } from "@/components/circle-manager";
 import { Avatar } from "@/components/avatar";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { Bell } from "lucide-react";
-import Link from "next/link";
 
 export default async function CirclesPage() {
   const supabase = await createServerSupabase();
@@ -63,14 +61,6 @@ export default async function CirclesPage() {
         >
           Hoy toca dar la talla.
         </h2>
-        <Link
-          href="/notificaciones"
-          className="button button-secondary"
-          aria-label="Notificaciones"
-          style={{ width: 48, padding: 0 }}
-        >
-          <Bell />
-        </Link>
       </header>
       <header>
         <span className="eyebrow" style={{ color: "var(--lime)" }}>

@@ -578,8 +578,8 @@ export function ChallengeWizard({
           >
             <ShieldCheck color="var(--violet)" />
             <small style={{ lineHeight: 1.45 }}>
-              Nada peligroso, ilegal, humillante ni monetario. Al enviar, las
-              reglas requerirán la aceptación de todos.
+              Nada peligroso, ilegal ni humillante — la consecuencia la decidís
+              vosotros. Al enviar, las reglas requerirán la aceptación de todos.
             </small>
           </div>
         </section>
