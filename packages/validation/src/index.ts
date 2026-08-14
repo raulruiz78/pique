@@ -49,6 +49,7 @@ export const profileSchema = z.object({
     .enum(["PRIVATE", "FRIENDS", "PUBLIC"])
     .default("FRIENDS"),
   notificationPreferences: notificationPreferencesSchema.optional(),
+  onboardingCompleted: z.boolean().optional(),
 });
 
 export const deviceSubscriptionSchema = z.object({

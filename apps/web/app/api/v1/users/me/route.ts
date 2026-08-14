@@ -32,6 +32,9 @@ export async function PATCH(request: Request) {
       ...(input.notificationPreferences === undefined
         ? {}
         : { notification_preferences: input.notificationPreferences }),
+      ...(input.onboardingCompleted === undefined
+        ? {}
+        : { onboarding_completed: input.onboardingCompleted }),
       updated_at: new Date().toISOString(),
     };
     const { data, error } = await auth.supabase
