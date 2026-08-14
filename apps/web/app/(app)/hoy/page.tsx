@@ -20,6 +20,7 @@ interface Relation {
   category?: string;
 }
 export default async function TodayPage() {
+  const now = new Date();
   const data = await dashboardQuery();
   const profile = data?.profile as {
     display_name?: string;
@@ -46,10 +47,14 @@ export default async function TodayPage() {
     const recurrence = goal?.recurrence ?? "";
     const multiple =
       recurrence.includes("FLEX=") || recurrence.includes("DAILYCOUNT=");
-    const period = recurrence.includes("FLEX=")
-      ? occurrence.closes_at
-      : occurrence.starts_at.slice(0, 10);
-    const key = multiple ? `${goal?.id}-${period}` : occurrence.id;
+    // La ventana de "hoy" está en la zona horaria del perfil, pero las
+    // ocurrencias fijas se generan en días naturales UTC: cerca de la
+    // medianoche local ambas franjas (UTC de ayer y de hoy) solapan la
+    // consulta y traen dos filas del mismo objetivo. Como esta página ya
+    // sólo pide un día, agrupar por objetivo (y no por fila) las colapsa.
+    const key = multiple
+      ? `${goal?.id}-${recurrence.includes("FLEX=") ? occurrence.closes_at : occurrence.starts_at.slice(0, 10)}`
+      : (goal?.id ?? occurrence.id);
     const group = groupedOccurrences.get(key) ?? { items: [], multiple };
     group.items.push(occurrence);
     groupedOccurrences.set(key, group);
@@ -228,7 +233,12 @@ export default async function TodayPage() {
         <div style={{ display: "grid", gap: 12 }}>
           {objectiveCards.map(({ items, multiple }) => {
             const occurrence =
-              items.find((item) => item.status === "PENDING") ?? items[0]!;
+              items.find(
+                (item) =>
+                  item.status === "PENDING" && new Date(item.closes_at) >= now,
+              ) ??
+              items.find((item) => item.status === "PENDING") ??
+              items[0]!;
             const goal = Array.isArray(occurrence.goals)
               ? occurrence.goals[0]
               : occurrence.goals;
@@ -238,7 +248,9 @@ export default async function TodayPage() {
             const completed = items.filter(
               (item) => item.status !== "PENDING",
             ).length;
-            const done = completed === items.length;
+            const done = multiple
+              ? completed === items.length
+              : items.some((item) => item.status !== "PENDING");
             return (
               <article
                 className="card"

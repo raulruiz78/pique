@@ -11,7 +11,6 @@ export function ProfileForm({
     display_name: string;
     timezone: string;
     locale: string;
-    profile_visibility?: "PRIVATE" | "FRIENDS" | "PUBLIC";
   };
 }) {
   const router = useRouter();
@@ -38,7 +37,6 @@ export function ProfileForm({
     displayName: profile.display_name,
     timezone: profile.timezone,
     locale: profile.locale,
-    profileVisibility: profile.profile_visibility ?? "FRIENDS",
   });
   async function save(event: React.FormEvent) {
     event.preventDefault();
@@ -59,24 +57,6 @@ export function ProfileForm({
       className="card"
       style={{ padding: 20, display: "grid", gap: 14 }}
     >
-      <label>
-        <span className="field-label">Visibilidad del perfil</span>
-        <select
-          className="field"
-          value={form.profileVisibility}
-          onChange={(event) =>
-            setForm({
-              ...form,
-              profileVisibility: event.target.value as
-                "PRIVATE" | "FRIENDS" | "PUBLIC",
-            })
-          }
-        >
-          <option value="PRIVATE">Privado</option>
-          <option value="FRIENDS">Solo círculos compartidos</option>
-          <option value="PUBLIC">Público</option>
-        </select>
-      </label>
       <label>
         <span className="field-label">Nombre visible</span>
         <input
