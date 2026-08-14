@@ -52,6 +52,7 @@ async function runMaintenance(request: Request) {
   const streakAtRisk = await admin.rpc("notify_streak_at_risk");
   const occurrencePending = await admin.rpc("notify_occurrence_pending");
   const rivalAhead = await admin.rpc("notify_rival_ahead");
+  const inactiveUsers = await admin.rpc("notify_inactive_users");
   const { pushed } = await flushPendingPush(admin);
 
   return ok({
@@ -62,6 +63,7 @@ async function runMaintenance(request: Request) {
       streakAtRisk: streakAtRisk.data ?? 0,
       occurrencePending: occurrencePending.data ?? 0,
       rivalAhead: rivalAhead.data ?? 0,
+      inactiveUsers: inactiveUsers.data ?? 0,
     },
     pushed,
   });

@@ -2,7 +2,11 @@ import { EmptyState } from "@/components/empty-state";
 import { Avatar } from "@/components/avatar";
 import { CategoryBadge } from "@/components/challenge-category";
 import { InteractiveMonth } from "@/components/interactive-month";
-import { calendarQuery, dashboardQuery } from "@/lib/queries";
+import {
+  calendarQuery,
+  dashboardQuery,
+  weeklySummaryQuery,
+} from "@/lib/queries";
 import {
   CalendarDays,
   Check,
@@ -10,6 +14,7 @@ import {
   ChevronRight,
   Clock3,
   Flame,
+  Trophy,
 } from "lucide-react";
 
 const DAYS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
@@ -22,9 +27,10 @@ export default async function CalendarPage() {
   const to = new Date(today);
   to.setDate(to.getDate() + 30);
   if (monthEnd > to) to.setTime(monthEnd.getTime());
-  const [calendarData, dashboard] = await Promise.all([
+  const [calendarData, dashboard, weeklySummary] = await Promise.all([
     calendarQuery(queryStart, to),
     dashboardQuery(),
+    weeklySummaryQuery(),
   ]);
   const rawItems = calendarData as unknown as Array<{
     id: string;
@@ -140,6 +146,42 @@ export default async function CalendarPage() {
           />
         </div>
       </section>
+      {weeklySummary && (
+        <section
+          className="stitch-card"
+          style={{
+            marginTop: 24,
+            padding: 20,
+            display: "flex",
+            alignItems: "center",
+            gap: 16,
+          }}
+        >
+          <span
+            style={{
+              width: 48,
+              height: 48,
+              flex: "0 0 auto",
+              borderRadius: 16,
+              display: "grid",
+              placeItems: "center",
+              background: "rgb(210 187 255 / 12%)",
+            }}
+          >
+            <Trophy color="var(--violet)" size={22} />
+          </span>
+          <div style={{ flex: 1 }}>
+            <span className="field-label muted">Tu semana</span>
+            <p style={{ margin: "4px 0 0" }}>
+              <b>{weeklySummary.weekPoints}</b> puntos ·{" "}
+              <b>{weeklySummary.weekCheckIns}</b>{" "}
+              {weeklySummary.weekCheckIns === 1
+                ? "check-in validado"
+                : "check-ins validados"}
+            </p>
+          </div>
+        </section>
+      )}
       <section
         className="stitch-card"
         style={{ margin: "28px 0 36px", padding: "24px 18px 28px" }}
