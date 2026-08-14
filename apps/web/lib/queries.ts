@@ -64,6 +64,71 @@ export function dayBounds(date: Date, timeZone: string) {
   };
 }
 
+export function weekBounds(date: Date, timeZone: string) {
+  const local = dateParts(date, timeZone);
+  const asUtcDate = new Date(
+    Date.UTC(local.year!, local.month! - 1, local.day!),
+  );
+  const weekday = asUtcDate.getUTCDay();
+  const mondayOffset = (weekday + 6) % 7;
+  const monday = new Date(asUtcDate);
+  monday.setUTCDate(monday.getUTCDate() - mondayOffset);
+  const nextMonday = new Date(monday);
+  nextMonday.setUTCDate(nextMonday.getUTCDate() + 7);
+  return {
+    start: localMidnightUtc(
+      monday.getUTCFullYear(),
+      monday.getUTCMonth() + 1,
+      monday.getUTCDate(),
+      timeZone,
+    ),
+    end: localMidnightUtc(
+      nextMonday.getUTCFullYear(),
+      nextMonday.getUTCMonth() + 1,
+      nextMonday.getUTCDate(),
+      timeZone,
+    ),
+  };
+}
+
+export async function weeklySummaryQuery() {
+  const supabase = await createServerSupabase();
+  if (!supabase) return null;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  const profile = await supabase
+    .from("profiles")
+    .select("timezone")
+    .eq("id", user.id)
+    .single();
+  const { start, end } = weekBounds(
+    new Date(),
+    profile.data?.timezone ?? "Europe/Madrid",
+  );
+  const [points, checkIns] = await Promise.all([
+    supabase
+      .from("score_transactions")
+      .select("points")
+      .eq("user_id", user.id)
+      .gte("created_at", start.toISOString())
+      .lt("created_at", end.toISOString()),
+    supabase
+      .from("check_ins")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("status", "APPROVED")
+      .gte("submitted_at", start.toISOString())
+      .lt("submitted_at", end.toISOString()),
+  ]);
+  const weekPoints = (points.data ?? []).reduce(
+    (sum, row) => sum + row.points,
+    0,
+  );
+  return { weekPoints, weekCheckIns: checkIns.count ?? 0 };
+}
+
 export async function dashboardQuery() {
   const supabase = await createServerSupabase();
   if (!supabase) return null;
