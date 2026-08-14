@@ -1,3 +1,4 @@
+import { ActivityFeed } from "@/components/activity-feed";
 import { Avatar } from "@/components/avatar";
 import { ChallengeActions } from "@/components/challenge-actions";
 import { CircleInviteButton } from "@/components/circle-invite-button";
@@ -46,6 +47,15 @@ export default async function CirclePage({
     .eq("id", circleId)
     .maybeSingle();
   if (!circle) notFound();
+
+  const { data: activities } = await supabase
+    .from("activities")
+    .select(
+      "id,type,payload,created_at,actor_id,profiles(display_name,avatar_path),challenges(title),reactions(user_id,emoji)",
+    )
+    .eq("circle_id", circleId)
+    .order("created_at", { ascending: false })
+    .limit(30);
 
   const pending = circle.challenges.filter((challenge) =>
     challenge.challenge_participants.some(
@@ -474,6 +484,19 @@ export default async function CirclePage({
             </div>
           )}
         </div>
+      </section>
+
+      <section style={{ marginTop: 28, marginBottom: 12 }}>
+        <span className="eyebrow">En directo</span>
+        <h2 style={{ margin: "6px 0 12px" }}>Actividad del círculo</h2>
+        <ActivityFeed
+          activities={
+            (activities ?? []) as unknown as React.ComponentProps<
+              typeof ActivityFeed
+            >["activities"]
+          }
+          currentUserId={user?.id ?? ""}
+        />
       </section>
     </main>
   );

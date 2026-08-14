@@ -113,4 +113,8 @@ export const respondFriendRequestSchema = z.object({
   response: z.enum(["ACCEPTED", "REJECTED"]),
 });
 
+export const reactionSchema = z.object({
+  emoji: z.enum(["🔥", "💪", "👏", "⚡"]),
+});
+
 export type CreateChallengeInput = z.infer<typeof createChallengeSchema>;
