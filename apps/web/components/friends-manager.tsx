@@ -88,7 +88,7 @@ export function FriendsManager({ items }: { items: FriendItem[] }) {
           <span className="field-label">Añadir por alias</span>
           <input
             className="field"
-            placeholder="carmen"
+            placeholder="usuario"
             value={username}
             onChange={(event) => setUsername(event.target.value)}
           />

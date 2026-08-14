@@ -4,7 +4,6 @@ import { CategoryBadge } from "@/components/challenge-category";
 import { InteractiveMonth } from "@/components/interactive-month";
 import { calendarQuery, dashboardQuery } from "@/lib/queries";
 import {
-  Bell,
   CalendarDays,
   Check,
   ChevronLeft,
@@ -12,7 +11,6 @@ import {
   Clock3,
   Flame,
 } from "lucide-react";
-import Link from "next/link";
 
 const DAYS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
 export default async function CalendarPage() {
@@ -105,14 +103,6 @@ export default async function CalendarPage() {
         >
           Hoy toca dar la talla.
         </h1>
-        <Link
-          href="/notificaciones"
-          className="button button-secondary"
-          aria-label="Notificaciones"
-          style={{ width: 48, padding: 0 }}
-        >
-          <Bell />
-        </Link>
       </header>
       <section style={{ marginTop: 40 }}>
         <div

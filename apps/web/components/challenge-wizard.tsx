@@ -125,7 +125,13 @@ export function ChallengeWizard({
         category: form.category,
         description: form.description,
         type: form.type,
-        startAt: new Date(`${form.startDate}T08:00:00`).toISOString(),
+        // Si el inicio sigue siendo hoy (el valor por defecto), usamos el
+        // instante actual: fijarlo a las 08:00 dejaba el reto "programado"
+        // en vez de "activo" hasta esa hora, aunque todos lo aceptaran antes.
+        startAt: (form.startDate === startDate
+          ? new Date()
+          : new Date(`${form.startDate}T08:00:00`)
+        ).toISOString(),
         endAt: new Date(`${form.endDate}T23:59:59`).toISOString(),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         recurrence:
@@ -578,8 +584,8 @@ export function ChallengeWizard({
           >
             <ShieldCheck color="var(--violet)" />
             <small style={{ lineHeight: 1.45 }}>
-              Nada peligroso, ilegal, humillante ni monetario. Al enviar, las
-              reglas requerirán la aceptación de todos.
+              Nada peligroso, ilegal ni humillante — la consecuencia la decidís
+              vosotros. Al enviar, las reglas requerirán la aceptación de todos.
             </small>
           </div>
         </section>

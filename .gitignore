@@ -18,3 +18,5 @@ supabase/.temp/
 supabase/.branches/
 *.tsbuildinfo
 apps/web/.gitignore
+.vercel
+.env*

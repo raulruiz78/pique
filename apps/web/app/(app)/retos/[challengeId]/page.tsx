@@ -3,9 +3,53 @@ import { ChallengeActions } from "@/components/challenge-actions";
 import { CategoryBadge, categoryMeta } from "@/components/challenge-category";
 import { EmptyState } from "@/components/empty-state";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { CalendarDays, Camera, ShieldCheck, Trophy } from "lucide-react";
+import {
+  CalendarDays,
+  Camera,
+  Repeat,
+  ShieldCheck,
+  Trophy,
+} from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
+const DAY_LABELS: Record<string, string> = {
+  MO: "lunes",
+  TU: "martes",
+  WE: "miércoles",
+  TH: "jueves",
+  FR: "viernes",
+  SA: "sábado",
+  SU: "domingo",
+};
+
+function describeRhythm(recurrence: string): string {
+  const parts = Object.fromEntries(
+    recurrence
+      .split(";")
+      .map((part) => part.split("="))
+      .filter(([key]) => key),
+  ) as Record<string, string>;
+
+  if (parts.DAILYCOUNT) {
+    const count = Number(parts.DAILYCOUNT);
+    return `${count} ${count === 1 ? "vez" : "veces"} al día, cualquier día`;
+  }
+  if (parts.FLEX) {
+    const count = Number(parts.FLEX);
+    return `${count} ${count === 1 ? "vez" : "veces"} por semana, tú eliges cuándo (flexible)`;
+  }
+  if (parts.FREQ === "DAILY") return "Todos los días";
+  if (parts.BYDAY) {
+    const days = parts.BYDAY.split(",")
+      .filter(Boolean)
+      .map((code) => DAY_LABELS[code] ?? code);
+    if (days.length === 0) return "Ritmo fijo";
+    if (days.length === 1) return `Solo ${days[0]}`;
+    return `${days.slice(0, -1).join(", ")} y ${days.at(-1)}`;
+  }
+  return "Ritmo fijo";
+}
 export default async function ChallengePage({
   params,
 }: {
@@ -72,6 +116,13 @@ export default async function ChallengePage({
             Icon={CalendarDays}
             label="Fechas"
             value={`${new Date(data.start_at).toLocaleDateString("es")} — ${new Date(data.end_at).toLocaleDateString("es")}`}
+          />
+        </div>
+        <div className="stitch-card metric-card">
+          <Row
+            Icon={Repeat}
+            label="Ritmo"
+            value={describeRhythm(data.goals[0]?.recurrence ?? "")}
           />
         </div>
         <div className="stitch-card metric-card">
@@ -163,7 +214,7 @@ export default async function ChallengePage({
           >
             <b>{data.penalties[0].description}</b>
             <p className="muted" style={{ margin: "7px 0 0", fontSize: 13 }}>
-              Consecuencia no monetaria, segura y consentida.
+              Lo que se juega aquí lo decidís vosotros.
             </p>
           </div>
         </>
