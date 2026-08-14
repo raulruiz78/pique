@@ -1,4 +1,5 @@
 import { fromError, ok, requestId, requireUser } from "@/lib/api";
+import { flushPendingPushInline } from "@/lib/notifications";
 import { createChallengeSchema } from "@pique/validation";
 import { NextResponse } from "next/server";
 export async function GET(request: Request) {
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
       payload,
     });
     if (error) throw error;
+    await flushPendingPushInline();
     return ok({ id: data }, 201);
   } catch (error) {
     return fromError(error, id);

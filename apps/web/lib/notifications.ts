@@ -1,7 +1,7 @@
 import { shouldSendPush, type NotificationPreferences } from "@pique/domain";
 import { createWebPushSender } from "./push-webpush";
 import { noOpPushSender, type PushSender } from "./push";
-import type { createAdminSupabase } from "./supabase/admin";
+import { createAdminSupabase } from "./supabase/admin";
 
 type AdminSupabase = NonNullable<ReturnType<typeof createAdminSupabase>>;
 
@@ -80,4 +80,19 @@ export async function flushPendingPush(
   }
 
   return { pushed };
+}
+
+/**
+ * Best-effort immediate push for the notification(s) a request handler just
+ * triggered (via an RPC/trigger). Never throws: if it fails, the daily
+ * maintenance cron still picks up any unflushed rows later.
+ */
+export async function flushPendingPushInline(): Promise<void> {
+  try {
+    const admin = createAdminSupabase();
+    if (!admin) return;
+    await flushPendingPush(admin);
+  } catch {
+    // Ignored — the cron is the fallback delivery path.
+  }
 }
