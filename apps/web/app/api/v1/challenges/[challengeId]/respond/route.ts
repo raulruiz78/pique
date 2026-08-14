@@ -1,4 +1,5 @@
 import { fail, fromError, ok, requestId, requireUser } from "@/lib/api";
+import { flushPendingPushInline } from "@/lib/notifications";
 import { NextResponse } from "next/server";
 export async function POST(
   request: Request,
@@ -17,6 +18,7 @@ export async function POST(
       response: body.response,
     });
     if (error) throw error;
+    await flushPendingPushInline();
     return ok({ status: data });
   } catch (error) {
     return fromError(error, id);

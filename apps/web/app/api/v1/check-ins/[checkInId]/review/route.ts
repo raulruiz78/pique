@@ -1,4 +1,5 @@
 import { fail, fromError, ok, requestId, requireUser } from "@/lib/api";
+import { flushPendingPushInline } from "@/lib/notifications";
 import { validationDecisionSchema } from "@pique/validation";
 import { NextResponse } from "next/server";
 export async function POST(
@@ -27,6 +28,7 @@ export async function POST(
     if (error && error.message.includes("ALREADY_REVIEWED"))
       return ok({ status: "ALREADY_REVIEWED" });
     if (error) throw error;
+    await flushPendingPushInline();
     return ok(data);
   } catch (error) {
     return fromError(error, id);

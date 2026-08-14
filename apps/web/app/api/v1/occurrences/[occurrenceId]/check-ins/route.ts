@@ -1,4 +1,5 @@
 import { fail, fromError, requestId, requireUser } from "@/lib/api";
+import { flushPendingPushInline } from "@/lib/notifications";
 import { checkInSchema } from "@pique/validation";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -67,6 +68,7 @@ export async function POST(
       response_code: 201,
       response_body: responseBody,
     });
+    await flushPendingPushInline();
     return NextResponse.json(responseBody, { status: 201 });
   } catch (error) {
     return fromError(error, id);

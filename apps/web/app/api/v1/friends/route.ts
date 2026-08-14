@@ -1,4 +1,5 @@
 import { fail, fromError, ok, requestId, requireUser } from "@/lib/api";
+import { flushPendingPushInline } from "@/lib/notifications";
 import { sendFriendRequestSchema } from "@pique/validation";
 import { NextResponse } from "next/server";
 
@@ -71,6 +72,7 @@ export async function POST(request: Request) {
         );
       throw error;
     }
+    await flushPendingPushInline();
     return ok(data, 201);
   } catch (error) {
     return fromError(error, id);
