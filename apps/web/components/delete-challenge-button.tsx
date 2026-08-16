@@ -7,16 +7,26 @@ import { toast } from "sonner";
 export function DeleteChallengeButton({
   challengeId,
   title,
+  active = false,
+  redirectTo,
 }: {
   challengeId: string;
   title: string;
+  /** El reto ya está en marcha: borrarlo también borra el historial
+   * (check-ins, puntuación) de los demás participantes. */
+  active?: boolean;
+  /** Si se borra desde la propia página del reto, esta ya no existe tras
+   * eliminarlo — navegar a otro sitio en vez de refrescarla (404). */
+  redirectTo?: string;
 }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
 
   async function remove() {
     const confirmed = window.confirm(
-      `¿Eliminar «${title}»? Esta acción no se puede deshacer.`,
+      active
+        ? `¿Eliminar «${title}»? Ya está en marcha: también se borrará el historial de check-ins y puntos de quien participe contigo. Esta acción no se puede deshacer.`
+        : `¿Eliminar «${title}»? Esta acción no se puede deshacer.`,
     );
     if (!confirmed) return;
     setDeleting(true);
@@ -32,7 +42,9 @@ export function DeleteChallengeButton({
         return;
       }
       toast.success("Reto eliminado.");
-      router.refresh();
+      if (redirectTo)
+        router.push(redirectTo as Parameters<typeof router.push>[0]);
+      else router.refresh();
     } catch {
       toast.error("No se pudo eliminar el reto.");
     } finally {

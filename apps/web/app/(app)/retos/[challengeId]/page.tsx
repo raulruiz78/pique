@@ -1,6 +1,7 @@
 import { Avatar } from "@/components/avatar";
 import { ChallengeActions } from "@/components/challenge-actions";
 import { CategoryBadge, categoryMeta } from "@/components/challenge-category";
+import { DeleteChallengeButton } from "@/components/delete-challenge-button";
 import { EmptyState } from "@/components/empty-state";
 import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 import {
@@ -260,6 +261,28 @@ export default async function ChallengePage({
           <Camera size={19} /> Subir evidencia
         </Link>
       )}
+      {data.creator_id === user?.id &&
+        (
+          ["DRAFT", "PENDING_ACCEPTANCE", "SCHEDULED", "ACTIVE"] as string[]
+        ).includes(data.status) && (
+          <div
+            style={{
+              marginTop: 28,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+            }}
+          >
+            <small className="muted">Eres el creador de este reto.</small>
+            <DeleteChallengeButton
+              challengeId={data.id}
+              title={data.title}
+              active={data.status === "ACTIVE"}
+              redirectTo={`/circulos/${data.circle_id}`}
+            />
+          </div>
+        )}
     </main>
   );
 }
