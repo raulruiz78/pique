@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { BottomSheet } from "@/components/bottom-sheet";
+import { CameraCapture } from "@/components/camera-capture";
 import { tap } from "@/lib/haptics";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
 
@@ -31,6 +32,7 @@ export function CheckInButton({
   const [note, setNote] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
   async function submit() {
     if (evidenceRequired && !file)
       return toast.error("Este reto necesita una foto.");
@@ -179,7 +181,7 @@ export function CheckInButton({
         </Dialog.Description>
         <span className="pill pill-violet">{title}</span>
         <div style={{ display: "grid", gap: 15, marginTop: 20 }}>
-          <label>
+          <div>
             <span className="field-label">
               Foto {evidenceRequired ? "obligatoria" : "opcional"}
             </span>
@@ -192,13 +194,20 @@ export function CheckInButton({
                   alt="Vista previa de la evidencia"
                 />
               ) : (
-                <span
+                <button
+                  type="button"
                   className="stitch-card"
+                  onClick={() => setCameraOpen(true)}
                   style={{
+                    width: "100%",
                     minHeight: 260,
                     display: "grid",
                     placeItems: "center",
                     borderStyle: "dashed",
+                    border: "1px dashed var(--line)",
+                    background: "transparent",
+                    color: "inherit",
+                    cursor: "pointer",
                   }}
                 >
                   <span style={{ textAlign: "center" }}>
@@ -207,22 +216,13 @@ export function CheckInButton({
                       Toca para añadir la foto
                     </b>
                   </span>
-                </span>
+                </button>
               )}
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                capture="environment"
-                hidden
-                onChange={(event) => {
-                  const nextFile = event.target.files?.[0] ?? null;
-                  if (preview) URL.revokeObjectURL(preview);
-                  setFile(nextFile);
-                  setPreview(nextFile ? URL.createObjectURL(nextFile) : null);
-                }}
-              />
-              <span
+              <button
+                type="button"
+                aria-label="Cambiar foto"
                 className="button button-secondary"
+                onClick={() => setCameraOpen(true)}
                 style={{
                   position: "absolute",
                   right: 14,
@@ -232,9 +232,25 @@ export function CheckInButton({
                 }}
               >
                 <Camera size={19} />
-              </span>
+              </button>
             </span>
-          </label>
+          </div>
+          {cameraOpen && (
+            <CameraCapture
+              onCancel={() => setCameraOpen(false)}
+              onConfirm={(blob) => {
+                setCameraOpen(false);
+                if (preview) URL.revokeObjectURL(preview);
+                const nextFile = new File(
+                  [blob],
+                  `evidencia-${Date.now()}.jpg`,
+                  { type: blob.type },
+                );
+                setFile(nextFile);
+                setPreview(URL.createObjectURL(blob));
+              }}
+            />
+          )}
           <label>
             <span className="field-label">Nota opcional</span>
             <textarea
