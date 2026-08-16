@@ -244,6 +244,7 @@ export default async function CalendarPage() {
                 })),
             };
           })}
+          userId={summary?.user?.id}
         />
       </section>
       <h2 style={{ marginBottom: 12 }}>Próximos 30 días</h2>

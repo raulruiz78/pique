@@ -227,7 +227,7 @@ poco frecuente.
 
 ## 0.8.9.4 — Mobile interaction
 
-### Bottom sheet para el modal de check-in
+### Bottom sheet para el modal de check-in — hecho (PR 3)
 
 Quedó explícitamente fuera de 0.8.7 ("es un cambio visual de un
 componente existente, no una decisión técnica pura") — aquí sí entra,
@@ -247,35 +247,53 @@ Nuevo componente `apps/web/components/bottom-sheet.tsx`:
 - reemplaza el modal de check-in existente sin cambiar su contenido ni
   su lógica, solo el contenedor.
 
-### Pull-to-refresh
+### Pull-to-refresh — deferido, no implementado en 0.8.9
 
-Solo en rutas con contenido que cambia por acción de terceros sin que
-el usuario haga nada él mismo (`/hoy`, `/circulos/[circleId]` — feed de
-actividad). No en rutas de solo-mutación (`/perfil`). Implementación
-nativa con Pointer Events sobre el contenedor de scroll, sin
-dependencia: umbral de arrastre → icono de refresco rota
-proporcionalmente al arrastre → al soltar por encima del umbral,
-llama a `router.refresh()` y muestra un spinner breve.
+Al llegar a esta pieza (PR 7) se revisaron sus dos rutas candidatas:
 
-### Rubber band
+- `/circulos/[circleId]` ya tiene **dos** carruseles de scroll
+  horizontal (`review-carousel`/`validation-deck` en `globals.css`,
+  usados en otras páginas del mismo patrón) y ahora también el deck de
+  `PendingChallengeCard` (`SwipeCard`, PR 2) — un gesto de pull-to-
+  refresh vertical sobre un contenedor que ya tiene hijos con gestos
+  horizontales propios es razonable en teoría, pero verificarlo bien
+  (que un arrastre diagonal no dispare los dos gestos a la vez) requiere
+  poder probarlo a mano en un dispositivo real, no solo por código —
+  y ese es precisamente el tipo de verificación que no se puede hacer
+  ahora mismo (sin entorno de pruebas con base de datos, según
+  confirmó el product owner).
+- `/hoy` no tiene ese conflicto de gestos, así que sería el candidato
+  más seguro para una primera implementación.
 
-Aplicar el mismo principio de "resistencia al límite + rebote" a:
-`SwipeCard` (ya lo tiene por diseño: por debajo del umbral, vuelve con
-`--ease-spring`), `BottomSheet` (idem, verticalmente), carrusel de
-evidencias si existe scroll horizontal nativo (usar
-`overscroll-behavior-x` + un `translateX` de resistencia, no CSS puro
-de scroll-snap solamente).
+Se deja fuera de esta fase en vez de implementarlo sin poder
+verificarlo — no es una pieza puramente visual como el resto de 0.8.9,
+es un gesto nuevo que compite por el mismo canal táctil que otros ya
+implementados. Queda como trabajo futuro, empezando solo por `/hoy`.
 
-### Haptics
+### Rubber band — hecho, ya cubierto
 
-`navigator.vibrate()` — soportado en Chrome/Android, **no soportado en
-iOS Safari** (ninguna PWA en iOS tiene Vibration API, con o sin
-instalar). Implementar como mejora opcional sin UI condicionada a su
-disponibilidad: `apps/web/lib/haptics.ts` con una función `tap(pattern)`
-que comprueba `"vibrate" in navigator` y no hace nada si no existe —
-nunca debe haber una rama de UI distinta según haya o no soporte,
-simplemente en Android vibra y en iOS no pasa nada. Eventos candidatos:
-confirmar swipe (10ms), check-in exitoso (15ms), error (2×10ms).
+`SwipeCard` y `BottomSheet` ya aplican "resistencia al límite +
+rebote" por diseño (por debajo del umbral, vuelven con
+`--ease-spring`) — no hace falta ninguna pieza adicional para las
+interacciones que existen hoy. Aplicarlo a los carruseles de scroll
+horizontal nativo (`review-carousel`/`validation-deck`) queda fuera:
+son scroll nativo del navegador, no arrastre por Pointer Events, y
+añadir resistencia ahí es una reescritura de esa navegación, no una
+extensión de este patrón — mismo tipo de decisión que llevó a bloquear
+el swipe de validaciones en 0.8.9.2.
+
+### Haptics — hecho (PR 7)
+
+`apps/web/lib/haptics.ts`: función `tap(pattern)` sobre
+`navigator.vibrate()` — soportado en Chrome/Android, **no en iOS
+Safari** (ninguna PWA en iOS tiene Vibration API, con o sin instalar).
+Sin rama de UI distinta según soporte: comprueba `"vibrate" in
+navigator` y no hace nada si no existe, así que en Android vibra y en
+iOS simplemente no pasa nada. Conectado en los dos eventos candidatos
+que ya existían: confirmar swipe en `SwipeCard` (10ms) y check-in
+exitoso en `check-in-button.tsx` (15ms). El evento de error (2×10ms)
+queda sin conectar — ver "Errores" en 0.8.9.6, no hay ningún elemento
+de error inline en la app hoy al que asociarlo.
 
 ---
 
@@ -324,15 +342,25 @@ confirmar swipe (10ms), check-in exitoso (15ms), error (2×10ms).
   así: no hace nada visible cuando no aplica, y reordena bien cuando
   sí.
 
-- **Empty states**: añadir una entrada sutil (`opacity + translateY(8px)`,
-  `--duration-normal`) a los estados vacíos ya existentes
-  ("Aún no hay actividad", "No tienes retos") — sin ilustraciones
-  nuevas, es solo la transición de aparición.
-- **Calendario**: al marcar un día como completado, `scale(0.8 → 1.15 → 1)`
-  sobre la celda, `--duration-normal`, `--ease-spring`.
-- **Errores**: en formularios con validación inline, un shake sutil
-  (`translateX` ±4px, 2 ciclos, `--duration-fast`) en el campo con
-  error al fallar la validación.
+- **Empty states — hecho (PR 7).** `EmptyState` gana `.motion-fade-in`
+  (primitiva de PR 1) — sin ilustraciones nuevas, solo la transición de
+  aparición. Se aplica en el componente compartido, así que cubre los
+  ~10 sitios que ya lo usan sin tocarlos uno a uno.
+- **Calendario — hecho (PR 7).** `InteractiveMonth` gana `.motion-pop`
+  en la celda del día al detectar que pasó a completado, con el mismo
+  mecanismo de comparación contra `localStorage` que `LevelProgress`/
+  `RankingList`/`NotificationBell` (esta página tampoco tiene datos en
+  vivo). Se reutiliza `.motion-pop` (`1→1.15→1`) en vez de crear una
+  variante `0.8→1.15→1` solo para este caso — la diferencia no
+  justificaba una primitiva nueva.
+- **Errores — bloqueado, no hay dónde aplicarlo.** Se revisaron los
+  formularios existentes (`auth-form.tsx` y el resto) y ninguno tiene
+  validación inline por campo — todos los errores se comunican vía
+  `toast.error(...)` (Sonner, que ya anima). No existe ningún elemento
+  "campo con error" en la app hoy al que asociar un shake; añadir uno
+  solo para tener algo que animar sería construir UI de validación de
+  formularios no pedida, no una pieza de motion. Se deja documentado
+  para cuando exista.
 
 ---
 
@@ -426,31 +454,34 @@ Codex debe mantener esta tabla actualizada en cada PR que toque motion
 según lo que encuentre en el código, no según lo que diga esta tabla
 en un momento dado:
 
-| Feature                       | Estado    | Implementación                                 | Prioridad | Observaciones                                                                                          |
-| ----------------------------- | --------- | ---------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------ |
-| Page transition               | existente | CSS (`page-enter`, tokens)                     | P0        | Migrado a tokens (PR 1)                                                                                |
-| Bottom nav animation          | existente | CSS (`.nav-item`, tokens)                      | P0        | Migrado a tokens (PR 1)                                                                                |
-| Press states                  | existente | CSS (`--scale-pressed`)                        | P0        | Unificado con tokens (PR 1)                                                                            |
-| Check-in delight              | hecho     | React + CSS (`.motion-pop` en "Enviado")       | P0        | Sin puntos flotantes, ver 0.8.9.3 (bloqueado)                                                          |
-| Validaciones delight          | hecho     | `ReviewButtons` con estado optimista (PR 3)    | P0        | No existía optimistic UI aquí (0.8.5 no lo cubrió)                                                     |
-| Swipe cards (retos)           | hecho     | `SwipeCard` + `PendingChallengeCard` (PR 2)    | P0        | Deck de `/circulos/[circleId]`                                                                         |
-| Swipe cards (validaciones)    | bloqueado | —                                              | P0        | Conflicto de eje con `.validation-deck` (scroll horizontal existente) — decisión de producto pendiente |
-| Bottom sheet (check-in)       | hecho     | `BottomSheet` sobre Radix Dialog (PR 3)        | P0        | Reutilizable para futuros modales de confirmación                                                      |
-| Ranking reorder (tabla)       | hecho     | `RankingList` con FLIP (PR 4)                  | P0        | Podio (top 3) queda fuera, ver 0.8.9.6                                                                 |
-| XP / nivel (barra + level-up) | hecho     | `LevelProgress` (PR 5)                         | P1        | Compara contra `localStorage`, ver 0.8.9.3                                                             |
-| Puntos flotantes (+N)         | bloqueado | —                                              | P1        | Ver 0.8.9.3 — requiere que `review_check_in` (o una consulta aparte) exponga los puntos otorgados      |
-| Racha (streak pulse)          | bloqueado | —                                              | P1        | Mismo motivo que puntos flotantes                                                                      |
-| Achievements unlock           | hecho     | `AchievementScroll` (PR 5)                     | P1        | Compara contra `localStorage`, ver 0.8.9.3                                                             |
-| Reaction pop                  | hecho     | `.motion-pop` al confirmar (PR 6)              | P1        | `activity-feed.tsx`                                                                                    |
-| Notification bell             | hecho     | `NotificationBell` (PR 6)                      | P1        | Compara contra `localStorage`, igual que 0.8.9.3                                                       |
-| Toasts entrance               | existente | Sonner (`<Toaster richColors .../>`)           | P1        | Verificado: Sonner ya anima entrada/salida (translate+opacity) por defecto, sin configurar nada        |
-| Confetti / rank-up            | hecho     | `Confetti` + overlay en `LevelProgress` (PR 5) | P2        | Solo en cambio de rango                                                                                |
-| Pull-to-refresh               | pendiente | —                                              | P2        | 0.8.9.4                                                                                                |
-| Haptics                       | pendiente | —                                              | P2        | 0.8.9.4 (sin soporte iOS)                                                                              |
-| Rubber band                   | pendiente | —                                              | P2        | 0.8.9.4                                                                                                |
-| Calendar day pop              | pendiente | —                                              | P2        | 0.8.9.6                                                                                                |
-| Error shake                   | pendiente | —                                              | P2        | 0.8.9.6                                                                                                |
-| Empty state entrance          | pendiente | —                                              | P2        | 0.8.9.6                                                                                                |
+| Feature                       | Estado    | Implementación                                         | Prioridad | Observaciones                                                                                            |
+| ----------------------------- | --------- | ------------------------------------------------------ | --------- | -------------------------------------------------------------------------------------------------------- |
+| Page transition               | existente | CSS (`page-enter`, tokens)                             | P0        | Migrado a tokens (PR 1)                                                                                  |
+| Bottom nav animation          | existente | CSS (`.nav-item`, tokens)                              | P0        | Migrado a tokens (PR 1)                                                                                  |
+| Press states                  | existente | CSS (`--scale-pressed`)                                | P0        | Unificado con tokens (PR 1)                                                                              |
+| Check-in delight              | hecho     | React + CSS (`.motion-pop` en "Enviado")               | P0        | Sin puntos flotantes, ver 0.8.9.3 (bloqueado)                                                            |
+| Validaciones delight          | hecho     | `ReviewButtons` con estado optimista (PR 3)            | P0        | No existía optimistic UI aquí (0.8.5 no lo cubrió)                                                       |
+| Swipe cards (retos)           | hecho     | `SwipeCard` + `PendingChallengeCard` (PR 2)            | P0        | Deck de `/circulos/[circleId]`                                                                           |
+| Swipe cards (validaciones)    | bloqueado | —                                                      | P0        | Conflicto de eje con `.validation-deck` (scroll horizontal existente) — decisión de producto pendiente   |
+| Bottom sheet (check-in)       | hecho     | `BottomSheet` sobre Radix Dialog (PR 3)                | P0        | Reutilizable para futuros modales de confirmación                                                        |
+| Ranking reorder (tabla)       | hecho     | `RankingList` con FLIP (PR 4)                          | P0        | Podio (top 3) queda fuera, ver 0.8.9.6                                                                   |
+| XP / nivel (barra + level-up) | hecho     | `LevelProgress` (PR 5)                                 | P1        | Compara contra `localStorage`, ver 0.8.9.3                                                               |
+| Puntos flotantes (+N)         | bloqueado | —                                                      | P1        | Ver 0.8.9.3 — requiere que `review_check_in` (o una consulta aparte) exponga los puntos otorgados        |
+| Racha (streak pulse)          | bloqueado | —                                                      | P1        | Mismo motivo que puntos flotantes                                                                        |
+| Achievements unlock           | hecho     | `AchievementScroll` (PR 5)                             | P1        | Compara contra `localStorage`, ver 0.8.9.3                                                               |
+| Reaction pop                  | hecho     | `.motion-pop` al confirmar (PR 6)                      | P1        | `activity-feed.tsx`                                                                                      |
+| Notification bell             | hecho     | `NotificationBell` (PR 6)                              | P1        | Compara contra `localStorage`, igual que 0.8.9.3                                                         |
+| Toasts entrance               | existente | Sonner (`<Toaster richColors .../>`)                   | P1        | Verificado: Sonner ya anima entrada/salida (translate+opacity) por defecto, sin configurar nada          |
+| Confetti / rank-up            | hecho     | `Confetti` + overlay en `LevelProgress` (PR 5)         | P2        | Solo en cambio de rango                                                                                  |
+| Pull-to-refresh               | deferido  | —                                                      | P2        | Ver 0.8.9.4 — conflicto de gestos en `/circulos/[circleId]`, sin forma de verificarlo a mano ahora mismo |
+| Haptics                       | hecho     | `lib/haptics.ts`, conectado en swipe y check-in (PR 7) | P2        | Sin soporte iOS, documentado                                                                             |
+| Rubber band                   | hecho     | Ya cubierto por `SwipeCard`/`BottomSheet`              | P2        | No hacía falta pieza nueva                                                                               |
+| Empty state entrance          | hecho     | `.motion-fade-in` en `EmptyState` (PR 7)               | P2        | Cubre todos los usos del componente compartido                                                           |
+| Calendar day pop              | hecho     | `.motion-pop` en `InteractiveMonth` (PR 7)             | P2        | Compara contra `localStorage`, igual que 0.8.9.3                                                         |
+| Error shake                   | bloqueado | —                                                      | P2        | No existe validación inline por campo en ningún formulario hoy                                           |
+| Calendar day pop              | pendiente | —                                                      | P2        | 0.8.9.6                                                                                                  |
+| Error shake                   | pendiente | —                                                      | P2        | 0.8.9.6                                                                                                  |
+| Empty state entrance          | pendiente | —                                                      | P2        | 0.8.9.6                                                                                                  |
 
 ## Componentes de motion compartidos
 
@@ -699,15 +730,15 @@ falta verificar en producto antes de seguir, para poder probar Pique
 entre bloques y corregir el lenguaje visual si algo queda sobrecargado
 antes de que se replique por el resto de la app:
 
-| PR                          | Cubre                                                                                                                         | Piezas de este documento          |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
-| 1. Motion foundation ✅     | Tokens, primitivas CSS, migrar `page-enter`/`.reaction-chip`/`.nav-item` — [#36](https://github.com/raulruiz78/pique/pull/36) | 0.8.9.1                           |
-| 2. Swipe cards              | `SwipeCard`, aplicado al deck de retos (validaciones bloqueadas, ver 0.8.9.2)                                                 | 0.8.9.2                           |
-| 3. Check-in delight ✅      | `BottomSheet` en el modal de check-in, `.motion-pop` en check-in y validaciones — puntos/racha bloqueados, ver 0.8.9.3        | 0.8.9.4 (bottom sheet)            |
-| 4. Ranking animations ✅    | Reordenación animada de la tabla (FLIP), podio queda fuera                                                                    | 0.8.9.6 (ranking reorder)         |
-| 5. Gamification motion ✅   | XP/nivel, logros, confeti, cambio de rango — puntos flotantes/racha siguen bloqueados                                         | 0.8.9.3 (resto)                   |
-| 6. Social motion ✅         | Pop de reacción, campana (`NotificationBell`), toasts verificados (Sonner ya animaba)                                         | 0.8.9.5                           |
-| 7. Mobile gestures + polish | Pull-to-refresh, rubber band, haptics, calendario, empty states, error shake                                                  | 0.8.9.4 (resto) + 0.8.9.6 (resto) |
+| PR                             | Cubre                                                                                                                         | Piezas de este documento          |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| 1. Motion foundation ✅        | Tokens, primitivas CSS, migrar `page-enter`/`.reaction-chip`/`.nav-item` — [#36](https://github.com/raulruiz78/pique/pull/36) | 0.8.9.1                           |
+| 2. Swipe cards                 | `SwipeCard`, aplicado al deck de retos (validaciones bloqueadas, ver 0.8.9.2)                                                 | 0.8.9.2                           |
+| 3. Check-in delight ✅         | `BottomSheet` en el modal de check-in, `.motion-pop` en check-in y validaciones — puntos/racha bloqueados, ver 0.8.9.3        | 0.8.9.4 (bottom sheet)            |
+| 4. Ranking animations ✅       | Reordenación animada de la tabla (FLIP), podio queda fuera                                                                    | 0.8.9.6 (ranking reorder)         |
+| 5. Gamification motion ✅      | XP/nivel, logros, confeti, cambio de rango — puntos flotantes/racha siguen bloqueados                                         | 0.8.9.3 (resto)                   |
+| 6. Social motion ✅            | Pop de reacción, campana (`NotificationBell`), toasts verificados (Sonner ya animaba)                                         | 0.8.9.5                           |
+| 7. Mobile gestures + polish ✅ | Haptics, calendario, empty states — pull-to-refresh deferido, error shake bloqueado (no hay UI que animar)                    | 0.8.9.4 (resto) + 0.8.9.6 (resto) |
 
 Cada fila es un PR independiente con su propio CI en verde, igual que
 0.8.x. No agrupar varias filas en un mismo PR aunque el cambio parezca
