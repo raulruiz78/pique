@@ -1,6 +1,7 @@
 import { ActivityFeed } from "@/components/activity-feed";
 import { Avatar } from "@/components/avatar";
 import { PendingChallengeCard } from "@/components/pending-challenge-card";
+import { RankingList } from "@/components/ranking-list";
 import { CircleInviteButton } from "@/components/circle-invite-button";
 import { CircleAccessPanel } from "@/components/circle-access-panel";
 import { CategoryBadge } from "@/components/challenge-category";
@@ -306,53 +307,12 @@ export default async function CirclePage({
                   );
                 })}
               </div>
-              {ranking.slice(3).map((player, offset) => {
-                const index = offset + 3;
-                const difference = (ranking[0]?.score ?? 0) - player.score;
-                return (
-                  <div
-                    key={player.userId}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 11,
-                      padding: "14px 0",
-                      borderBottom:
-                        index < ranking.length - 1
-                          ? "1px solid var(--line)"
-                          : 0,
-                    }}
-                  >
-                    <b
-                      style={{
-                        width: 23,
-                        color: index === 0 ? "var(--gold)" : "var(--muted)",
-                      }}
-                    >
-                      #{index + 1}
-                    </b>
-                    <Avatar
-                      name={player.name}
-                      size={38}
-                      accent={index === 0 ? "var(--lime)" : "var(--violet)"}
-                      src={
-                        player.avatarPath
-                          ? `/api/v1/media/profiles/${player.userId}`
-                          : null
-                      }
-                    />
-                    <div style={{ flex: 1 }}>
-                      <b>{player.name}</b>
-                      <small className="muted" style={{ display: "block" }}>
-                        {difference === 0
-                          ? `${player.streak} de racha`
-                          : `a ${difference} pt del líder`}
-                      </small>
-                    </div>
-                    <strong>{player.score} pt</strong>
-                  </div>
-                );
-              })}
+              <RankingList
+                players={ranking.slice(3)}
+                leaderScore={ranking[0]?.score ?? 0}
+                startIndex={3}
+                totalCount={ranking.length}
+              />
             </>
           )}
         </div>

@@ -290,14 +290,26 @@ confirmar swipe (10ms), check-in exitoso (15ms), error (2×10ms).
 
 ## 0.8.9.6 — Polish
 
-- **Reordenación de ranking**: cuando cambia la posición de alguien
-  en un ranking visible (podio, tabla de círculo) tras una acción
-  propia, animar la reordenación de las filas/cards existentes
-  (`transform: translateY` a la nueva posición, `--duration-slow`,
-  `--ease-spring`) en vez de que `router.refresh()` sustituya la lista
-  de golpe. Requiere que las keys de React sean estables por usuario
-  (ya lo son, son IDs) — sin esto la animación de reordenación de FLIP
-  no es posible.
+- **Reordenación de ranking — hecho para la tabla, pendiente para el
+  podio.** `apps/web/components/ranking-list.tsx` (PR 4) anima con FLIP
+  (Web Animations API, `translateY`, 400ms, `--ease-spring`) las filas
+  de la tabla de ranking (`/circulos/[circleId]`, puestos 4+) cuando
+  cambian de orden entre renders del mismo árbol montado, comparando
+  la posición de cada fila (por `userId`, key estable) antes/después
+  vía `getBoundingClientRect()`. El podio (top 3) queda fuera de esta
+  pieza: cambiar de puesto ahí implica también cambiar de tamaño de
+  avatar y de columna, no un simple `translateY` — animarlo bien es un
+  problema distinto, no una extensión trivial de esto.
+
+  Nota honesta sobre cuándo se ve: como esta página no tiene datos en
+  vivo (sin realtime, ver README), la reordenación solo es visible si
+  el árbol de este componente sigue montado cuando cambian los datos
+  (p. ej. un `router.refresh()` disparado desde esta misma página) —
+  no en una navegación nueva a la página (ahí ya llega con el orden
+  final, no hay nada que animar). Sigue siendo correcto implementarlo
+  así: no hace nada visible cuando no aplica, y reordena bien cuando
+  sí.
+
 - **Empty states**: añadir una entrada sutil (`opacity + translateY(8px)`,
   `--duration-normal`) a los estados vacíos ya existentes
   ("Aún no hay actividad", "No tienes retos") — sin ilustraciones
@@ -410,7 +422,7 @@ en un momento dado:
 | Swipe cards (retos)           | hecho         | `SwipeCard` + `PendingChallengeCard` (PR 2) | P0        | Deck de `/circulos/[circleId]`                                                                         |
 | Swipe cards (validaciones)    | bloqueado     | —                                           | P0        | Conflicto de eje con `.validation-deck` (scroll horizontal existente) — decisión de producto pendiente |
 | Bottom sheet (check-in)       | hecho         | `BottomSheet` sobre Radix Dialog (PR 3)     | P0        | Reutilizable para futuros modales de confirmación                                                      |
-| Ranking reorder               | pendiente     | —                                           | P0        | 0.8.9.6                                                                                                |
+| Ranking reorder (tabla)       | hecho         | `RankingList` con FLIP (PR 4)               | P0        | Podio (top 3) queda fuera, ver 0.8.9.6                                                                 |
 | XP / nivel (barra + level-up) | pendiente     | —                                           | P1        | 0.8.9.3 — no requiere el delta de una acción, solo comparar valor anterior/nuevo entre renders         |
 | Puntos flotantes (+N)         | bloqueado     | —                                           | P1        | Ver 0.8.9.3 — requiere que `review_check_in` (o una consulta aparte) exponga los puntos otorgados      |
 | Racha (streak pulse)          | bloqueado     | —                                           | P1        | Mismo motivo que puntos flotantes                                                                      |
@@ -678,7 +690,7 @@ antes de que se replique por el resto de la app:
 | 1. Motion foundation ✅     | Tokens, primitivas CSS, migrar `page-enter`/`.reaction-chip`/`.nav-item` — [#36](https://github.com/raulruiz78/pique/pull/36) | 0.8.9.1                           |
 | 2. Swipe cards              | `SwipeCard`, aplicado al deck de retos (validaciones bloqueadas, ver 0.8.9.2)                                                 | 0.8.9.2                           |
 | 3. Check-in delight ✅      | `BottomSheet` en el modal de check-in, `.motion-pop` en check-in y validaciones — puntos/racha bloqueados, ver 0.8.9.3        | 0.8.9.4 (bottom sheet)            |
-| 4. Ranking animations       | Reordenación animada de podio/tabla                                                                                           | 0.8.9.6 (ranking reorder)         |
+| 4. Ranking animations ✅    | Reordenación animada de la tabla (FLIP), podio queda fuera                                                                    | 0.8.9.6 (ranking reorder)         |
 | 5. Gamification motion      | XP/nivel, logros, confeti, cambio de rango, `Celebration`                                                                     | 0.8.9.3 (resto)                   |
 | 6. Social motion            | Pop de reacción, campana, toasts                                                                                              | 0.8.9.5                           |
 | 7. Mobile gestures + polish | Pull-to-refresh, rubber band, haptics, calendario, empty states, error shake                                                  | 0.8.9.4 (resto) + 0.8.9.6 (resto) |
