@@ -492,6 +492,18 @@ small {
   touch-action: none;
   cursor: grab;
 }
+/* Confeti de cambio de rango (docs/features/motion-system.md, 0.8.9.3):
+   disparo único, nunca continuo. */
+@keyframes confetti-fall {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(160px) rotate(340deg);
+    opacity: 0;
+  }
+}
 /* Transición al cambiar de pestaña (0.8.7): un template.tsx por ruta bajo
    (app) monta un nodo nuevo en cada navegación, así que esta animación se
    repite en cada cambio — solo transform/opacity, 200ms. */

@@ -1,6 +1,8 @@
 import { Avatar } from "@/components/avatar";
+import { AchievementScroll } from "@/components/achievement-scroll";
 import { EmptyState } from "@/components/empty-state";
 import { ImageUpload } from "@/components/image-upload";
+import { LevelProgress } from "@/components/level-progress";
 import { SignOutButton } from "@/components/sign-out";
 import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 import Link from "next/link";
@@ -63,8 +65,8 @@ export default async function ProfilePage() {
     "Leyenda",
   ];
   const tier =
-    tierNames[Math.min(tierNames.length - 1, Math.floor((level - 1) / 3))];
-  const levelProgress = points % 500;
+    tierNames[Math.min(tierNames.length - 1, Math.floor((level - 1) / 3))] ??
+    tierNames[0]!;
   return (
     <main className="page">
       <div
@@ -119,38 +121,12 @@ export default async function ProfilePage() {
           <span className="muted">@{value?.username}</span>
         </div>
       </header>
-      <section className="stitch-card" style={{ padding: 20, marginTop: 24 }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "end",
-          }}
-        >
-          <div>
-            <span className="field-label muted">Tu nivel</span>
-            <strong
-              className="display"
-              style={{ color: "var(--violet)", fontSize: 28 }}
-            >
-              {tier} {level}
-            </strong>
-          </div>
-          <Crown color="var(--lime)" size={32} />
-        </div>
-        <div className="wizard-progress-track" style={{ marginTop: 16 }}>
-          <div
-            className="wizard-progress-fill"
-            style={{
-              width: `${levelProgress / 5}%`,
-              background: "var(--lime)",
-            }}
-          />
-        </div>
-        <small className="muted" style={{ display: "block", marginTop: 8 }}>
-          {500 - levelProgress} puntos para el nivel {level + 1}
-        </small>
-      </section>
+      <LevelProgress
+        userId={user!.id}
+        points={points}
+        level={level}
+        tier={tier}
+      />
       <section
         style={{
           display: "grid",
@@ -192,53 +168,67 @@ export default async function ProfilePage() {
       </section>
       <section style={{ marginBottom: 28 }}>
         <h2>Logros y medallas</h2>
-        <div className="achievement-scroll">
-          {[
-            [Medal, "Primer pique", points > 0, "Consigue tus primeros puntos"],
-            [Target, "Centurión", points >= 100, "Alcanza 100 puntos"],
-            [Dumbbell, "Bestia", points >= 500, "Alcanza 500 puntos"],
-            [Star, "Imparable", points >= 2500, "Alcanza 2.500 puntos"],
-            [Flame, "En llamas", streak >= 7, "Mantén una racha de 7 días"],
-            [Crown, "Leyenda", streak >= 30, "Mantén una racha de 30 días"],
-            [
-              UsersRound,
-              "Sociable",
-              (circleCount.count ?? 0) >= 3,
-              "Participa en 3 círculos",
-            ],
-            [
-              BookOpen,
-              "Veterano",
-              (challengeCount.count ?? 0) >= 10,
-              "Acepta 10 retos",
-            ],
-          ].map(([Icon, label, unlocked, description]) => {
-            const Comp = Icon as typeof Medal;
-            return (
-              <div
-                key={String(label)}
-                className="stitch-card"
-                style={{
-                  padding: 16,
-                  minWidth: 140,
-                  textAlign: "center",
-                  opacity: unlocked ? 1 : 0.38,
-                }}
-              >
-                <Comp color={unlocked ? "var(--lime)" : "var(--muted)"} />
-                <small className="field-label" style={{ margin: "12px 0 0" }}>
-                  {String(label)}
-                </small>
-                <small
-                  className="muted"
-                  style={{ display: "block", marginTop: 6 }}
-                >
-                  {String(description)}
-                </small>
-              </div>
-            );
-          })}
-        </div>
+        <AchievementScroll
+          userId={user!.id}
+          achievements={[
+            {
+              key: "first-point",
+              icon: Medal,
+              label: "Primer pique",
+              unlocked: points > 0,
+              description: "Consigue tus primeros puntos",
+            },
+            {
+              key: "centurion",
+              icon: Target,
+              label: "Centurión",
+              unlocked: points >= 100,
+              description: "Alcanza 100 puntos",
+            },
+            {
+              key: "beast",
+              icon: Dumbbell,
+              label: "Bestia",
+              unlocked: points >= 500,
+              description: "Alcanza 500 puntos",
+            },
+            {
+              key: "unstoppable",
+              icon: Star,
+              label: "Imparable",
+              unlocked: points >= 2500,
+              description: "Alcanza 2.500 puntos",
+            },
+            {
+              key: "on-fire",
+              icon: Flame,
+              label: "En llamas",
+              unlocked: streak >= 7,
+              description: "Mantén una racha de 7 días",
+            },
+            {
+              key: "legend",
+              icon: Crown,
+              label: "Leyenda",
+              unlocked: streak >= 30,
+              description: "Mantén una racha de 30 días",
+            },
+            {
+              key: "sociable",
+              icon: UsersRound,
+              label: "Sociable",
+              unlocked: (circleCount.count ?? 0) >= 3,
+              description: "Participa en 3 círculos",
+            },
+            {
+              key: "veteran",
+              icon: BookOpen,
+              label: "Veterano",
+              unlocked: (challengeCount.count ?? 0) >= 10,
+              description: "Acepta 10 retos",
+            },
+          ]}
+        />
       </section>
       <h2 style={{ marginTop: 30 }}>Configuración</h2>
       <div className="stitch-card" style={{ padding: "4px 17px" }}>
