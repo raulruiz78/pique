@@ -9,8 +9,10 @@ export function ReviewButtons({ checkInId }: { checkInId: string }) {
   const [reviewed, setReviewed] = useState<"APPROVED" | "REJECTED" | null>(
     null,
   );
+  const [rejecting, setRejecting] = useState(false);
+  const [reason, setReason] = useState("");
 
-  async function review(decision: "APPROVED" | "REJECTED") {
+  async function review(decision: "APPROVED" | "REJECTED", note?: string) {
     // Optimista, mismo patrón que challenge-actions.tsx/check-in-button.tsx:
     // el estado local se ve al instante, el refresh posterior reconcilia con
     // la lista real de validaciones pendientes.
@@ -21,7 +23,7 @@ export function ReviewButtons({ checkInId }: { checkInId: string }) {
         "Content-Type": "application/json",
         "Idempotency-Key": crypto.randomUUID(),
       },
-      body: JSON.stringify({ decision }),
+      body: JSON.stringify(note ? { decision, reason: note } : { decision }),
     });
     const body = (await response.json()) as { error?: { message: string } };
     if (!response.ok) {
@@ -31,7 +33,7 @@ export function ReviewButtons({ checkInId }: { checkInId: string }) {
     toast.success(
       decision === "APPROVED"
         ? "Validado. Los puntos ya cuentan."
-        : "Evidencia rechazada.",
+        : "Evidencia rechazada. Puede volver a intentarlo.",
     );
     router.refresh();
   }
@@ -52,6 +54,43 @@ export function ReviewButtons({ checkInId }: { checkInId: string }) {
       </span>
     );
 
+  if (rejecting)
+    return (
+      <div style={{ display: "grid", gap: 10, width: "100%" }}>
+        <textarea
+          className="field"
+          rows={2}
+          autoFocus
+          maxLength={500}
+          value={reason}
+          onChange={(event) => setReason(event.target.value)}
+          placeholder="¿Por qué lo rechazas? Le ayuda a corregirlo (opcional, pero se agradece)."
+        />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1.35fr",
+            gap: 10,
+          }}
+        >
+          <button
+            type="button"
+            className="button button-secondary"
+            onClick={() => setRejecting(false)}
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            className="button button-danger"
+            onClick={() => review("REJECTED", reason.trim() || undefined)}
+          >
+            <X size={18} /> Confirmar rechazo
+          </button>
+        </div>
+      </div>
+    );
+
   return (
     <div
       style={{
@@ -64,7 +103,7 @@ export function ReviewButtons({ checkInId }: { checkInId: string }) {
       <button
         aria-label="Rechazar"
         className="button button-secondary"
-        onClick={() => review("REJECTED")}
+        onClick={() => setRejecting(true)}
       >
         <X size={18} /> Rechazar
       </button>

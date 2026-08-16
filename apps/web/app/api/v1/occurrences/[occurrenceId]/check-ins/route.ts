@@ -53,6 +53,24 @@ export async function POST(
       });
     const input = bodySchema.parse(await request.json());
     const { occurrenceId } = await context.params;
+    // Si esto es un reenvío tras un rechazo, el RPC reutiliza el mismo
+    // check-in (occurrence_id es único) y sustituye su evidencia — pero el
+    // blob anterior en Storage no se borra solo. Se captura antes de llamar
+    // al RPC para poder limpiarlo después si la evidencia cambia.
+    const { data: previousCheckIn } = await auth.supabase
+      .from("check_ins")
+      .select("id")
+      .eq("occurrence_id", occurrenceId)
+      .maybeSingle();
+    let previousEvidencePath: string | null = null;
+    if (previousCheckIn) {
+      const { data: previousEvidence } = await auth.supabase
+        .from("evidence")
+        .select("storage_path")
+        .eq("check_in_id", previousCheckIn.id)
+        .maybeSingle();
+      previousEvidencePath = previousEvidence?.storage_path ?? null;
+    }
     const { data, error } = await auth.supabase.rpc("submit_check_in", {
       target_occurrence_id: occurrenceId,
       check_note: input.note ?? null,
@@ -60,6 +78,19 @@ export async function POST(
       evidence_payload: input.evidence ?? null,
     });
     if (error) throw error;
+    if (
+      previousEvidencePath &&
+      input.evidence &&
+      previousEvidencePath !== input.evidence.storagePath
+    ) {
+      try {
+        await auth.supabase.storage
+          .from("evidence")
+          .remove([previousEvidencePath]);
+      } catch {
+        // No crítico.
+      }
+    }
     const responseBody = { data };
     await auth.supabase.from("idempotency_keys").insert({
       user_id: auth.user.id,

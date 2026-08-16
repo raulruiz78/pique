@@ -47,6 +47,24 @@ export default async function TodayPage() {
     closes_at: string;
     goals: Relation | Relation[];
     challenges: Relation | Relation[];
+    check_ins:
+      | {
+          id: string;
+          validations: Array<{
+            reason: string | null;
+            decision: string;
+            created_at: string;
+          }>;
+        }
+      | {
+          id: string;
+          validations: Array<{
+            reason: string | null;
+            decision: string;
+            created_at: string;
+          }>;
+        }[]
+      | null;
   }>;
   const groupedOccurrences = new Map<
     string,
@@ -240,16 +258,26 @@ export default async function TodayPage() {
             // medianoche, mismo origen que el bug de duplicados de 0.6.0),
             // usar items.some() marcaba "LISTO" y ocultaba el botón de
             // check-in aunque la de hoy siguiera pendiente.
+            const rejected = !multiple && occurrence.status === "REJECTED";
             const done = multiple
               ? completed === items.length
-              : occurrence.status !== "PENDING";
+              : occurrence.status !== "PENDING" && !rejected;
+            const checkIn = Array.isArray(occurrence.check_ins)
+              ? occurrence.check_ins[0]
+              : occurrence.check_ins;
+            const rejectionReason = rejected
+              ? [...(checkIn?.validations ?? [])]
+                  .filter((item) => item.decision === "REJECTED")
+                  .sort((a, b) => b.created_at.localeCompare(a.created_at))[0]
+                  ?.reason
+              : null;
             return (
               <article
                 className="card"
                 key={`${occurrence.id}-${items.length}`}
                 style={{
                   overflow: "hidden",
-                  borderLeft: `5px solid ${done ? "var(--success)" : "var(--violet)"}`,
+                  borderLeft: `5px solid ${rejected ? "var(--danger)" : done ? "var(--success)" : "var(--violet)"}`,
                 }}
               >
                 <div
@@ -263,9 +291,19 @@ export default async function TodayPage() {
                   <CategoryBadge category={challenge?.category} />
                   <div style={{ flex: 1 }}>
                     <span
-                      className={`pill ${done ? "pill-lime" : "pill-violet"}`}
+                      className={`pill ${rejected ? "pill-violet" : done ? "pill-lime" : "pill-violet"}`}
+                      style={
+                        rejected
+                          ? {
+                              background: "rgb(255 180 171 / 16%)",
+                              color: "var(--danger)",
+                            }
+                          : undefined
+                      }
                     >
-                      {done ? (
+                      {rejected ? (
+                        "RECHAZADO"
+                      ) : done ? (
                         "LISTO"
                       ) : (
                         <>
@@ -281,12 +319,26 @@ export default async function TodayPage() {
                       {multiple &&
                         ` · ${completed} de ${items.length} completados`}
                     </p>
+                    {rejected && (
+                      <p
+                        style={{
+                          margin: "8px 0 0",
+                          fontSize: 13,
+                          color: "var(--danger)",
+                        }}
+                      >
+                        {rejectionReason
+                          ? `Tu rival dice: «${rejectionReason}»`
+                          : "Tu rival no lo ha dado por bueno. Prueba otra vez."}
+                      </p>
+                    )}
                   </div>
-                  {!done && (
+                  {(!done || rejected) && (
                     <CheckInButton
                       occurrenceId={occurrence.id}
                       evidenceRequired={Boolean(goal?.evidence_required)}
                       title={goal?.name ?? "Objetivo"}
+                      resubmit={rejected}
                     />
                   )}
                 </div>
