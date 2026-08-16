@@ -1,6 +1,6 @@
 import { ActivityFeed } from "@/components/activity-feed";
 import { Avatar } from "@/components/avatar";
-import { ChallengeActions } from "@/components/challenge-actions";
+import { PendingChallengeCard } from "@/components/pending-challenge-card";
 import { CircleInviteButton } from "@/components/circle-invite-button";
 import { CircleAccessPanel } from "@/components/circle-access-panel";
 import { CategoryBadge } from "@/components/challenge-category";
@@ -181,25 +181,11 @@ export default async function CirclePage({
           <span className="eyebrow">Necesitan tu respuesta</span>
           <div style={{ display: "grid", gap: 11, marginTop: 10 }}>
             {pending.map((challenge) => (
-              <article
+              <PendingChallengeCard
                 key={challenge.id}
-                className="card"
-                style={{ padding: 18, borderLeft: "5px solid var(--coral)" }}
-              >
-                <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-                  <Clock3 color="var(--coral)" />
-                  <div>
-                    <b>{challenge.title}</b>
-                    <small
-                      className="muted"
-                      style={{ display: "block", marginTop: 3 }}
-                    >
-                      Te han retado. Revisa y responde.
-                    </small>
-                  </div>
-                </div>
-                <ChallengeActions challengeId={challenge.id} />
-              </article>
+                challengeId={challenge.id}
+                title={challenge.title}
+              />
             ))}
           </div>
         </section>
