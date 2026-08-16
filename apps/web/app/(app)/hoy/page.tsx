@@ -232,9 +232,17 @@ export default async function TodayPage() {
             const completed = items.filter(
               (item) => item.status !== "PENDING",
             ).length;
+            // Objetivo simple (no multiple): "listo" debe mirar solo la
+            // ocurrencia que se muestra de verdad (occurrence, ya elegida
+            // arriba priorizando la pendiente), no cualquier fila del grupo.
+            // Si el agrupado por goal.id junta la de hoy (pendiente) con una
+            // de ayer ya resuelta (solape de huso horario cerca de
+            // medianoche, mismo origen que el bug de duplicados de 0.6.0),
+            // usar items.some() marcaba "LISTO" y ocultaba el botón de
+            // check-in aunque la de hoy siguiera pendiente.
             const done = multiple
               ? completed === items.length
-              : items.some((item) => item.status !== "PENDING");
+              : occurrence.status !== "PENDING";
             return (
               <article
                 className="card"

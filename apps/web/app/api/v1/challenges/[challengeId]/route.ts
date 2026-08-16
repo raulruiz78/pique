@@ -17,14 +17,14 @@ export async function DELETE(
       .delete()
       .eq("id", parsedChallengeId)
       .eq("creator_id", auth.user.id)
-      .in("status", ["DRAFT", "PENDING_ACCEPTANCE", "SCHEDULED"])
+      .in("status", ["DRAFT", "PENDING_ACCEPTANCE", "SCHEDULED", "ACTIVE"])
       .select("id")
       .maybeSingle();
     if (error) throw error;
     if (!data)
       return fail(
         "CHALLENGE_NOT_DELETABLE",
-        "Este reto no existe, no lo creaste tú, o ya está en marcha y no se puede eliminar.",
+        "Este reto no existe, no lo creaste tú, o ya ha terminado y no se puede eliminar.",
         id,
         404,
       );

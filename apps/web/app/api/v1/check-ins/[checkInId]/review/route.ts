@@ -29,6 +29,27 @@ export async function POST(
       return ok({ status: "ALREADY_REVIEWED" });
     if (error) throw error;
     await flushPendingPushInline();
+    // La foto de evidencia ya no hace falta una vez hay una decisión final
+    // — se borra para no acumular imágenes en Storage indefinidamente.
+    // Best effort: si falla, la revisión ya se ha completado igualmente.
+    try {
+      const { data: evidenceRow } = await auth.supabase
+        .from("evidence")
+        .select("storage_path")
+        .eq("check_in_id", checkInId)
+        .maybeSingle();
+      if (evidenceRow) {
+        await auth.supabase.storage
+          .from("evidence")
+          .remove([evidenceRow.storage_path]);
+        await auth.supabase
+          .from("evidence")
+          .delete()
+          .eq("check_in_id", checkInId);
+      }
+    } catch {
+      // No crítico.
+    }
     return ok(data);
   } catch (error) {
     return fromError(error, id);
