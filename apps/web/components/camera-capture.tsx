@@ -145,30 +145,16 @@ export function CameraCapture({
     const video = videoRef.current;
     if (!video?.videoWidth) return;
     const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    // En bastantes móviles (sobre todo cámara frontal, sujetando el
-    // teléfono en vertical) el buffer de vídeo llega en horizontal
-    // (videoWidth > videoHeight) aunque la vista previa se vea perfectamente
-    // vertical en pantalla — el navegador aplica una rotación solo para
-    // mostrarla, que drawImage() no hereda. Capturar tal cual en ese caso
-    // saca la foto girada 90°. Si detectamos ese desajuste, compensamos
-    // rotando nosotros mismos al dibujar en el canvas.
-    const bufferIsLandscape = video.videoWidth > video.videoHeight;
-    const displayIsPortrait = video.clientWidth < video.clientHeight;
-    const needsRotation = bufferIsLandscape && displayIsPortrait;
-    if (needsRotation) {
-      canvas.width = video.videoHeight;
-      canvas.height = video.videoWidth;
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate(Math.PI / 2);
-      ctx.drawImage(video, -video.videoWidth / 2, -video.videoHeight / 2);
-    } else {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      // Frame tal cual, sin voltear — ver comentario del componente.
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    }
+    // Frame tal cual, sin voltear — el espejo de la vista previa (solo
+    // cámara frontal) vive en un <div> envolvente, no en el propio <video>
+    // (ver más abajo), precisamente para que esta captura sea siempre el
+    // frame real sin depender de si el navegador arrastra o no el
+    // transform CSS del elemento origen hacia drawImage().
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     stopStream();
     canvas.toBlob(
       (blob) => {
@@ -276,20 +262,29 @@ export function CameraCapture({
           />
         ) : (
           <>
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
+            {/* El espejo (solo cámara frontal) va en este contenedor, no en
+                el <video> — así drawImage(video,...) en capture() nunca
+                puede arrastrar el transform CSS al frame capturado, pase lo
+                que pase en cada navegador. */}
+            <div
               style={{
                 width: "100%",
                 height: "100%",
-                objectFit: "cover",
-                // Espejo solo visual, solo cámara frontal — nunca se aplica
-                // al frame capturado (ver capture()).
                 transform: facing === "user" ? "scaleX(-1)" : "none",
               }}
-            />
+            >
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
+            </div>
             {starting && !cameraError && (
               <div
                 style={{

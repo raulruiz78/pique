@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       .select("id")
       .eq("id", input.occurrenceId)
       .eq("participant_id", auth.user.id)
-      .eq("status", "PENDING")
+      .in("status", ["PENDING", "REJECTED"])
       .maybeSingle();
     if (!occurrence)
       return fail(

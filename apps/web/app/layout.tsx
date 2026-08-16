@@ -27,6 +27,13 @@ export const viewport: Viewport = {
   themeColor: "#131313",
   width: "device-width",
   initialScale: 1,
+  // Sin esto, tocar un campo de texto hace que el navegador haga zoom para
+  // "ayudar" a leerlo — se siente como un bug, no como una app. Los campos
+  // ya tienen font-size >= 16px (evita el zoom automático de iOS por sí
+  // solo), pero fijar la escala máxima lo evita también en Android y ante
+  // cualquier caso que se escape.
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
 };
@@ -110,7 +117,15 @@ export default function RootLayout({
         className={`${sora.variable} ${inter.variable} ${spaceGrotesk.variable}`}
       >
         {children}
-        <Toaster richColors position="top-center" />
+        <Toaster
+          richColors
+          position="top-center"
+          // Igual que .app-shell/.bottom-nav (0.4.0): sin esto, los avisos
+          // ("Reto creado", "Check-in enviado"...) se dibujan debajo del
+          // notch/Dynamic Island en vez de respetar la zona segura.
+          offset={{ top: "calc(var(--safe-top) + 16px)" }}
+          mobileOffset={{ top: "calc(var(--safe-top) + 16px)" }}
+        />
       </body>
     </html>
   );
