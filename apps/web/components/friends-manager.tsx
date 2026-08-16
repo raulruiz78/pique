@@ -1,7 +1,7 @@
 "use client";
 import { Check, LoaderCircle, Plus, X, UserRoundX } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useOptimistic, useState } from "react";
 import { toast } from "sonner";
 import { Avatar } from "./avatar";
 import { EmptyState } from "./empty-state";
@@ -23,14 +23,28 @@ export function FriendsManager({ items }: { items: FriendItem[] }) {
   const [username, setUsername] = useState("");
   const [sending, setSending] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [optimisticItems, applyOptimisticUpdate] = useOptimistic(
+    items,
+    (
+      state,
+      action:
+        | { type: "respond"; id: string; response: "ACCEPTED" | "REJECTED" }
+        | { type: "remove"; id: string },
+    ) =>
+      action.type === "remove"
+        ? state.filter((item) => item.id !== action.id)
+        : state.map((item) =>
+            item.id === action.id ? { ...item, status: action.response } : item,
+          ),
+  );
 
-  const incoming = items.filter(
+  const incoming = optimisticItems.filter(
     (item) => item.status === "PENDING" && item.direction === "INCOMING",
   );
-  const outgoing = items.filter(
+  const outgoing = optimisticItems.filter(
     (item) => item.status === "PENDING" && item.direction === "OUTGOING",
   );
-  const accepted = items.filter((item) => item.status === "ACCEPTED");
+  const accepted = optimisticItems.filter((item) => item.status === "ACCEPTED");
 
   async function sendRequest(event: React.FormEvent) {
     event.preventDefault();
@@ -56,6 +70,7 @@ export function FriendsManager({ items }: { items: FriendItem[] }) {
 
   async function respond(id: string, response: "ACCEPTED" | "REJECTED") {
     setBusyId(id);
+    applyOptimisticUpdate({ type: "respond", id, response });
     const result = await fetch(`/api/v1/friends/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -71,6 +86,7 @@ export function FriendsManager({ items }: { items: FriendItem[] }) {
 
   async function remove(id: string) {
     setBusyId(id);
+    applyOptimisticUpdate({ type: "remove", id });
     const result = await fetch(`/api/v1/friends/${id}`, { method: "DELETE" });
     setBusyId(null);
     if (!result.ok) return toast.error("No se pudo eliminar.");

@@ -25,6 +25,7 @@ export function CheckInButton({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [note, setNote] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -106,6 +107,11 @@ export function CheckInButton({
       localStorage.removeItem(`pique-pending-${occurrenceId}`);
       toast.success("Check-in enviado. ¡Bien jugado!");
       setOpen(false);
+      // Optimista: en cuanto el servidor confirma, mostramos el estado
+      // "enviado" al instante en vez de esperar a que termine el refresh
+      // completo de la página (que igualmente llegará justo después y
+      // sustituirá este botón por la tarjeta ya marcada como lista).
+      setSubmitted(true);
       router.refresh();
     } catch (error) {
       toast.error(
@@ -115,6 +121,15 @@ export function CheckInButton({
       setLoading(false);
     }
   }
+  if (submitted)
+    return (
+      <span
+        className="pill pill-lime"
+        style={{ display: "flex", alignItems: "center", gap: 6 }}
+      >
+        <Check size={14} /> Enviado
+      </span>
+    );
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
