@@ -24,6 +24,15 @@
   --safe-right: env(safe-area-inset-right, 0px);
   --nav-height: 76px;
   --nav-gap: 10px;
+  /* Motion tokens (docs/features/motion-system.md, 0.8.9.1). Toda
+     animación/transición nueva reutiliza esto en vez de valores
+     sueltos. */
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 400ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --scale-pressed: 0.97;
 }
 
 * {
@@ -146,15 +155,15 @@ a {
   cursor: pointer;
   text-decoration: none;
   transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    opacity 0.18s ease;
+    transform var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    opacity var(--duration-normal) var(--ease-out);
 }
 .button:hover {
   transform: translateY(-1px);
 }
 .button:active {
-  transform: translateY(1px) scale(0.99);
+  transform: translateY(1px) scale(var(--scale-pressed));
 }
 .button-primary {
   color: #25005a;
@@ -189,8 +198,8 @@ a {
   padding: 14px 16px;
   font-size: 1rem;
   transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease;
+    border-color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out);
 }
 .field:focus {
   border-color: var(--violet);
@@ -316,8 +325,8 @@ a {
   font-size: 0.68rem;
   font-weight: 700;
   transition:
-    color 0.2s ease,
-    transform 0.15s ease;
+    color var(--duration-normal) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring);
 }
 .nav-item:active {
   transform: scale(0.92);
@@ -333,6 +342,7 @@ a {
   background: var(--violet);
   color: #3f008e;
   box-shadow: 0 8px 30px rgb(210 187 255 / 32%);
+  transition: transform var(--duration-fast) var(--ease-spring);
 }
 .nav-create:active {
   transform: scale(0.93);
@@ -394,6 +404,55 @@ small {
 .rise {
   animation: rise 0.38s ease both;
 }
+/* Primitivas de motion reutilizables (docs/features/motion-system.md).
+   Añadir una nueva solo cuando dos o más piezas de esa fase la
+   necesiten de forma idéntica. */
+@keyframes motion-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes motion-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes motion-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes motion-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+.motion-fade-in {
+  animation: motion-fade-in var(--duration-normal) var(--ease-out) both;
+}
+.motion-pop {
+  animation: motion-pop var(--duration-fast) var(--ease-spring) both;
+}
+.motion-slide-up {
+  animation: motion-slide-up var(--duration-normal) var(--ease-out) both;
+}
+.motion-shake {
+  animation: motion-shake var(--duration-fast) linear;
+}
 /* Transición al cambiar de pestaña (0.8.7): un template.tsx por ruta bajo
    (app) monta un nodo nuevo en cada navegación, así que esta animación se
    repite en cada cambio — solo transform/opacity, 200ms. */
@@ -404,13 +463,13 @@ small {
   }
 }
 .page-enter {
-  animation: page-enter 0.2s ease both;
+  animation: page-enter var(--duration-normal) var(--ease-out) both;
 }
 .reaction-chip {
   transition:
-    transform 0.15s ease,
-    border-color 0.15s ease,
-    background 0.15s ease;
+    transform var(--duration-fast) var(--ease-spring),
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
 }
 .reaction-chip:active {
   transform: scale(0.88);
