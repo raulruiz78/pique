@@ -1,5 +1,10 @@
 import { ChallengeWizard } from "@/components/challenge-wizard";
-export default function CreatePage() {
+export default async function CreatePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ circleId?: string }>;
+}) {
+  const { circleId } = await searchParams;
   const start = new Date();
   const end = new Date(start);
   end.setDate(end.getDate() + 30);
@@ -20,6 +25,7 @@ export default function CreatePage() {
       <ChallengeWizard
         startDate={start.toISOString().slice(0, 10)}
         endDate={end.toISOString().slice(0, 10)}
+        initialCircleId={circleId}
       />
     </main>
   );

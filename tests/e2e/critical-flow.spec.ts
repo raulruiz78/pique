@@ -31,7 +31,6 @@ test("A crea → B acepta → A cumple → B valida → ranking cambia", async (
   try {
     await login(pageA, "raul@pique.local");
     await pageA.goto("/crear");
-    await pageA.getByRole("button", { name: "Empezar desde cero" }).click();
     await pageA.getByRole("button", { name: /Foco y mente/ }).click();
     await expect(pageA.getByText("Carmen")).toBeVisible({ timeout: 30_000 });
     await pageA.getByLabel("Título").fill(challengeTitle);
