@@ -2,10 +2,17 @@
 
 import { createBrowserClient } from "@supabase/ssr";
 import { Camera, LoaderCircle, Trash2 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ImageCropModal } from "./image-crop-modal";
+
+// El modal de recorte (canvas, arrastre, zoom) solo hace falta tras elegir
+// una foto — no en la carga inicial de /perfil ni /circulos/[circleId].
+const ImageCropModal = dynamic(
+  () => import("./image-crop-modal").then((mod) => mod.ImageCropModal),
+  { ssr: false },
+);
 
 export function ImageUpload({
   endpoint,
