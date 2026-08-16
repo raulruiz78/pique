@@ -4,6 +4,14 @@ import { OnboardingTutorial } from "@/components/onboarding-tutorial";
 import { PwaRegister } from "@/components/pwa-register";
 import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 
+// Se mantiene explícito a propósito (auditoría 0.8.3): toda página bajo
+// (app) ya usa cookies() a través de Supabase para saber quién ha
+// iniciado sesión, lo que fuerza render dinámico en Next con o sin este
+// export. Quitarlo no aportaría una ganancia medible y sí el riesgo de
+// que, si en el futuro algún fetch propio no pasara por Supabase-js,
+// Next pudiera cachearlo por defecto y servir datos de otra persona/
+// sesión — con datos tan personales (evidencias, puntuaciones, rachas),
+// se prioriza la certeza de "siempre fresco" sobre esa optimización.
 export const dynamic = "force-dynamic";
 export default async function AppLayout({
   children,
