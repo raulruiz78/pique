@@ -1,6 +1,6 @@
 "use client";
 import { CalendarCheck2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type CalendarCell = {
   key: string;
@@ -10,11 +10,39 @@ export type CalendarCell = {
   done: boolean;
   events: Array<{ name: string; challenge: string; points: number }>;
 };
-export function InteractiveMonth({ days }: { days: CalendarCell[] }) {
+export function InteractiveMonth({
+  days,
+  userId,
+}: {
+  days: CalendarCell[];
+  userId?: string | undefined;
+}) {
   const [selected, setSelected] = useState(
     days.find((day) => day.today)?.key ?? days[0]?.key ?? "",
   );
+  const [justCompleted, setJustCompleted] = useState<Set<string>>(new Set());
   const current = days.find((day) => day.key === selected);
+
+  // Igual que LevelProgress/RankingList/NotificationBell: esta página no
+  // tiene datos en vivo, así que "recién completado" se calcula comparando
+  // contra el último estado visto por este navegador (docs/features/motion-system.md,
+  // 0.8.9.6).
+  useEffect(() => {
+    if (!userId) return;
+    const storageKey = `pique-calendar-done-${userId}`;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const raw = localStorage.getItem(storageKey);
+    const doneKeys = days.filter((day) => day.done).map((day) => day.key);
+    localStorage.setItem(storageKey, JSON.stringify(doneKeys));
+    if (reducedMotion || !raw) return;
+    const prevDone = new Set<string>(JSON.parse(raw) as string[]);
+    const fresh = doneKeys.filter((key) => !prevDone.has(key));
+    if (fresh.length)
+      requestAnimationFrame(() => setJustCompleted(new Set(fresh)));
+  }, [userId, days]);
+
   return (
     <>
       <div className="month-grid">
@@ -22,7 +50,9 @@ export function InteractiveMonth({ days }: { days: CalendarCell[] }) {
           <button
             key={day.key}
             type="button"
-            className="month-day"
+            className={
+              justCompleted.has(day.key) ? "month-day motion-pop" : "month-day"
+            }
             aria-label={`Día ${day.day}, ${day.events.length} retos`}
             aria-pressed={selected === day.key}
             data-selected={selected === day.key}

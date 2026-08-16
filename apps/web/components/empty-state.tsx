@@ -13,7 +13,10 @@ export function EmptyState({
   action?: string;
 }) {
   return (
-    <div className="card" style={{ textAlign: "center", padding: "42px 26px" }}>
+    <div
+      className="card motion-fade-in"
+      style={{ textAlign: "center", padding: "42px 26px" }}
+    >
       <CircleDashed
         size={34}
         color="var(--violet)"

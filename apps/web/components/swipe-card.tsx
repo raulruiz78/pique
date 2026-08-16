@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useState } from "react";
+import { tap } from "@/lib/haptics";
 
 interface SwipeCardProps {
   onSwipeLeft: () => void;
@@ -71,6 +72,7 @@ export function SwipeCard({
       return;
     }
     const direction = distance > 0 ? "right" : "left";
+    tap(10);
     if (prefersReducedMotion()) {
       setDx(0);
       if (direction === "right") onSwipeRight();

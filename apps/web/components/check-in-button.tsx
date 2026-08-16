@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { BottomSheet } from "@/components/bottom-sheet";
+import { tap } from "@/lib/haptics";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
 
 async function hashFile(file: File): Promise<string> {
@@ -107,6 +108,7 @@ export function CheckInButton({
         throw new Error(body.error?.message ?? "No se pudo registrar.");
       localStorage.removeItem(`pique-pending-${occurrenceId}`);
       toast.success("Check-in enviado. ¡Bien jugado!");
+      tap(15);
       setOpen(false);
       // Optimista: en cuanto el servidor confirma, mostramos el estado
       // "enviado" al instante en vez de esperar a que termine el refresh
