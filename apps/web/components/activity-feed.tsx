@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useOptimistic, useState } from "react";
 import { Avatar } from "./avatar";
 
 const EMOJIS = ["🔥", "💪", "👏", "⚡"] as const;
@@ -51,10 +51,27 @@ export function ActivityFeed({
 }) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [optimisticActivities, applyOptimisticReaction] = useOptimistic(
+    activities,
+    (state, update: { activityId: string; emoji: string; removing: boolean }) =>
+      state.map((activity) => {
+        if (activity.id !== update.activityId) return activity;
+        const reactions = activity.reactions.filter(
+          (item) => item.user_id !== currentUserId,
+        );
+        if (!update.removing)
+          reactions.push({ user_id: currentUserId, emoji: update.emoji });
+        return { ...activity, reactions };
+      }),
+  );
 
   async function react(activityId: string, emoji: string, mine: string | null) {
-    setBusyId(activityId);
     const removing = mine === emoji;
+    setBusyId(activityId);
+    // Optimista: la reacción cambia al instante en pantalla; el
+    // router.refresh() posterior reconcilia con el estado real del
+    // servidor (y revierte solo si la petición ha fallado).
+    applyOptimisticReaction({ activityId, emoji, removing });
     await fetch(
       `/api/v1/activities/${activityId}/reactions`,
       removing
@@ -69,7 +86,7 @@ export function ActivityFeed({
     router.refresh();
   }
 
-  if (activities.length === 0)
+  if (optimisticActivities.length === 0)
     return (
       <p className="muted" style={{ padding: "4px 2px" }}>
         Aún no hay actividad. En cuanto alguien proponga o cumpla un reto,
@@ -79,7 +96,7 @@ export function ActivityFeed({
 
   return (
     <div style={{ display: "grid", gap: 10 }}>
-      {activities.map((activity) => {
+      {optimisticActivities.map((activity) => {
         const mine =
           activity.reactions.find((item) => item.user_id === currentUserId)
             ?.emoji ?? null;
