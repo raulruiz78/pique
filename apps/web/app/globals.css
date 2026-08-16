@@ -102,6 +102,11 @@ a {
   width: min(100%, 540px);
   min-height: 100dvh;
   margin: 0 auto;
+  /* Antes esto se animaba con `animation: shell-ambient ...` desplazando
+     background-position de forma continua e infinita (auditoría 0.8.7):
+     esa propiedad no es compositable y fuerza repintado constante durante
+     toda la vida de la app, compitiendo con scroll e interacción. El
+     degradado se queda, pero fijo. */
   background:
     radial-gradient(circle at 8% 0%, rgb(124 58 237 / 13%), transparent 25rem),
     radial-gradient(circle at 96% 70%, rgb(188 255 95 / 5%), transparent 20rem),
@@ -110,7 +115,6 @@ a {
     150% 150%,
     150% 150%,
     auto;
-  animation: shell-ambient 22s ease-in-out infinite alternate;
   position: relative;
   padding-top: var(--safe-top);
   padding-bottom: calc(
@@ -311,6 +315,12 @@ a {
   font-family: var(--font-space-grotesk), sans-serif;
   font-size: 0.68rem;
   font-weight: 700;
+  transition:
+    color 0.2s ease,
+    transform 0.15s ease;
+}
+.nav-item:active {
+  transform: scale(0.92);
 }
 .nav-item[data-active="true"] {
   color: var(--violet);
@@ -323,6 +333,9 @@ a {
   background: var(--violet);
   color: #3f008e;
   box-shadow: 0 8px 30px rgb(210 187 255 / 32%);
+}
+.nav-create:active {
+  transform: scale(0.93);
 }
 h1,
 h2,
@@ -378,28 +391,29 @@ small {
     transform: translate3d(-8vw, -55vh, 0) scale(1.08);
   }
 }
-@keyframes shell-ambient {
-  0% {
-    background-position:
-      0% 0%,
-      100% 100%,
-      0 0;
-  }
-  50% {
-    background-position:
-      35% 24%,
-      62% 54%,
-      0 0;
-  }
-  100% {
-    background-position:
-      14% 70%,
-      84% 12%,
-      0 0;
-  }
-}
 .rise {
   animation: rise 0.38s ease both;
+}
+/* Transición al cambiar de pestaña (0.8.7): un template.tsx por ruta bajo
+   (app) monta un nodo nuevo en cada navegación, así que esta animación se
+   repite en cada cambio — solo transform/opacity, 200ms. */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.page-enter {
+  animation: page-enter 0.2s ease both;
+}
+.reaction-chip {
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+.reaction-chip:active {
+  transform: scale(0.88);
 }
 .screen-header {
   display: flex;
