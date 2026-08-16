@@ -158,7 +158,7 @@ export async function todayOccurrencesQuery(timezone: string) {
   const { data } = await supabase
     .from("goal_occurrences")
     .select(
-      "id,starts_at,closes_at,status,goals(id,name,recurrence,base_points,evidence_required),challenges(id,title,category)",
+      "id,starts_at,closes_at,status,goals(id,name,recurrence,base_points,evidence_required),challenges(id,title,category),check_ins(id,validations(reason,decision,created_at))",
     )
     .eq("participant_id", user.id)
     .lt("starts_at", end.toISOString())

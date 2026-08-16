@@ -20,10 +20,14 @@ export function CheckInButton({
   occurrenceId,
   evidenceRequired,
   title,
+  resubmit = false,
 }: {
   occurrenceId: string;
   evidenceRequired: boolean;
   title: string;
+  /** El check-in anterior de esta ocurrencia fue rechazado — esto es un
+   * reintento, no el primer envío. */
+  resubmit?: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -141,8 +145,12 @@ export function CheckInButton({
       onOpenChange={setOpen}
       ariaDescribedBy="check-description"
       trigger={
-        <button className="button button-lime">
-          <Check size={18} /> Hecho
+        <button
+          className={
+            resubmit ? "button button-secondary" : "button button-lime"
+          }
+        >
+          <Check size={18} /> {resubmit ? "Subir de nuevo" : "Hecho"}
         </button>
       }
     >
@@ -160,7 +168,7 @@ export function CheckInButton({
               className="display"
               style={{ fontSize: 35, margin: "7px 0" }}
             >
-              Sube tu prueba
+              {resubmit ? "Corrige tu prueba" : "Sube tu prueba"}
             </Dialog.Title>
           </div>
           <Dialog.Close
@@ -176,8 +184,9 @@ export function CheckInButton({
           className="muted"
           style={{ lineHeight: 1.5 }}
         >
-          Asegúrate de que el resultado sea visible para que tu círculo pueda
-          validarlo.
+          {resubmit
+            ? "Tu rival la rechazó. Sube una prueba que deje claro que sí lo has hecho."
+            : "Asegúrate de que el resultado sea visible para que tu círculo pueda validarlo."}
         </Dialog.Description>
         <span className="pill pill-violet">{title}</span>
         <div style={{ display: "grid", gap: 15, marginTop: 20 }}>
@@ -268,7 +277,7 @@ export function CheckInButton({
             onClick={submit}
           >
             {loading ? <LoaderCircle className="animate-spin" /> : <Check />}{" "}
-            Confirmar hecho
+            {resubmit ? "Reenviar" : "Confirmar hecho"}
           </button>
         </div>
       </div>
