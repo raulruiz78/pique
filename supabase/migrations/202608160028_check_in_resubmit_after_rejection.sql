@@ -50,7 +50,7 @@ begin
       sha256 = excluded.sha256,
       created_at = now();
   end if;
-  update public.goal_occurrences set status = case when challenge.validation_type = 'SELF' then 'APPROVED' else 'SUBMITTED' end where id = occurrence.id;
+  update public.goal_occurrences set status = (case when challenge.validation_type = 'SELF' then 'APPROVED' else 'SUBMITTED' end)::public.occurrence_status where id = occurrence.id;
   insert into public.outbox_events(aggregate_type, aggregate_id, event_type, payload)
   values ('check_in', created.id, case when challenge.validation_type = 'SELF' then 'CheckInApproved' else 'CheckInSubmitted' end, jsonb_build_object('checkInId', created.id));
   return created;
