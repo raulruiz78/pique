@@ -1,0 +1,16 @@
+-- Bug en producción: "Validar"/"Rechazar" fallaba con
+-- "duplicate key value violates unique constraint
+-- validations_check_in_id_reviewer_id_key" en cuanto el mismo
+-- revisor volvía a revisar un check-in que ya había rechazado antes
+-- (0.8.9 permitió reenviar tras un rechazo reutilizando el mismo
+-- check_in_id — la unicidad (check_in_id, reviewer_id) asumía que un
+-- check_in solo se revisa una vez en toda su vida, y eso dejó de ser
+-- cierto).
+--
+-- Esta restricción era redundante para lo que de verdad importa
+-- (evitar registrar dos veces la misma revisión): review_check_in ya
+-- bloquea eso con "for update" (bloqueo de fila) + la comprobación de
+-- status <> 'PENDING_REVIEW' → 'ALREADY_REVIEWED'. Quitarla no reabre
+-- ninguna carrera; solo deja de impedir que el mismo revisor pueda
+-- volver a revisar tras un reenvío legítimo.
+alter table public.validations drop constraint validations_check_in_id_reviewer_id_key;
