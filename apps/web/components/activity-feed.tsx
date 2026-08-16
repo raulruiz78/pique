@@ -137,6 +137,7 @@ export function ActivityFeed({
                     <button
                       key={emoji}
                       type="button"
+                      className="reaction-chip"
                       disabled={busyId === activity.id}
                       onClick={() => void react(activity.id, emoji, mine)}
                       style={{
