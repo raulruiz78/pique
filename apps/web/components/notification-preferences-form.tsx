@@ -37,7 +37,28 @@ export function NotificationPreferencesForm({
     } else {
       await unsubscribe();
     }
-    setForm((current) => ({ ...current, push: enabled }));
+    const next = { ...form, push: enabled };
+    setForm(next);
+    // Se guarda al momento, no al pulsar "Guardar cambios" de más abajo:
+    // dejarlo pendiente de ese botón hacía que activar el interruptor
+    // pareciera hecho sin estarlo — el navegador quedaba suscrito pero
+    // shouldSendPush() mira esta preferencia ya guardada en el perfil, no
+    // la suscripción en sí, así que sin guardar no llegaba nada.
+    const response = await fetch("/api/v1/users/me", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ notificationPreferences: next }),
+    });
+    if (!response.ok) {
+      toast.error("No se pudo guardar la preferencia de notificaciones.");
+      return;
+    }
+    toast.success(
+      enabled
+        ? "Notificaciones push activadas."
+        : "Notificaciones push desactivadas.",
+    );
+    router.refresh();
   }
 
   async function save(event: React.FormEvent) {

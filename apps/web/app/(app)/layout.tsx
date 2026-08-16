@@ -1,6 +1,7 @@
 import { BottomNav } from "@/components/bottom-nav";
 import { InstallBanner } from "@/components/install-banner";
 import { OnboardingTutorial } from "@/components/onboarding-tutorial";
+import { PushOptInBanner } from "@/components/push-opt-in-banner";
 import { PwaRegister } from "@/components/pwa-register";
 import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 
@@ -24,7 +25,7 @@ export default async function AppLayout({
     supabase && user
       ? await supabase
           .from("profiles")
-          .select("onboarding_completed")
+          .select("onboarding_completed,notification_preferences")
           .eq("id", user.id)
           .maybeSingle()
       : { data: null };
@@ -33,6 +34,17 @@ export default async function AppLayout({
       <PwaRegister />
       {profile && !profile.onboarding_completed && <OnboardingTutorial />}
       <InstallBanner />
+      <PushOptInBanner
+        preferences={
+          (profile?.notification_preferences as {
+            inApp: boolean;
+            push: boolean;
+            email: boolean;
+            quietStart: string;
+            quietEnd: string;
+          } | null) ?? null
+        }
+      />
       {children}
       <BottomNav />
     </div>
