@@ -2,7 +2,7 @@ import { Avatar } from "@/components/avatar";
 import { EmptyState } from "@/components/empty-state";
 import { ImageUpload } from "@/components/image-upload";
 import { SignOutButton } from "@/components/sign-out";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 import Link from "next/link";
 import {
   Bell,
@@ -30,9 +30,7 @@ export default async function ProfilePage() {
         />
       </main>
     );
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const profile = await supabase
     .from("profiles")
     .select(

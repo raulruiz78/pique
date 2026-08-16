@@ -1,14 +1,12 @@
 import { EmptyState } from "@/components/empty-state";
 import { Avatar } from "@/components/avatar";
 import { MarkNotificationsRead } from "@/components/notification-list";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 import { ArrowLeft, Bell, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 export default async function NotificationsPage() {
   const supabase = await createServerSupabase();
-  const {
-    data: { user },
-  } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
+  const user = await getCurrentUser();
   const { data: profile } =
     supabase && user
       ? await supabase

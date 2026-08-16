@@ -1,12 +1,10 @@
 import { CircleManager } from "@/components/circle-manager";
 import { Avatar } from "@/components/avatar";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 
 export default async function CirclesPage() {
   const supabase = await createServerSupabase();
-  const {
-    data: { user },
-  } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
+  const user = await getCurrentUser();
   const { data: circles } = supabase
     ? await supabase
         .from("circles")

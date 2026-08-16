@@ -2,7 +2,7 @@ import { Avatar } from "@/components/avatar";
 import { ChallengeActions } from "@/components/challenge-actions";
 import { CategoryBadge, categoryMeta } from "@/components/challenge-category";
 import { EmptyState } from "@/components/empty-state";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 import {
   CalendarDays,
   Camera,
@@ -106,9 +106,7 @@ export default async function ChallengePage({
         />
       </main>
     );
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const { data } = await supabase
     .from("challenges")
     .select(

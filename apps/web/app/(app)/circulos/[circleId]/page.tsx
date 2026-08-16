@@ -5,7 +5,7 @@ import { CircleInviteButton } from "@/components/circle-invite-button";
 import { CircleAccessPanel } from "@/components/circle-access-panel";
 import { CategoryBadge } from "@/components/challenge-category";
 import { ImageUpload } from "@/components/image-upload";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 import {
   ArrowLeft,
   ChevronRight,
@@ -36,9 +36,7 @@ export default async function CirclePage({
   const { circleId } = await params;
   const supabase = await createServerSupabase();
   if (!supabase) notFound();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const { data: circle } = await supabase
     .from("circles")
     .select(

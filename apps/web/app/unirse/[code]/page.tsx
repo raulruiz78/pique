@@ -1,4 +1,4 @@
-import { createServerSupabase } from "@/lib/supabase/server";
+import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 import { Sparkles, Users } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -28,9 +28,7 @@ export default async function JoinPage({
   const { code } = await params;
   const supabase = await createServerSupabase();
   if (!supabase) redirect("/login");
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     const { data: preview } = (await supabase

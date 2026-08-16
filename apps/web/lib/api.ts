@@ -2,7 +2,7 @@ import type { ApiErrorShape, Json } from "@pique/database";
 import type { User } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { createServerSupabase } from "./supabase/server";
+import { createServerSupabase, getCurrentUser } from "./supabase/server";
 
 export function requestId(request: Request): string {
   return request.headers.get("x-request-id") ?? crypto.randomUUID();
@@ -79,11 +79,8 @@ export async function requireUser(id: string): Promise<
       id,
       503,
     );
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  if (error || !user)
+  const user = await getCurrentUser();
+  if (!user)
     return fail("UNAUTHENTICATED", "Inicia sesión para continuar.", id, 401);
   return { user, supabase };
 }
