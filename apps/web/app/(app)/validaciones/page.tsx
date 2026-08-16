@@ -3,13 +3,13 @@ import {
   EvidenceReviewCard,
   type EvidenceReview,
 } from "@/components/evidence-review-card";
-import { dashboardQuery } from "@/lib/queries";
+import { pendingReviewsQuery } from "@/lib/queries";
 import { ArrowLeft, ShieldCheck, Zap } from "lucide-react";
 import Link from "next/link";
 
 export default async function ValidationsPage() {
-  const data = await dashboardQuery();
-  const reviews = (data?.reviews ?? []) as unknown as EvidenceReview[];
+  const reviewRows = await pendingReviewsQuery();
+  const reviews = reviewRows as unknown as EvidenceReview[];
   return (
     <main className="page">
       <header className="screen-header">

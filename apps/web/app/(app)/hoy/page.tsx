@@ -6,7 +6,12 @@ import {
   type EvidenceReview,
 } from "@/components/evidence-review-card";
 import { CategoryBadge } from "@/components/challenge-category";
-import { dashboardQuery } from "@/lib/queries";
+import {
+  pendingReviewsQuery,
+  profileSummaryQuery,
+  todayOccurrencesQuery,
+  unreadNotificationsCountQuery,
+} from "@/lib/queries";
 import { Bell, ChevronRight, Clock3, Flame, Award } from "lucide-react";
 import Link from "next/link";
 
@@ -21,14 +26,20 @@ interface Relation {
 }
 export default async function TodayPage() {
   const now = new Date();
-  const data = await dashboardQuery();
-  const profile = data?.profile as {
+  const summary = await profileSummaryQuery();
+  const profile = summary?.profile as {
     display_name?: string;
     avatar_path?: string | null;
     total_points?: number;
     current_streak?: number;
+    timezone?: string;
   } | null;
-  const occurrences = (data?.occurrences ?? []) as unknown as Array<{
+  const [rawOccurrences, reviewRows, unreadNotifications] = await Promise.all([
+    todayOccurrencesQuery(profile?.timezone ?? "Europe/Madrid"),
+    pendingReviewsQuery(),
+    unreadNotificationsCountQuery(),
+  ]);
+  const occurrences = rawOccurrences as unknown as Array<{
     id: string;
     status: string;
     starts_at: string;
@@ -60,9 +71,8 @@ export default async function TodayPage() {
     groupedOccurrences.set(key, group);
   }
   const objectiveCards = [...groupedOccurrences.values()];
-  const reviews = (data?.reviews ?? []) as unknown as EvidenceReview[];
+  const reviews = reviewRows as unknown as EvidenceReview[];
   const displayName = profile?.display_name ?? "jugador";
-  const unreadNotifications = data?.unreadNotifications ?? 0;
   const totalPoints = profile?.total_points ?? 0;
   const level = Math.floor(totalPoints / 500) + 1;
   const levelProgress = totalPoints % 500;
@@ -81,8 +91,8 @@ export default async function TodayPage() {
             name={displayName}
             size={48}
             src={
-              profile?.avatar_path && data?.user.id
-                ? `/api/v1/media/profiles/${data.user.id}`
+              profile?.avatar_path && summary?.user?.id
+                ? `/api/v1/media/profiles/${summary.user.id}`
                 : null
             }
           />
@@ -220,9 +230,9 @@ export default async function TodayPage() {
       </div>
       {objectiveCards.length === 0 ? (
         <EmptyState
-          title={data ? "Hoy tienes vía libre" : "Conecta tu base de datos"}
+          title={summary ? "Hoy tienes vía libre" : "Conecta tu base de datos"}
           text={
-            data
+            summary
               ? "No hay objetivos para hoy. Puedes preparar el próximo reto."
               : "No se ha podido conectar con el servicio. Inténtalo de nuevo en unos minutos."
           }

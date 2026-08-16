@@ -4,7 +4,7 @@ import { CategoryBadge } from "@/components/challenge-category";
 import { InteractiveMonth } from "@/components/interactive-month";
 import {
   calendarQuery,
-  dashboardQuery,
+  profileSummaryQuery,
   weeklySummaryQuery,
 } from "@/lib/queries";
 import {
@@ -27,9 +27,9 @@ export default async function CalendarPage() {
   const to = new Date(today);
   to.setDate(to.getDate() + 30);
   if (monthEnd > to) to.setTime(monthEnd.getTime());
-  const [calendarData, dashboard, weeklySummary] = await Promise.all([
+  const [calendarData, summary, weeklySummary] = await Promise.all([
     calendarQuery(queryStart, to),
-    dashboardQuery(),
+    profileSummaryQuery(),
     weeklySummaryQuery(),
   ]);
   const rawItems = calendarData as unknown as Array<{
@@ -81,7 +81,7 @@ export default async function CalendarPage() {
       .filter((item) => item.done)
       .map((item) => dateKey(new Date(item.starts_at))),
   );
-  const profile = dashboard?.profile as {
+  const profile = summary?.profile as {
     display_name?: string;
     avatar_path?: string | null;
     total_points?: number;
@@ -98,8 +98,8 @@ export default async function CalendarPage() {
           name={profile?.display_name ?? "Pique"}
           size={48}
           src={
-            profile?.avatar_path && dashboard?.user.id
-              ? `/api/v1/media/profiles/${dashboard.user.id}`
+            profile?.avatar_path && summary?.user?.id
+              ? `/api/v1/media/profiles/${summary.user.id}`
               : null
           }
         />

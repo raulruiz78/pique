@@ -127,7 +127,14 @@ export async function weeklySummaryQuery() {
   return { weekPoints, weekCheckIns: checkIns.count ?? 0 };
 }
 
-export async function dashboardQuery() {
+// dashboardQuery() original se dividió en piezas más pequeñas (auditoría de
+// rendimiento 0.8.4): /calendario y /validaciones pagaban por las 5 queries
+// en paralelo (incluida la generación de URLs firmadas de evidencia) aunque
+// solo necesitaran el perfil o las revisiones pendientes respectivamente.
+// De paso, `participants` y `activities` no los leía ningún caller — se
+// han retirado en vez de trasladarlos.
+
+export async function profileSummaryQuery() {
   const supabase = await createServerSupabase();
   if (!supabase) return null;
   const user = await getCurrentUser();
@@ -139,50 +146,55 @@ export async function dashboardQuery() {
     )
     .eq("id", user.id)
     .single();
-  const { start, end } = dayBounds(
-    new Date(),
-    profile.data?.timezone ?? "Europe/Madrid",
-  );
-  const [occurrences, participants, activities, reviews, unreadNotifications] =
-    await Promise.all([
-      supabase
-        .from("goal_occurrences")
-        .select(
-          "id,starts_at,closes_at,status,goals(id,name,recurrence,base_points,evidence_required),challenges(id,title,category)",
-        )
-        .eq("participant_id", user.id)
-        .lt("starts_at", end.toISOString())
-        .gte("closes_at", start.toISOString())
-        .order("starts_at"),
-      supabase
-        .from("challenge_participants")
-        .select(
-          "user_id,score,current_streak,challenges!inner(circle_id,status),profiles(display_name,username,avatar_path)",
-        )
-        .in("challenges.status", ["ACTIVE", "SCHEDULED"])
-        .order("score", { ascending: false })
-        .limit(5),
-      supabase
-        .from("activities")
-        .select("id,type,payload,created_at,profiles(display_name)")
-        .order("created_at", { ascending: false })
-        .limit(8),
-      supabase
-        .from("check_ins")
-        .select(
-          "id,note,submitted_at,user_id,profiles(display_name,avatar_path),challenges(title)",
-        )
-        .eq("status", "PENDING_REVIEW")
-        .neq("user_id", user.id)
-        .order("submitted_at", { ascending: false })
-        .limit(50),
-      supabase
-        .from("notifications")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .is("read_at", null),
-    ]);
-  const reviewRows = reviews.data ?? [];
+  return { user, profile: profile.data };
+}
+
+export async function todayOccurrencesQuery(timezone: string) {
+  const supabase = await createServerSupabase();
+  if (!supabase) return [];
+  const user = await getCurrentUser();
+  if (!user) return [];
+  const { start, end } = dayBounds(new Date(), timezone);
+  const { data } = await supabase
+    .from("goal_occurrences")
+    .select(
+      "id,starts_at,closes_at,status,goals(id,name,recurrence,base_points,evidence_required),challenges(id,title,category)",
+    )
+    .eq("participant_id", user.id)
+    .lt("starts_at", end.toISOString())
+    .gte("closes_at", start.toISOString())
+    .order("starts_at");
+  return data ?? [];
+}
+
+export async function unreadNotificationsCountQuery() {
+  const supabase = await createServerSupabase();
+  if (!supabase) return 0;
+  const user = await getCurrentUser();
+  if (!user) return 0;
+  const { count } = await supabase
+    .from("notifications")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .is("read_at", null);
+  return count ?? 0;
+}
+
+export async function pendingReviewsQuery() {
+  const supabase = await createServerSupabase();
+  if (!supabase) return [];
+  const user = await getCurrentUser();
+  if (!user) return [];
+  const { data: reviews } = await supabase
+    .from("check_ins")
+    .select(
+      "id,note,submitted_at,user_id,profiles(display_name,avatar_path),challenges(title)",
+    )
+    .eq("status", "PENDING_REVIEW")
+    .neq("user_id", user.id)
+    .order("submitted_at", { ascending: false })
+    .limit(50);
+  const reviewRows = reviews ?? [];
   const evidenceByCheckIn = new Map<string, string>();
   if (reviewRows.length > 0) {
     const { data: evidenceRows } = await supabase
@@ -203,18 +215,10 @@ export async function dashboardQuery() {
       }),
     );
   }
-  return {
-    user,
-    profile: profile.data,
-    occurrences: occurrences.data ?? [],
-    participants: participants.data ?? [],
-    activities: activities.data ?? [],
-    reviews: reviewRows.map((review) => ({
-      ...review,
-      evidenceUrl: evidenceByCheckIn.get(review.id) ?? null,
-    })),
-    unreadNotifications: unreadNotifications.count ?? 0,
-  };
+  return reviewRows.map((review) => ({
+    ...review,
+    evidenceUrl: evidenceByCheckIn.get(review.id) ?? null,
+  }));
 }
 
 export async function calendarQuery(from: Date, to: Date) {
