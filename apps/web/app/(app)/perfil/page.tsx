@@ -173,56 +173,88 @@ export default async function ProfilePage() {
           achievements={[
             {
               key: "first-point",
-              icon: Medal,
+              icon: (
+                <Medal color={points > 0 ? "var(--lime)" : "var(--muted)"} />
+              ),
               label: "Primer pique",
               unlocked: points > 0,
               description: "Consigue tus primeros puntos",
             },
             {
               key: "centurion",
-              icon: Target,
+              icon: (
+                <Target
+                  color={points >= 100 ? "var(--lime)" : "var(--muted)"}
+                />
+              ),
               label: "Centurión",
               unlocked: points >= 100,
               description: "Alcanza 100 puntos",
             },
             {
               key: "beast",
-              icon: Dumbbell,
+              icon: (
+                <Dumbbell
+                  color={points >= 500 ? "var(--lime)" : "var(--muted)"}
+                />
+              ),
               label: "Bestia",
               unlocked: points >= 500,
               description: "Alcanza 500 puntos",
             },
             {
               key: "unstoppable",
-              icon: Star,
+              icon: (
+                <Star color={points >= 2500 ? "var(--lime)" : "var(--muted)"} />
+              ),
               label: "Imparable",
               unlocked: points >= 2500,
               description: "Alcanza 2.500 puntos",
             },
             {
               key: "on-fire",
-              icon: Flame,
+              icon: (
+                <Flame color={streak >= 7 ? "var(--lime)" : "var(--muted)"} />
+              ),
               label: "En llamas",
               unlocked: streak >= 7,
               description: "Mantén una racha de 7 días",
             },
             {
               key: "legend",
-              icon: Crown,
+              icon: (
+                <Crown color={streak >= 30 ? "var(--lime)" : "var(--muted)"} />
+              ),
               label: "Leyenda",
               unlocked: streak >= 30,
               description: "Mantén una racha de 30 días",
             },
             {
               key: "sociable",
-              icon: UsersRound,
+              icon: (
+                <UsersRound
+                  color={
+                    (circleCount.count ?? 0) >= 3
+                      ? "var(--lime)"
+                      : "var(--muted)"
+                  }
+                />
+              ),
               label: "Sociable",
               unlocked: (circleCount.count ?? 0) >= 3,
               description: "Participa en 3 círculos",
             },
             {
               key: "veteran",
-              icon: BookOpen,
+              icon: (
+                <BookOpen
+                  color={
+                    (challengeCount.count ?? 0) >= 10
+                      ? "var(--lime)"
+                      : "var(--muted)"
+                  }
+                />
+              ),
               label: "Veterano",
               unlocked: (challengeCount.count ?? 0) >= 10,
               description: "Acepta 10 retos",
