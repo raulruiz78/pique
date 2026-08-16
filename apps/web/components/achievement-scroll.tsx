@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { LucideIcon } from "lucide-react";
 
 export type AchievementItem = {
   key: string;
-  icon: LucideIcon;
+  // Elemento ya renderizado (p. ej. <Medal color="..." />), no el
+  // componente en sí: una referencia a un componente no es serializable
+  // al cruzar de Server a Client Component (RSC), un elemento sí.
+  icon: React.ReactNode;
   label: string;
   unlocked: boolean;
   description: string;
@@ -46,35 +48,30 @@ export function AchievementScroll({
 
   return (
     <div className="achievement-scroll">
-      {achievements.map((achievement) => {
-        const Icon = achievement.icon;
-        return (
-          <div
-            key={achievement.key}
-            className={
-              justUnlocked.has(achievement.key)
-                ? "stitch-card motion-pop"
-                : "stitch-card"
-            }
-            style={{
-              padding: 16,
-              minWidth: 140,
-              textAlign: "center",
-              opacity: achievement.unlocked ? 1 : 0.38,
-            }}
-          >
-            <Icon
-              color={achievement.unlocked ? "var(--lime)" : "var(--muted)"}
-            />
-            <small className="field-label" style={{ margin: "12px 0 0" }}>
-              {achievement.label}
-            </small>
-            <small className="muted" style={{ display: "block", marginTop: 6 }}>
-              {achievement.description}
-            </small>
-          </div>
-        );
-      })}
+      {achievements.map((achievement) => (
+        <div
+          key={achievement.key}
+          className={
+            justUnlocked.has(achievement.key)
+              ? "stitch-card motion-pop"
+              : "stitch-card"
+          }
+          style={{
+            padding: 16,
+            minWidth: 140,
+            textAlign: "center",
+            opacity: achievement.unlocked ? 1 : 0.38,
+          }}
+        >
+          {achievement.icon}
+          <small className="field-label" style={{ margin: "12px 0 0" }}>
+            {achievement.label}
+          </small>
+          <small className="muted" style={{ display: "block", marginTop: 6 }}>
+            {achievement.description}
+          </small>
+        </div>
+      ))}
     </div>
   );
 }
