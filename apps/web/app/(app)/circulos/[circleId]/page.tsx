@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   ChevronRight,
   Clock3,
+  Plus,
   Trophy,
   UsersRound,
 } from "lucide-react";
@@ -177,6 +178,14 @@ export default async function CirclePage({
       {circle.owner_id === user?.id && (
         <CircleAccessPanel circleId={circle.id} />
       )}
+
+      <Link
+        href={`/crear?circleId=${circle.id}`}
+        className="button button-primary"
+        style={{ width: "100%", marginTop: 18 }}
+      >
+        <Plus size={18} /> Crear un reto
+      </Link>
 
       {pending.length > 0 && (
         <section style={{ marginTop: 26 }}>
