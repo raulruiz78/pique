@@ -1,5 +1,6 @@
 import { ActivityFeed } from "@/components/activity-feed";
 import { Avatar } from "@/components/avatar";
+import { DeleteChallengeButton } from "@/components/delete-challenge-button";
 import { PendingChallengeCard } from "@/components/pending-challenge-card";
 import { RankingList } from "@/components/ranking-list";
 import { CircleInviteButton } from "@/components/circle-invite-button";
@@ -41,7 +42,7 @@ export default async function CirclePage({
   const { data: circle } = await supabase
     .from("circles")
     .select(
-      "id,name,description,avatar_path,owner_id,circle_members(user_id,profiles(display_name,username,avatar_path)),challenges(id,title,category,status,start_at,end_at,challenge_participants(user_id,acceptance,score,current_streak,profiles(display_name,username,avatar_path)))",
+      "id,name,description,avatar_path,owner_id,circle_members(user_id,profiles(display_name,username,avatar_path)),challenges(id,title,category,status,creator_id,start_at,end_at,challenge_participants(user_id,acceptance,score,current_streak,profiles(display_name,username,avatar_path)))",
     )
     .eq("id", circleId)
     .maybeSingle();
@@ -192,46 +193,6 @@ export default async function CirclePage({
         </section>
       )}
 
-      {waitingOnOthers.length > 0 && (
-        <section style={{ marginTop: 26 }}>
-          <span className="eyebrow">Propuestos por ti</span>
-          <div style={{ display: "grid", gap: 11, marginTop: 10 }}>
-            {waitingOnOthers.map((challenge) => {
-              const waitingNames = (
-                challenge.challenge_participants as Player[]
-              )
-                .filter((player) => player.acceptance === "PENDING")
-                .map(
-                  (player) =>
-                    player.profiles?.display_name ??
-                    player.profiles?.username ??
-                    "tu rival",
-                );
-              return (
-                <article
-                  key={challenge.id}
-                  className="card"
-                  style={{ padding: 18, borderLeft: "5px solid var(--violet)" }}
-                >
-                  <div style={{ display: "flex", gap: 10 }}>
-                    <Clock3 color="var(--violet)" />
-                    <div>
-                      <b>{challenge.title}</b>
-                      <small
-                        className="muted"
-                        style={{ display: "block", marginTop: 3 }}
-                      >
-                        Esperando respuesta de {waitingNames.join(", ")}.
-                      </small>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
       <section style={{ marginTop: 28 }}>
         <span className="eyebrow">Podio general</span>
         <h2 style={{ margin: "6px 0 18px" }}>¿Quién manda?</h2>
@@ -317,40 +278,6 @@ export default async function CirclePage({
           )}
         </div>
       </section>
-      <section
-        className="stitch-card"
-        style={{
-          marginTop: 32,
-          padding: 22,
-          display: "flex",
-          alignItems: "center",
-          gap: 16,
-          borderStyle: "dashed",
-        }}
-      >
-        <span
-          style={{
-            width: 58,
-            height: 58,
-            flex: "0 0 auto",
-            borderRadius: "50%",
-            display: "grid",
-            placeItems: "center",
-            border: "2px dashed var(--violet)",
-          }}
-        >
-          <UsersRound color="var(--violet)" />
-        </span>
-        <div style={{ flex: 1 }}>
-          <b style={{ fontSize: 18 }}>¡Invita a tu equipo!</b>
-          <small className="muted" style={{ display: "block" }}>
-            Más gente, más competitividad.
-          </small>
-        </div>
-        <div style={{ width: 105 }}>
-          <CircleInviteButton circleId={circle.id} />
-        </div>
-      </section>
 
       <section style={{ marginTop: 28 }}>
         <span className="eyebrow">Reto a reto</span>
@@ -427,6 +354,91 @@ export default async function CirclePage({
               </p>
             </div>
           )}
+        </div>
+      </section>
+
+      {waitingOnOthers.length > 0 && (
+        <section style={{ marginTop: 28 }}>
+          <span className="eyebrow">Propuestos por ti</span>
+          <div style={{ display: "grid", gap: 11, marginTop: 10 }}>
+            {waitingOnOthers.map((challenge) => {
+              const waitingNames = (
+                challenge.challenge_participants as Player[]
+              )
+                .filter((player) => player.acceptance === "PENDING")
+                .map(
+                  (player) =>
+                    player.profiles?.display_name ??
+                    player.profiles?.username ??
+                    "tu rival",
+                );
+              return (
+                <article
+                  key={challenge.id}
+                  className="card"
+                  style={{
+                    padding: 18,
+                    borderLeft: "5px solid var(--violet)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  <Clock3 color="var(--violet)" />
+                  <div style={{ flex: 1 }}>
+                    <b>{challenge.title}</b>
+                    <small
+                      className="muted"
+                      style={{ display: "block", marginTop: 3 }}
+                    >
+                      Esperando respuesta de {waitingNames.join(", ")}.
+                    </small>
+                  </div>
+                  {challenge.creator_id === user?.id && (
+                    <DeleteChallengeButton
+                      challengeId={challenge.id}
+                      title={challenge.title}
+                    />
+                  )}
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      <section
+        className="stitch-card"
+        style={{
+          marginTop: 28,
+          padding: 22,
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          borderStyle: "dashed",
+        }}
+      >
+        <span
+          style={{
+            width: 58,
+            height: 58,
+            flex: "0 0 auto",
+            borderRadius: "50%",
+            display: "grid",
+            placeItems: "center",
+            border: "2px dashed var(--violet)",
+          }}
+        >
+          <UsersRound color="var(--violet)" />
+        </span>
+        <div style={{ flex: 1 }}>
+          <b style={{ fontSize: 18 }}>¡Invita a tu equipo!</b>
+          <small className="muted" style={{ display: "block" }}>
+            Más gente, más competitividad.
+          </small>
+        </div>
+        <div style={{ width: 105 }}>
+          <CircleInviteButton circleId={circle.id} />
         </div>
       </section>
 
