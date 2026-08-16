@@ -1,4 +1,4 @@
-import { createServerSupabase } from "./supabase/server";
+import { createServerSupabase, getCurrentUser } from "./supabase/server";
 
 function dateParts(date: Date, timeZone: string) {
   const values = Object.fromEntries(
@@ -94,9 +94,7 @@ export function weekBounds(date: Date, timeZone: string) {
 export async function weeklySummaryQuery() {
   const supabase = await createServerSupabase();
   if (!supabase) return null;
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) return null;
   const profile = await supabase
     .from("profiles")
@@ -132,9 +130,7 @@ export async function weeklySummaryQuery() {
 export async function dashboardQuery() {
   const supabase = await createServerSupabase();
   if (!supabase) return null;
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) return null;
   const profile = await supabase
     .from("profiles")
@@ -224,9 +220,7 @@ export async function dashboardQuery() {
 export async function calendarQuery(from: Date, to: Date) {
   const supabase = await createServerSupabase();
   if (!supabase) return [];
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) return [];
   const { data } = await supabase
     .from("goal_occurrences")

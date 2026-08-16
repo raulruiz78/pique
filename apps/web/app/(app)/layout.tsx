@@ -2,7 +2,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { InstallBanner } from "@/components/install-banner";
 import { OnboardingTutorial } from "@/components/onboarding-tutorial";
 import { PwaRegister } from "@/components/pwa-register";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 export default async function AppLayout({
@@ -11,9 +11,7 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createServerSupabase();
-  const {
-    data: { user },
-  } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
+  const user = await getCurrentUser();
   const { data: profile } =
     supabase && user
       ? await supabase

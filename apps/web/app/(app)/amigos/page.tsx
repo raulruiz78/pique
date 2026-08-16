@@ -1,6 +1,6 @@
 import { EmptyState } from "@/components/empty-state";
 import { FriendsManager } from "@/components/friends-manager";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 import { ArrowLeft, UsersRound } from "lucide-react";
 import Link from "next/link";
 
@@ -15,9 +15,7 @@ export default async function FriendsPage() {
         />
       </main>
     );
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const { data: friendships } = await supabase
     .from("friendships")
     .select("id,requester_id,addressee_id,status,created_at")

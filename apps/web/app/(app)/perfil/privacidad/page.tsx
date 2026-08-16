@@ -1,6 +1,6 @@
 import { EmptyState } from "@/components/empty-state";
 import { PrivacyForm } from "@/components/privacy-form";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -15,9 +15,7 @@ export default async function PrivacyPage() {
         />
       </main>
     );
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const { data: profile } = await supabase
     .from("profiles")
     .select("profile_visibility")
