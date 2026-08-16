@@ -494,6 +494,22 @@ small {
 }
 /* Confeti de cambio de rango (docs/features/motion-system.md, 0.8.9.3):
    disparo único, nunca continuo. */
+@keyframes notification-bell-ring {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-8deg);
+  }
+  75% {
+    transform: rotate(8deg);
+  }
+}
+.notification-bell-ring {
+  animation: notification-bell-ring var(--duration-normal) ease-in-out;
+  transform-origin: 50% 0%;
+}
 @keyframes confetti-fall {
   from {
     transform: translateY(0);

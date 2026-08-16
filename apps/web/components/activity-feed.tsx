@@ -51,6 +51,7 @@ export function ActivityFeed({
 }) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [poppedKey, setPoppedKey] = useState<string | null>(null);
   const [optimisticActivities, applyOptimisticReaction] = useOptimistic(
     activities,
     (state, update: { activityId: string; emoji: string; removing: boolean }) =>
@@ -72,6 +73,14 @@ export function ActivityFeed({
     // router.refresh() posterior reconcilia con el estado real del
     // servidor (y revierte solo si la petición ha fallado).
     applyOptimisticReaction({ activityId, emoji, removing });
+    if (!removing) {
+      const key = `${activityId}:${emoji}`;
+      setPoppedKey(key);
+      setTimeout(
+        () => setPoppedKey((current) => (current === key ? null : current)),
+        200,
+      );
+    }
     await fetch(
       `/api/v1/activities/${activityId}/reactions`,
       removing
@@ -133,11 +142,14 @@ export function ActivityFeed({
                 {EMOJIS.map((emoji) => {
                   const count = counts.get(emoji) ?? 0;
                   const active = mine === emoji;
+                  const popped = poppedKey === `${activity.id}:${emoji}`;
                   return (
                     <button
                       key={emoji}
                       type="button"
-                      className="reaction-chip"
+                      className={
+                        popped ? "reaction-chip motion-pop" : "reaction-chip"
+                      }
                       disabled={busyId === activity.id}
                       onClick={() => void react(activity.id, emoji, mine)}
                       style={{

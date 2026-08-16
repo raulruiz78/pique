@@ -6,13 +6,14 @@ import {
   type EvidenceReview,
 } from "@/components/evidence-review-card";
 import { CategoryBadge } from "@/components/challenge-category";
+import { NotificationBell } from "@/components/notification-bell";
 import {
   pendingReviewsQuery,
   profileSummaryQuery,
   todayOccurrencesQuery,
   unreadNotificationsCountQuery,
 } from "@/lib/queries";
-import { Bell, ChevronRight, Clock3, Flame, Award } from "lucide-react";
+import { ChevronRight, Clock3, Flame, Award } from "lucide-react";
 import Link from "next/link";
 
 interface Relation {
@@ -110,37 +111,10 @@ export default async function TodayPage() {
             </h1>
           </div>
         </div>
-        <Link
-          aria-label="Notificaciones"
-          href={"/notificaciones" as "/hoy"}
-          className="button button-secondary"
-          style={{ width: 48, padding: 0, position: "relative" }}
-        >
-          <Bell size={20} />
-          {unreadNotifications > 0 && (
-            <span
-              aria-label={`${unreadNotifications} notificaciones sin leer`}
-              style={{
-                position: "absolute",
-                top: -6,
-                right: -6,
-                minWidth: 20,
-                height: 20,
-                padding: "0 5px",
-                borderRadius: 10,
-                display: "grid",
-                placeItems: "center",
-                background: "var(--coral)",
-                color: "white",
-                border: "2px solid var(--canvas)",
-                fontSize: 10,
-                fontWeight: 900,
-              }}
-            >
-              {unreadNotifications > 99 ? "99+" : unreadNotifications}
-            </span>
-          )}
-        </Link>
+        <NotificationBell
+          userId={summary?.user?.id}
+          unreadCount={unreadNotifications}
+        />
       </header>
       <section
         aria-label="Resumen"
