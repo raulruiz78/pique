@@ -144,21 +144,39 @@ dependencias nuevas:
 Estas son las piezas con más ROI de "sensación de recompensa" por
 esfuerzo de implementación.
 
-### Puntos flotantes
+### Puntos flotantes — bloqueado, requiere una decisión previa
 
-Al completar una acción que da puntos (check-in aprobado, reto ganado):
-`+N` aparece sobre el elemento origen y sube y desvanece:
-`opacity 0→1→0`, `translateY(0 → -35px)`, `--duration-slow` (⁓700ms),
-`--ease-out`. Implementar como un componente reutilizable
-`apps/web/components/floating-points.tsx` montado condicionalmente
-(no siempre presente en el árbol).
+Al implementar 0.8.9.3 se descubrió que esta pieza, tal como estaba
+descrita, asumía que el check-in del propio usuario otorga puntos al
+instante. No es así: `review_check_in` (función `security definer`,
+`supabase/migrations/202608140024_check_in_activity.sql`) es quien
+otorga los puntos, y solo se ejecuta cuando **otro** participante
+aprueba la evidencia — no cuando el usuario hace check-in. Además esa
+función devuelve la fila de `check_ins` actualizada, no los puntos
+otorgados; ni el cliente que hace check-in ni el que revisa
+(`ReviewButtons`) tienen ese número hoy.
 
-### Racha (streak)
+Mostrar un `+N` en cualquiera de los dos momentos sin ese dato sería
+inventar una cifra. Antes de implementar puntos flotantes hace falta
+una de estas dos cosas (decisión técnica, no de producto, pero sí un
+cambio deliberado sobre una función crítica, no algo para colar en un
+PR de motion):
 
-En `check-in-button.tsx` (ya tiene estado `submitted` desde 0.8.5): al
-pasar a `submitted`, si hay racha visible cerca, anima
-`scale(1 → 1.3 → 1)` sobre el emoji 🔥 y el número, `--duration-normal`,
-`--ease-spring`.
+1. Que `review_check_in` devuelva también los puntos otorgados
+   (`goal.base_points`), o
+2. Que el cliente que revisa consulte el punto base del goal por
+   separado antes de llamar a la RPC.
+
+Hasta entonces, `ReviewButtons` (PR 3) usa el mismo patrón optimista
+"Validando…/Rechazando…" que `ChallengeActions`, con `.motion-pop` al
+confirmar — sin número, honesto con lo que se sabe en ese momento.
+
+### Racha (streak) — bloqueado por el mismo motivo
+
+La racha tampoco aumenta al hacer check-in, sino al aprobarse (mismo
+trigger que los puntos, mismo problema: el valor nuevo no llega al
+cliente en el momento del gesto). Descartado hasta que exista una
+fuente de datos real; no se simula.
 
 ### Barra de XP / nivel
 
@@ -382,29 +400,31 @@ Codex debe mantener esta tabla actualizada en cada PR que toque motion
 según lo que encuentre en el código, no según lo que diga esta tabla
 en un momento dado:
 
-| Feature                    | Estado        | Implementación                              | Prioridad | Observaciones                                                                                          |
-| -------------------------- | ------------- | ------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------ |
-| Page transition            | existente     | CSS (`page-enter`, tokens)                  | P0        | Migrado a tokens (PR 1)                                                                                |
-| Bottom nav animation       | existente     | CSS (`.nav-item`, tokens)                   | P0        | Migrado a tokens (PR 1)                                                                                |
-| Press states               | existente     | CSS (`--scale-pressed`)                     | P0        | Unificado con tokens (PR 1)                                                                            |
-| Check-in delight           | parcial       | React + CSS (estado `submitted`)            | P0        | Añadir puntos flotantes + racha                                                                        |
-| Swipe cards (retos)        | hecho         | `SwipeCard` + `PendingChallengeCard` (PR 2) | P0        | Deck de `/circulos/[circleId]`                                                                         |
-| Swipe cards (validaciones) | bloqueado     | —                                           | P0        | Conflicto de eje con `.validation-deck` (scroll horizontal existente) — decisión de producto pendiente |
-| Bottom sheet (check-in)    | pendiente     | —                                           | P0        | 0.8.9.4                                                                                                |
-| Ranking reorder            | pendiente     | —                                           | P0        | 0.8.9.6                                                                                                |
-| XP / nivel                 | pendiente     | —                                           | P1        | 0.8.9.3                                                                                                |
-| Racha (streak pulse)       | pendiente     | —                                           | P1        | 0.8.9.3                                                                                                |
-| Achievements unlock        | pendiente     | —                                           | P1        | 0.8.9.3                                                                                                |
-| Reaction pop               | parcial       | CSS (`.reaction-chip:active`)               | P1        | Añadir pop al confirmar                                                                                |
-| Notification bell          | pendiente     | —                                           | P1        | 0.8.9.5                                                                                                |
-| Toasts entrance            | por verificar | —                                           | P1        | Confirmar si el sistema actual ya anima                                                                |
-| Confetti / rank-up         | pendiente     | —                                           | P2        | 0.8.9.3                                                                                                |
-| Pull-to-refresh            | pendiente     | —                                           | P2        | 0.8.9.4                                                                                                |
-| Haptics                    | pendiente     | —                                           | P2        | 0.8.9.4 (sin soporte iOS)                                                                              |
-| Rubber band                | pendiente     | —                                           | P2        | 0.8.9.4                                                                                                |
-| Calendar day pop           | pendiente     | —                                           | P2        | 0.8.9.6                                                                                                |
-| Error shake                | pendiente     | —                                           | P2        | 0.8.9.6                                                                                                |
-| Empty state entrance       | pendiente     | —                                           | P2        | 0.8.9.6                                                                                                |
+| Feature                       | Estado        | Implementación                              | Prioridad | Observaciones                                                                                          |
+| ----------------------------- | ------------- | ------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------ |
+| Page transition               | existente     | CSS (`page-enter`, tokens)                  | P0        | Migrado a tokens (PR 1)                                                                                |
+| Bottom nav animation          | existente     | CSS (`.nav-item`, tokens)                   | P0        | Migrado a tokens (PR 1)                                                                                |
+| Press states                  | existente     | CSS (`--scale-pressed`)                     | P0        | Unificado con tokens (PR 1)                                                                            |
+| Check-in delight              | hecho         | React + CSS (`.motion-pop` en "Enviado")    | P0        | Sin puntos flotantes, ver 0.8.9.3 (bloqueado)                                                          |
+| Validaciones delight          | hecho         | `ReviewButtons` con estado optimista (PR 3) | P0        | No existía optimistic UI aquí (0.8.5 no lo cubrió)                                                     |
+| Swipe cards (retos)           | hecho         | `SwipeCard` + `PendingChallengeCard` (PR 2) | P0        | Deck de `/circulos/[circleId]`                                                                         |
+| Swipe cards (validaciones)    | bloqueado     | —                                           | P0        | Conflicto de eje con `.validation-deck` (scroll horizontal existente) — decisión de producto pendiente |
+| Bottom sheet (check-in)       | hecho         | `BottomSheet` sobre Radix Dialog (PR 3)     | P0        | Reutilizable para futuros modales de confirmación                                                      |
+| Ranking reorder               | pendiente     | —                                           | P0        | 0.8.9.6                                                                                                |
+| XP / nivel (barra + level-up) | pendiente     | —                                           | P1        | 0.8.9.3 — no requiere el delta de una acción, solo comparar valor anterior/nuevo entre renders         |
+| Puntos flotantes (+N)         | bloqueado     | —                                           | P1        | Ver 0.8.9.3 — requiere que `review_check_in` (o una consulta aparte) exponga los puntos otorgados      |
+| Racha (streak pulse)          | bloqueado     | —                                           | P1        | Mismo motivo que puntos flotantes                                                                      |
+| Achievements unlock           | pendiente     | —                                           | P1        | 0.8.9.3                                                                                                |
+| Reaction pop                  | parcial       | CSS (`.reaction-chip:active`)               | P1        | Añadir pop al confirmar                                                                                |
+| Notification bell             | pendiente     | —                                           | P1        | 0.8.9.5                                                                                                |
+| Toasts entrance               | por verificar | —                                           | P1        | Confirmar si el sistema actual ya anima                                                                |
+| Confetti / rank-up            | pendiente     | —                                           | P2        | 0.8.9.3                                                                                                |
+| Pull-to-refresh               | pendiente     | —                                           | P2        | 0.8.9.4                                                                                                |
+| Haptics                       | pendiente     | —                                           | P2        | 0.8.9.4 (sin soporte iOS)                                                                              |
+| Rubber band                   | pendiente     | —                                           | P2        | 0.8.9.4                                                                                                |
+| Calendar day pop              | pendiente     | —                                           | P2        | 0.8.9.6                                                                                                |
+| Error shake                   | pendiente     | —                                           | P2        | 0.8.9.6                                                                                                |
+| Empty state entrance          | pendiente     | —                                           | P2        | 0.8.9.6                                                                                                |
 
 ## Componentes de motion compartidos
 
@@ -653,15 +673,15 @@ falta verificar en producto antes de seguir, para poder probar Pique
 entre bloques y corregir el lenguaje visual si algo queda sobrecargado
 antes de que se replique por el resto de la app:
 
-| PR                          | Cubre                                                                                                                         | Piezas de este documento                         |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| 1. Motion foundation ✅     | Tokens, primitivas CSS, migrar `page-enter`/`.reaction-chip`/`.nav-item` — [#36](https://github.com/raulruiz78/pique/pull/36) | 0.8.9.1                                          |
-| 2. Swipe cards              | `SwipeCard`, aplicado al deck de retos (validaciones bloqueadas, ver 0.8.9.2)                                                 | 0.8.9.2                                          |
-| 3. Check-in delight         | `FloatingPoints`, pulso de racha, `BottomSheet` en el modal de check-in                                                       | 0.8.9.3 (puntos, racha) + 0.8.9.4 (bottom sheet) |
-| 4. Ranking animations       | Reordenación animada de podio/tabla                                                                                           | 0.8.9.6 (ranking reorder)                        |
-| 5. Gamification motion      | XP/nivel, logros, confeti, cambio de rango, `Celebration`                                                                     | 0.8.9.3 (resto)                                  |
-| 6. Social motion            | Pop de reacción, campana, toasts                                                                                              | 0.8.9.5                                          |
-| 7. Mobile gestures + polish | Pull-to-refresh, rubber band, haptics, calendario, empty states, error shake                                                  | 0.8.9.4 (resto) + 0.8.9.6 (resto)                |
+| PR                          | Cubre                                                                                                                         | Piezas de este documento          |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| 1. Motion foundation ✅     | Tokens, primitivas CSS, migrar `page-enter`/`.reaction-chip`/`.nav-item` — [#36](https://github.com/raulruiz78/pique/pull/36) | 0.8.9.1                           |
+| 2. Swipe cards              | `SwipeCard`, aplicado al deck de retos (validaciones bloqueadas, ver 0.8.9.2)                                                 | 0.8.9.2                           |
+| 3. Check-in delight ✅      | `BottomSheet` en el modal de check-in, `.motion-pop` en check-in y validaciones — puntos/racha bloqueados, ver 0.8.9.3        | 0.8.9.4 (bottom sheet)            |
+| 4. Ranking animations       | Reordenación animada de podio/tabla                                                                                           | 0.8.9.6 (ranking reorder)         |
+| 5. Gamification motion      | XP/nivel, logros, confeti, cambio de rango, `Celebration`                                                                     | 0.8.9.3 (resto)                   |
+| 6. Social motion            | Pop de reacción, campana, toasts                                                                                              | 0.8.9.5                           |
+| 7. Mobile gestures + polish | Pull-to-refresh, rubber band, haptics, calendario, empty states, error shake                                                  | 0.8.9.4 (resto) + 0.8.9.6 (resto) |
 
 Cada fila es un PR independiente con su propio CI en verde, igual que
 0.8.x. No agrupar varias filas en un mismo PR aunque el cambio parezca
