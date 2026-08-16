@@ -12,6 +12,20 @@ const config: NextConfig = {
     "@pique/ui",
   ],
   typedRoutes: true,
+  // Todas las rutas bajo (app) ya son dinámicas por sí mismas (usan
+  // cookies() a través del cliente de Supabase para saber quién ha
+  // iniciado sesión), así que el Router Cache del cliente parte de 0s por
+  // defecto: cada vez que se revisita una pestaña ya vista hace un
+  // instante, se vuelve a pedir todo desde cero. 30s deja que cambiar
+  // entre Hoy/Calendario/Círculos varias veces en la misma sesión se
+  // sienta instantáneo la segunda vez, sin afectar a las mutaciones: los
+  // router.refresh() tras cada acción (check-in, reacción, etc.) siguen
+  // invalidando la caché y pidiendo datos frescos de inmediato.
+  experimental: {
+    staleTimes: {
+      dynamic: 30,
+    },
+  },
   images: {
     remotePatterns: supabaseUrl
       ? [
