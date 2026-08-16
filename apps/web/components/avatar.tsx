@@ -38,6 +38,13 @@ export function Avatar({
       }}
     >
       {src ? (
+        // unoptimized a propósito (auditoría 0.8.6): src es una ruta propia
+        // autenticada (/api/v1/media/...), no un asset público. El
+        // optimizador de imágenes de Next hace su propio fetch interno
+        // servidor-a-servidor para generar las variantes, y ese fetch no
+        // reenvía las cookies de sesión del navegador — con optimización
+        // activada, cada avatar fallaría la comprobación de auth de la ruta
+        // y no cargaría ninguna imagen.
         <Image
           src={src}
           alt=""
