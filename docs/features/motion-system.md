@@ -279,23 +279,26 @@ confirmar swipe (10ms), check-in exitoso (15ms), error (2×10ms).
 
 ---
 
-## 0.8.9.5 — Social motion
+## 0.8.9.5 — Social motion — hecho
 
-- **Reacciones** (`activity-feed.tsx`): `.reaction-chip` ya tiene
-  `:active{scale}` desde 0.8.7. Añadir, al confirmar una reacción
-  nueva (no al quitarla), un pequeño "pop" sobre el emoji seleccionado:
-  `scale(1 → 1.4 → 1)`, `--duration-fast`, sin partículas — la
-  auditoría original sugería algo tipo Instagram con menú emergente al
-  mantener pulsado; se deja fuera de esta fase por ser un rediseño de
-  interacción (long-press + menú), no una animación sobre la
-  interacción ya existente.
-- **Campana de notificaciones**: al llegar una notificación nueva (el
-  badge cambia), la campana hace `rotate(-8deg → 8deg → 0)`,
-  `--duration-normal`; el número del badge entra con
-  `scale(0 → 1.15 → 1)`.
-- **Toasts**: si el sistema de toasts actual no anima su entrada,
-  añadir `translateY(12px → 0) + opacity`, `--duration-fast`, entrada
-  desde abajo (coherente con los bottom sheets de 0.8.9.4).
+- **Reacciones** (`activity-feed.tsx`, PR 6): al confirmar una reacción
+  nueva (no al quitarla) el chip gana `.motion-pop` durante 200ms —
+  primitiva ya definida en PR 1, sin partículas. La auditoría original
+  sugería algo tipo Instagram con menú emergente al mantener pulsado;
+  se deja fuera de esta fase por ser un rediseño de interacción
+  (long-press + menú), no una animación sobre la interacción ya
+  existente.
+- **Campana de notificaciones**: `apps/web/components/notification-bell.tsx`
+  (PR 6), usado en `/hoy`. Mismo mecanismo que `LevelProgress`/
+  `RankingList`: `/hoy` es un Server Component sin datos en vivo, así
+  que "ha llegado algo nuevo" se calcula comparando el recuento actual
+  con el último visto por este navegador (`localStorage`), no con un
+  push en tiempo real. Al detectar un aumento: campana
+  `rotate(-8deg → 8deg → 0)` (`--duration-normal`) + badge con
+  `.motion-pop`.
+- **Toasts**: verificado, no hacía falta nada — Sonner
+  (`<Toaster richColors .../>`, ya en `app/layout.tsx`) anima entrada y
+  salida por defecto sin configuración adicional.
 
 ---
 
@@ -423,31 +426,31 @@ Codex debe mantener esta tabla actualizada en cada PR que toque motion
 según lo que encuentre en el código, no según lo que diga esta tabla
 en un momento dado:
 
-| Feature                       | Estado        | Implementación                                 | Prioridad | Observaciones                                                                                          |
-| ----------------------------- | ------------- | ---------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------ |
-| Page transition               | existente     | CSS (`page-enter`, tokens)                     | P0        | Migrado a tokens (PR 1)                                                                                |
-| Bottom nav animation          | existente     | CSS (`.nav-item`, tokens)                      | P0        | Migrado a tokens (PR 1)                                                                                |
-| Press states                  | existente     | CSS (`--scale-pressed`)                        | P0        | Unificado con tokens (PR 1)                                                                            |
-| Check-in delight              | hecho         | React + CSS (`.motion-pop` en "Enviado")       | P0        | Sin puntos flotantes, ver 0.8.9.3 (bloqueado)                                                          |
-| Validaciones delight          | hecho         | `ReviewButtons` con estado optimista (PR 3)    | P0        | No existía optimistic UI aquí (0.8.5 no lo cubrió)                                                     |
-| Swipe cards (retos)           | hecho         | `SwipeCard` + `PendingChallengeCard` (PR 2)    | P0        | Deck de `/circulos/[circleId]`                                                                         |
-| Swipe cards (validaciones)    | bloqueado     | —                                              | P0        | Conflicto de eje con `.validation-deck` (scroll horizontal existente) — decisión de producto pendiente |
-| Bottom sheet (check-in)       | hecho         | `BottomSheet` sobre Radix Dialog (PR 3)        | P0        | Reutilizable para futuros modales de confirmación                                                      |
-| Ranking reorder (tabla)       | hecho         | `RankingList` con FLIP (PR 4)                  | P0        | Podio (top 3) queda fuera, ver 0.8.9.6                                                                 |
-| XP / nivel (barra + level-up) | hecho         | `LevelProgress` (PR 5)                         | P1        | Compara contra `localStorage`, ver 0.8.9.3                                                             |
-| Puntos flotantes (+N)         | bloqueado     | —                                              | P1        | Ver 0.8.9.3 — requiere que `review_check_in` (o una consulta aparte) exponga los puntos otorgados      |
-| Racha (streak pulse)          | bloqueado     | —                                              | P1        | Mismo motivo que puntos flotantes                                                                      |
-| Achievements unlock           | hecho         | `AchievementScroll` (PR 5)                     | P1        | Compara contra `localStorage`, ver 0.8.9.3                                                             |
-| Reaction pop                  | parcial       | CSS (`.reaction-chip:active`)                  | P1        | Añadir pop al confirmar                                                                                |
-| Notification bell             | pendiente     | —                                              | P1        | 0.8.9.5                                                                                                |
-| Toasts entrance               | por verificar | —                                              | P1        | Confirmar si el sistema actual ya anima                                                                |
-| Confetti / rank-up            | hecho         | `Confetti` + overlay en `LevelProgress` (PR 5) | P2        | Solo en cambio de rango                                                                                |
-| Pull-to-refresh               | pendiente     | —                                              | P2        | 0.8.9.4                                                                                                |
-| Haptics                       | pendiente     | —                                              | P2        | 0.8.9.4 (sin soporte iOS)                                                                              |
-| Rubber band                   | pendiente     | —                                              | P2        | 0.8.9.4                                                                                                |
-| Calendar day pop              | pendiente     | —                                              | P2        | 0.8.9.6                                                                                                |
-| Error shake                   | pendiente     | —                                              | P2        | 0.8.9.6                                                                                                |
-| Empty state entrance          | pendiente     | —                                              | P2        | 0.8.9.6                                                                                                |
+| Feature                       | Estado    | Implementación                                 | Prioridad | Observaciones                                                                                          |
+| ----------------------------- | --------- | ---------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------ |
+| Page transition               | existente | CSS (`page-enter`, tokens)                     | P0        | Migrado a tokens (PR 1)                                                                                |
+| Bottom nav animation          | existente | CSS (`.nav-item`, tokens)                      | P0        | Migrado a tokens (PR 1)                                                                                |
+| Press states                  | existente | CSS (`--scale-pressed`)                        | P0        | Unificado con tokens (PR 1)                                                                            |
+| Check-in delight              | hecho     | React + CSS (`.motion-pop` en "Enviado")       | P0        | Sin puntos flotantes, ver 0.8.9.3 (bloqueado)                                                          |
+| Validaciones delight          | hecho     | `ReviewButtons` con estado optimista (PR 3)    | P0        | No existía optimistic UI aquí (0.8.5 no lo cubrió)                                                     |
+| Swipe cards (retos)           | hecho     | `SwipeCard` + `PendingChallengeCard` (PR 2)    | P0        | Deck de `/circulos/[circleId]`                                                                         |
+| Swipe cards (validaciones)    | bloqueado | —                                              | P0        | Conflicto de eje con `.validation-deck` (scroll horizontal existente) — decisión de producto pendiente |
+| Bottom sheet (check-in)       | hecho     | `BottomSheet` sobre Radix Dialog (PR 3)        | P0        | Reutilizable para futuros modales de confirmación                                                      |
+| Ranking reorder (tabla)       | hecho     | `RankingList` con FLIP (PR 4)                  | P0        | Podio (top 3) queda fuera, ver 0.8.9.6                                                                 |
+| XP / nivel (barra + level-up) | hecho     | `LevelProgress` (PR 5)                         | P1        | Compara contra `localStorage`, ver 0.8.9.3                                                             |
+| Puntos flotantes (+N)         | bloqueado | —                                              | P1        | Ver 0.8.9.3 — requiere que `review_check_in` (o una consulta aparte) exponga los puntos otorgados      |
+| Racha (streak pulse)          | bloqueado | —                                              | P1        | Mismo motivo que puntos flotantes                                                                      |
+| Achievements unlock           | hecho     | `AchievementScroll` (PR 5)                     | P1        | Compara contra `localStorage`, ver 0.8.9.3                                                             |
+| Reaction pop                  | hecho     | `.motion-pop` al confirmar (PR 6)              | P1        | `activity-feed.tsx`                                                                                    |
+| Notification bell             | hecho     | `NotificationBell` (PR 6)                      | P1        | Compara contra `localStorage`, igual que 0.8.9.3                                                       |
+| Toasts entrance               | existente | Sonner (`<Toaster richColors .../>`)           | P1        | Verificado: Sonner ya anima entrada/salida (translate+opacity) por defecto, sin configurar nada        |
+| Confetti / rank-up            | hecho     | `Confetti` + overlay en `LevelProgress` (PR 5) | P2        | Solo en cambio de rango                                                                                |
+| Pull-to-refresh               | pendiente | —                                              | P2        | 0.8.9.4                                                                                                |
+| Haptics                       | pendiente | —                                              | P2        | 0.8.9.4 (sin soporte iOS)                                                                              |
+| Rubber band                   | pendiente | —                                              | P2        | 0.8.9.4                                                                                                |
+| Calendar day pop              | pendiente | —                                              | P2        | 0.8.9.6                                                                                                |
+| Error shake                   | pendiente | —                                              | P2        | 0.8.9.6                                                                                                |
+| Empty state entrance          | pendiente | —                                              | P2        | 0.8.9.6                                                                                                |
 
 ## Componentes de motion compartidos
 
@@ -703,7 +706,7 @@ antes de que se replique por el resto de la app:
 | 3. Check-in delight ✅      | `BottomSheet` en el modal de check-in, `.motion-pop` en check-in y validaciones — puntos/racha bloqueados, ver 0.8.9.3        | 0.8.9.4 (bottom sheet)            |
 | 4. Ranking animations ✅    | Reordenación animada de la tabla (FLIP), podio queda fuera                                                                    | 0.8.9.6 (ranking reorder)         |
 | 5. Gamification motion ✅   | XP/nivel, logros, confeti, cambio de rango — puntos flotantes/racha siguen bloqueados                                         | 0.8.9.3 (resto)                   |
-| 6. Social motion            | Pop de reacción, campana, toasts                                                                                              | 0.8.9.5                           |
+| 6. Social motion ✅         | Pop de reacción, campana (`NotificationBell`), toasts verificados (Sonner ya animaba)                                         | 0.8.9.5                           |
 | 7. Mobile gestures + polish | Pull-to-refresh, rubber band, haptics, calendario, empty states, error shake                                                  | 0.8.9.4 (resto) + 0.8.9.6 (resto) |
 
 Cada fila es un PR independiente con su propio CI en verde, igual que
