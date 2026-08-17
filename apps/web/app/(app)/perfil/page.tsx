@@ -14,6 +14,7 @@ import {
   Dumbbell,
   Eye,
   Flame,
+  History,
   Medal,
   Settings,
   ShieldCheck,
@@ -267,6 +268,11 @@ export default async function ProfilePage() {
         {(
           [
             { icon: Settings, label: "Editar perfil", href: "/perfil/editar" },
+            {
+              icon: History,
+              label: "Mis pruebas enviadas",
+              href: "/mis-pruebas",
+            },
             { icon: UsersRound, label: "Amigos", href: "/amigos" },
             {
               icon: Eye,
@@ -302,7 +308,7 @@ export default async function ProfilePage() {
           return "href" in item ? (
             <Link
               key={item.label}
-              href={item.href}
+              href={item.href as "/perfil/editar"}
               className="button"
               style={style}
             >

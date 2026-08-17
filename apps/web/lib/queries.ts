@@ -221,6 +221,46 @@ export async function pendingReviewsQuery() {
   }));
 }
 
+export async function myCheckInsQuery() {
+  const supabase = await createServerSupabase();
+  if (!supabase) return [];
+  const user = await getCurrentUser();
+  if (!user) return [];
+  const { data: checkIns } = await supabase
+    .from("check_ins")
+    .select(
+      "id,note,status,submitted_at,reviewed_at,challenges(title),goal_occurrences(starts_at,closes_at,goals(name)),validations(decision,reason,created_at,reviewer_id,profiles(display_name))",
+    )
+    .eq("user_id", user.id)
+    .order("submitted_at", { ascending: false })
+    .limit(50);
+  const rows = checkIns ?? [];
+  const pendingIds = rows
+    .filter((row) => row.status === "PENDING_REVIEW")
+    .map((row) => row.id);
+  const evidenceByCheckIn = new Map<string, string>();
+  if (pendingIds.length > 0) {
+    const { data: evidenceRows } = await supabase
+      .from("evidence")
+      .select("check_in_id,storage_path")
+      .in("check_in_id", pendingIds);
+    await Promise.all(
+      (evidenceRows ?? []).map(async (evidence) => {
+        if (!evidence.check_in_id) return;
+        const { data: signed } = await supabase.storage
+          .from("evidence")
+          .createSignedUrl(evidence.storage_path, 300);
+        if (signed?.signedUrl)
+          evidenceByCheckIn.set(evidence.check_in_id, signed.signedUrl);
+      }),
+    );
+  }
+  return rows.map((row) => ({
+    ...row,
+    evidenceUrl: evidenceByCheckIn.get(row.id) ?? null,
+  }));
+}
+
 export async function calendarQuery(from: Date, to: Date) {
   const supabase = await createServerSupabase();
   if (!supabase) return [];
