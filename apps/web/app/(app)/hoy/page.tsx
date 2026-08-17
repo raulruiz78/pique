@@ -13,7 +13,7 @@ import {
   todayOccurrencesQuery,
   unreadNotificationsCountQuery,
 } from "@/lib/queries";
-import { ChevronRight, Clock3, Flame, Award } from "lucide-react";
+import { ChevronRight, Clock3, Flame, Award, History } from "lucide-react";
 import Link from "next/link";
 
 interface Relation {
@@ -216,9 +216,24 @@ export default async function TodayPage() {
           <span className="eyebrow">En juego</span>
           <h2 style={{ margin: "4px 0 0" }}>Tus objetivos de hoy</h2>
         </div>
-        <Link href="/calendario" aria-label="Ver calendario">
-          <ChevronRight />
-        </Link>
+        <div style={{ display: "flex", gap: 6 }}>
+          <Link
+            href={"/mis-pruebas" as "/hoy"}
+            aria-label="Ver mis pruebas enviadas"
+            className="button button-secondary"
+            style={{ width: 40, height: 40, padding: 0 }}
+          >
+            <History size={18} />
+          </Link>
+          <Link
+            href="/calendario"
+            aria-label="Ver calendario"
+            className="button button-secondary"
+            style={{ width: 40, height: 40, padding: 0 }}
+          >
+            <ChevronRight size={18} />
+          </Link>
+        </div>
       </div>
       {objectiveCards.length === 0 ? (
         <EmptyState
@@ -234,13 +249,28 @@ export default async function TodayPage() {
       ) : (
         <div style={{ display: "grid", gap: 12 }}>
           {objectiveCards.map(({ items, multiple }) => {
+            // El agrupado por goal.id (comentario arriba) puede juntar la
+            // ocurrencia de hoy con una de ayer que ya se resolvió (solape
+            // de huso horario). Antes, si ninguna estaba PENDING —p. ej.
+            // justo tras enviar el check-in de hoy, que pasa a SUBMITTED—
+            // el fallback caía en items[0], que por orden de consulta
+            // (starts_at ascendente) era la más ANTIGUA, no la de hoy. Por
+            // eso un envío fresco podía mostrarse como "RECHAZADO" con el
+            // motivo de un rechazo de otro día. Ordenar por starts_at
+            // descendente antes del fallback garantiza que, sin ninguna
+            // PENDING, se muestre siempre la ocurrencia más reciente.
+            const byRecency = [...items].sort(
+              (a, b) =>
+                new Date(b.starts_at).getTime() -
+                new Date(a.starts_at).getTime(),
+            );
             const occurrence =
-              items.find(
+              byRecency.find(
                 (item) =>
                   item.status === "PENDING" && new Date(item.closes_at) >= now,
               ) ??
-              items.find((item) => item.status === "PENDING") ??
-              items[0]!;
+              byRecency.find((item) => item.status === "PENDING") ??
+              byRecency[0]!;
             const goal = Array.isArray(occurrence.goals)
               ? occurrence.goals[0]
               : occurrence.goals;
