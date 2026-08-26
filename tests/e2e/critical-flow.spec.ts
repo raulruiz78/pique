@@ -64,9 +64,15 @@ test("A crea → B acepta → A cumple → B valida → ranking cambia", async (
     }
     // El checkbox vive dentro de un <label class="stitch-card"> grande: el
     // control de accionabilidad estricto de Playwright a veces lo marca como
-    // intersectado/inestable por el propio label que lo envuelve. El toque
-    // real siempre funciona sobre esta tarjeta, así que forzamos el clic.
-    await pageA.getByLabel("Foto como evidencia").uncheck({ force: true });
+    // intersectado/inestable por el propio label que lo envuelve, y
+    // forzar el clic sobre el propio input (en vez de sobre el texto que
+    // lo envuelve) resultó inestable en CI tras reordenar las tarjetas de
+    // este paso. Tocar el texto reproduce mejor un toque real (el label
+    // delega el toggle a su control nativamente) y la aserción posterior
+    // confirma explícitamente el resultado en vez de fiarse solo del
+    // `uncheck` interno de Playwright.
+    await pageA.getByText("Foto como evidencia").click();
+    await expect(pageA.getByLabel("Foto como evidencia")).not.toBeChecked();
     await pageA.getByRole("button", { name: /Siguiente/ }).click();
     await pageA.getByRole("button", { name: /Enviar reto/ }).click();
     await expect(pageA).toHaveURL(/\/retos\//, { timeout: 30_000 });
