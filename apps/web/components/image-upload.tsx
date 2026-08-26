@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useRef, useState } from "react";
 import { toast } from "sonner";
+import { BottomSheet } from "@/components/bottom-sheet";
 
 // El modal de recorte (canvas, arrastre, zoom) solo hace falta tras elegir
 // una foto — no en la carga inicial de /perfil ni /circulos/[circleId].
@@ -19,16 +20,22 @@ export function ImageUpload({
   hasImage,
   label,
   children,
+  menu = false,
 }: {
   endpoint: string;
   hasImage: boolean;
   label: string;
   children: ReactNode;
+  /** En vez de las dos burbujas siempre visibles (cámara + papelera), la
+   * foto entera es el disparador y las acciones salen en una hoja al
+   * tocarla. */
+  menu?: boolean;
 }) {
   const router = useRouter();
   const input = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   function selectFile(file?: File) {
     if (!file) return;
@@ -130,68 +137,144 @@ export function ImageUpload({
           }}
         />
       )}
-      <button
-        type="button"
-        disabled={loading}
-        aria-label={`${hasImage ? "Cambiar" : "Añadir"} ${label.toLowerCase()}`}
-        title={`${hasImage ? "Cambiar" : "Añadir"} ${label.toLowerCase()}`}
-        onClick={() => input.current?.click()}
-        style={{
-          padding: 0,
-          border: 0,
-          background: "transparent",
-          display: "block",
-          cursor: "pointer",
-        }}
-      >
-        {children}
-        <span
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            right: -3,
-            bottom: -3,
-            width: 28,
-            height: 28,
-            borderRadius: "50%",
-            display: "grid",
-            placeItems: "center",
-            color: "#25005a",
-            background: "var(--violet)",
-            border: "3px solid var(--canvas)",
-          }}
+      {menu ? (
+        <BottomSheet
+          open={sheetOpen}
+          onOpenChange={setSheetOpen}
+          trigger={
+            <button
+              type="button"
+              disabled={loading}
+              aria-label={`Opciones de ${label.toLowerCase()}`}
+              title={`Opciones de ${label.toLowerCase()}`}
+              style={{
+                padding: 0,
+                border: 0,
+                background: "transparent",
+                display: "block",
+                cursor: "pointer",
+                position: "relative",
+              }}
+            >
+              {children}
+              {loading && (
+                <span
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    display: "grid",
+                    placeItems: "center",
+                    background: "rgb(0 0 0 / 45%)",
+                    borderRadius: "50%",
+                  }}
+                >
+                  <LoaderCircle className="animate-spin" color="white" />
+                </span>
+              )}
+            </button>
+          }
         >
-          {loading ? (
-            <LoaderCircle className="animate-spin" size={14} />
-          ) : (
-            <Camera size={14} />
+          <div style={{ padding: 16, display: "grid", gap: 10 }}>
+            <span className="eyebrow">{label}</span>
+            <button
+              type="button"
+              className="button button-secondary"
+              style={{ justifyContent: "flex-start", gap: 10 }}
+              onClick={() => {
+                setSheetOpen(false);
+                input.current?.click();
+              }}
+            >
+              <Camera size={18} />
+              {hasImage ? "Cambiar foto" : "Subir foto"}
+            </button>
+            {hasImage && (
+              <button
+                type="button"
+                className="button button-secondary"
+                style={{
+                  justifyContent: "flex-start",
+                  gap: 10,
+                  color: "var(--danger)",
+                }}
+                onClick={() => {
+                  setSheetOpen(false);
+                  void remove();
+                }}
+              >
+                <Trash2 size={18} />
+                Eliminar foto
+              </button>
+            )}
+          </div>
+        </BottomSheet>
+      ) : (
+        <>
+          <button
+            type="button"
+            disabled={loading}
+            aria-label={`${hasImage ? "Cambiar" : "Añadir"} ${label.toLowerCase()}`}
+            title={`${hasImage ? "Cambiar" : "Añadir"} ${label.toLowerCase()}`}
+            onClick={() => input.current?.click()}
+            style={{
+              padding: 0,
+              border: 0,
+              background: "transparent",
+              display: "block",
+              cursor: "pointer",
+            }}
+          >
+            {children}
+            <span
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                right: -3,
+                bottom: -3,
+                width: 28,
+                height: 28,
+                borderRadius: "50%",
+                display: "grid",
+                placeItems: "center",
+                color: "#25005a",
+                background: "var(--violet)",
+                border: "3px solid var(--canvas)",
+              }}
+            >
+              {loading ? (
+                <LoaderCircle className="animate-spin" size={14} />
+              ) : (
+                <Camera size={14} />
+              )}
+            </span>
+          </button>
+          {hasImage && !loading && (
+            <button
+              type="button"
+              aria-label={`Eliminar ${label.toLowerCase()}`}
+              title={`Eliminar ${label.toLowerCase()}`}
+              onClick={remove}
+              style={{
+                position: "absolute",
+                top: -5,
+                right: -5,
+                width: 24,
+                height: 24,
+                padding: 0,
+                borderRadius: "50%",
+                display: "grid",
+                placeItems: "center",
+                color: "white",
+                background: "var(--coral)",
+                border: "2px solid var(--canvas)",
+                cursor: "pointer",
+              }}
+            >
+              <Trash2 size={12} />
+            </button>
           )}
-        </span>
-      </button>
-      {hasImage && !loading && (
-        <button
-          type="button"
-          aria-label={`Eliminar ${label.toLowerCase()}`}
-          title={`Eliminar ${label.toLowerCase()}`}
-          onClick={remove}
-          style={{
-            position: "absolute",
-            top: -5,
-            right: -5,
-            width: 24,
-            height: 24,
-            padding: 0,
-            borderRadius: "50%",
-            display: "grid",
-            placeItems: "center",
-            color: "white",
-            background: "var(--coral)",
-            border: "2px solid var(--canvas)",
-            cursor: "pointer",
-          }}
-        >
-          <Trash2 size={12} />
-        </button>
+        </>
       )}
     </div>
   );

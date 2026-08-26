@@ -206,6 +206,21 @@ a {
   box-shadow: 0 0 0 3px rgb(210 187 255 / 10%);
   outline: none;
 }
+/* iOS Safari da a los <input type="date"> su propia altura interna por
+   métricas de fuente nativas, ignorando min-height/padding de .field —
+   el control se ve más grande que el resto de campos del mismo
+   formulario. -webkit-appearance: none más un alto/ancho explícitos en
+   el valor interno lo alinean con el resto. */
+input[type="date"].field {
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-min-logical-width: 0%;
+}
+input[type="date"].field::-webkit-date-and-time-value {
+  text-align: left;
+  min-height: 1.2em;
+  margin: 0;
+}
 .field-label {
   font-size: 0.78rem;
   font-family: var(--font-space-grotesk), sans-serif;

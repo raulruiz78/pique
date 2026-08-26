@@ -350,9 +350,17 @@ export function ChallengeWizard({
                 <input
                   className="field"
                   type="date"
+                  min={startDate}
                   value={form.startDate}
                   onChange={(event) =>
-                    setForm({ ...form, startDate: event.target.value })
+                    setForm({
+                      ...form,
+                      startDate: event.target.value,
+                      endDate:
+                        event.target.value > form.endDate
+                          ? event.target.value
+                          : form.endDate,
+                    })
                   }
                 />
               </label>
@@ -361,6 +369,7 @@ export function ChallengeWizard({
                 <input
                   className="field"
                   type="date"
+                  min={form.startDate}
                   value={form.endDate}
                   onChange={(event) =>
                     setForm({ ...form, endDate: event.target.value })
@@ -538,30 +547,6 @@ export function ChallengeWizard({
                 })}
               </div>
             </div>
-            <label
-              className="stitch-card"
-              style={{
-                padding: 16,
-                display: "flex",
-                gap: 12,
-                alignItems: "center",
-              }}
-            >
-              <Camera color="var(--violet)" />
-              <span style={{ flex: 1 }}>
-                <b>Foto como evidencia</b>
-                <small className="muted" style={{ display: "block" }}>
-                  Privada y visible para validadores.
-                </small>
-              </span>
-              <input
-                type="checkbox"
-                checked={form.evidenceRequired}
-                onChange={(event) =>
-                  setForm({ ...form, evidenceRequired: event.target.checked })
-                }
-              />
-            </label>
             <div>
               <label
                 className="stitch-card"
@@ -584,7 +569,12 @@ export function ChallengeWizard({
                   type="checkbox"
                   checked={form.peerReview}
                   onChange={(event) =>
-                    setForm({ ...form, peerReview: event.target.checked })
+                    setForm({
+                      ...form,
+                      peerReview: event.target.checked,
+                      evidenceRequired:
+                        event.target.checked && form.evidenceRequired,
+                    })
                   }
                 />
               </label>
@@ -602,6 +592,35 @@ export function ChallengeWizard({
                 </small>
               )}
             </div>
+            {form.peerReview && (
+              <label
+                className="stitch-card"
+                style={{
+                  padding: 16,
+                  display: "flex",
+                  gap: 12,
+                  alignItems: "center",
+                }}
+              >
+                <Camera color="var(--violet)" />
+                <span style={{ flex: 1 }}>
+                  <b>Foto como evidencia</b>
+                  <small className="muted" style={{ display: "block" }}>
+                    Privada y visible para validadores.
+                  </small>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={form.evidenceRequired}
+                  onChange={(event) =>
+                    setForm({
+                      ...form,
+                      evidenceRequired: event.target.checked,
+                    })
+                  }
+                />
+              </label>
+            )}
             <label
               className="stitch-card"
               style={{

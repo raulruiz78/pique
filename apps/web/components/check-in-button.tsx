@@ -267,6 +267,21 @@ export function CheckInButton({
               rows={3}
               value={note}
               onChange={(event) => setNote(event.target.value)}
+              onFocus={(event) => {
+                // El teclado móvil tapa la nota porque la hoja inferior
+                // no se desplaza sola al enfocar — iOS necesita un
+                // margen para que la animación del teclado termine antes
+                // de calcular hasta dónde hay que subir.
+                const field = event.currentTarget;
+                setTimeout(
+                  () =>
+                    field.scrollIntoView({
+                      block: "center",
+                      behavior: "smooth",
+                    }),
+                  300,
+                );
+              }}
               maxLength={140}
               placeholder="¿Cómo te has sentido hoy?"
             />
