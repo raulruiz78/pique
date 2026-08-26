@@ -1,6 +1,6 @@
 {
   "name": "pique",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "Retos compartidos para gente que se pica bien.",
   "packageManager": "pnpm@11.18.0",
@@ -20,6 +20,7 @@
     "format:check": "prettier --check .",
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
+    "db:seed:extra": "docker exec -i supabase_db_pique-local psql -U postgres -d postgres < scripts/dev-seed-extra.sql",
     "db:stop": "supabase stop",
     "db:types": "supabase gen types typescript --local > packages/database/src/database.types.ts",
     "smoke": "bash scripts/smoke.sh",

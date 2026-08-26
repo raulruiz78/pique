@@ -6,6 +6,7 @@ import {
   type EvidenceReview,
 } from "@/components/evidence-review-card";
 import { CategoryBadge } from "@/components/challenge-category";
+import { MultiplierBadge } from "@/components/multiplier-badge";
 import { NotificationBell } from "@/components/notification-bell";
 import {
   pendingReviewsQuery,
@@ -22,8 +23,10 @@ interface Relation {
   recurrence?: string;
   base_points?: number;
   evidence_required?: boolean;
+  streak_multiplier_enabled?: boolean;
   title?: string;
   category?: string;
+  challenge_participants?: { user_id: string; streak_days: number }[];
 }
 export default async function TodayPage() {
   const now = new Date();
@@ -106,15 +109,17 @@ export default async function TodayPage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <Avatar
-            name={displayName}
-            size={48}
-            src={
-              profile?.avatar_path && summary?.user?.id
-                ? `/api/v1/media/profiles/${summary.user.id}`
-                : null
-            }
-          />
+          <Link href="/perfil" aria-label="Tu perfil">
+            <Avatar
+              name={displayName}
+              size={48}
+              src={
+                profile?.avatar_path && summary?.user?.id
+                  ? `/api/v1/media/profiles/${summary.user.id}`
+                  : null
+              }
+            />
+          </Link>
           <div>
             <span className="eyebrow">Tu día</span>
             <h1
@@ -340,7 +345,16 @@ export default async function TodayPage() {
                           <Clock3 size={12} /> HOY · {goal?.base_points ?? 0} PT
                         </>
                       )}
-                    </span>
+                    </span>{" "}
+                    <MultiplierBadge
+                      enabled={goal?.streak_multiplier_enabled ?? false}
+                      streakDays={
+                        challenge?.challenge_participants?.find(
+                          (participant) =>
+                            participant.user_id === summary?.user?.id,
+                        )?.streak_days ?? 0
+                      }
+                    />
                     <h3 style={{ fontSize: 21, margin: "12px 0 3px" }}>
                       {goal?.name}
                     </h3>

@@ -83,9 +83,13 @@ export const createChallengeSchema = z
     endAt: z.iso.datetime(),
     timezone: timezoneSchema,
     recurrence: z.string().max(200),
-    points: z.int().min(1).max(10_000),
+    // Fijos a propósito (no un rango libre): el ranking global y las
+    // medallas por puntos (p. ej. cada 500) asumen incrementos
+    // predecibles — un valor arbitrario los rompería.
+    points: z.union([z.literal(5), z.literal(10), z.literal(20)]),
     evidenceRequired: z.boolean(),
     validationType: z.enum(["SELF", "PEER_REVIEW"]),
+    streakMultiplier: z.boolean().default(false),
     consequence: z.string().trim().max(240).optional(),
     participantIds: z.array(uuidSchema).min(2).max(20),
   })

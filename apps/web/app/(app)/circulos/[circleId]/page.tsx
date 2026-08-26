@@ -7,6 +7,7 @@ import { CircleInviteButton } from "@/components/circle-invite-button";
 import { CircleAccessPanel } from "@/components/circle-access-panel";
 import { CategoryBadge } from "@/components/challenge-category";
 import { ImageUpload } from "@/components/image-upload";
+import { MultiplierBadge } from "@/components/multiplier-badge";
 import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 import {
   ArrowLeft,
@@ -24,6 +25,7 @@ type Player = {
   acceptance: string;
   score: number;
   current_streak: number;
+  streak_days: number;
   profiles: {
     display_name?: string;
     username?: string;
@@ -43,7 +45,7 @@ export default async function CirclePage({
   const { data: circle } = await supabase
     .from("circles")
     .select(
-      "id,name,description,avatar_path,owner_id,circle_members(user_id,profiles(display_name,username,avatar_path)),challenges(id,title,category,status,creator_id,start_at,end_at,challenge_participants(user_id,acceptance,score,current_streak,profiles(display_name,username,avatar_path)))",
+      "id,name,description,avatar_path,owner_id,circle_members(user_id,profiles(display_name,username,avatar_path)),challenges(id,title,category,status,creator_id,start_at,end_at,goals(streak_multiplier_enabled),challenge_participants(user_id,acceptance,score,current_streak,streak_days,profiles(display_name,username,avatar_path)))",
     )
     .eq("id", circleId)
     .maybeSingle();
@@ -299,6 +301,10 @@ export default async function CirclePage({
             const lead =
               (players[0]?.score ?? 0) -
               (players[1]?.score ?? players[0]?.score ?? 0);
+            const goal = Array.isArray(challenge.goals)
+              ? challenge.goals[0]
+              : challenge.goals;
+            const me = players.find((player) => player.user_id === user?.id);
             const progress =
               challenge.status === "COMPLETED"
                 ? 100
@@ -317,7 +323,19 @@ export default async function CirclePage({
                   <Trophy color="var(--violet)" />
                   <CategoryBadge category={challenge.category} size={44} />
                   <div style={{ flex: 1 }}>
-                    <b>{challenge.title}</b>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                      }}
+                    >
+                      <b>{challenge.title}</b>
+                      <MultiplierBadge
+                        enabled={goal?.streak_multiplier_enabled ?? false}
+                        streakDays={me?.streak_days ?? 0}
+                      />
+                    </div>
                     <small
                       className="muted"
                       style={{ display: "block", marginTop: 3 }}

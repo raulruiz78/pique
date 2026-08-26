@@ -1,6 +1,7 @@
 import { CircleManager } from "@/components/circle-manager";
 import { Avatar } from "@/components/avatar";
 import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
+import Link from "next/link";
 
 export default async function CirclesPage() {
   const supabase = await createServerSupabase();
@@ -44,15 +45,17 @@ export default async function CirclesPage() {
           marginBottom: 38,
         }}
       >
-        <Avatar
-          name={profile?.display_name ?? "Pique"}
-          size={48}
-          src={
-            profile?.avatar_path && user
-              ? `/api/v1/media/profiles/${user.id}`
-              : null
-          }
-        />
+        <Link href="/perfil" aria-label="Tu perfil">
+          <Avatar
+            name={profile?.display_name ?? "Pique"}
+            size={48}
+            src={
+              profile?.avatar_path && user
+                ? `/api/v1/media/profiles/${user.id}`
+                : null
+            }
+          />
+        </Link>
         <h2
           className="display"
           style={{ color: "var(--violet)", fontSize: 26, margin: 0, flex: 1 }}

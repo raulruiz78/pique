@@ -15,13 +15,13 @@ async function runMaintenance(request: Request) {
   const expired = await admin
     .from("goal_occurrences")
     .update({ status: "EXPIRED" })
-    .eq("status", "PENDING")
+    .in("status", ["PENDING", "REJECTED"])
     .lt("closes_at", now)
     .select("id,challenge_id,participant_id");
   for (const occurrence of expired.data ?? []) {
     await admin
       .from("challenge_participants")
-      .update({ current_streak: 0 })
+      .update({ current_streak: 0, streak_days: 0 })
       .eq("challenge_id", occurrence.challenge_id)
       .eq("user_id", occurrence.participant_id);
     await admin
@@ -29,6 +29,7 @@ async function runMaintenance(request: Request) {
       .update({ current_streak: 0 })
       .eq("id", occurrence.participant_id);
   }
+  const autoApproved = await admin.rpc("auto_approve_stale_check_ins");
   const ended = await admin
     .from("challenges")
     .select("id")
@@ -51,6 +52,7 @@ async function runMaintenance(request: Request) {
 
   const streakAtRisk = await admin.rpc("notify_streak_at_risk");
   const occurrencePending = await admin.rpc("notify_occurrence_pending");
+  const afternoonReminder = await admin.rpc("notify_afternoon_reminder");
   const rivalAhead = await admin.rpc("notify_rival_ahead");
   const inactiveUsers = await admin.rpc("notify_inactive_users");
   const { pushed } = await flushPendingPush(admin);
@@ -58,10 +60,12 @@ async function runMaintenance(request: Request) {
   return ok({
     expired: expired.data?.length ?? 0,
     completed,
+    autoApproved: autoApproved.data ?? 0,
     outbox: outbox.data?.length ?? 0,
     derived: {
       streakAtRisk: streakAtRisk.data ?? 0,
       occurrencePending: occurrencePending.data ?? 0,
+      afternoonReminder: afternoonReminder.data ?? 0,
       rivalAhead: rivalAhead.data ?? 0,
       inactiveUsers: inactiveUsers.data ?? 0,
     },

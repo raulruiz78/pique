@@ -16,6 +16,7 @@ import {
   Flame,
   Trophy,
 } from "lucide-react";
+import Link from "next/link";
 
 const DAYS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
 export default async function CalendarPage() {
@@ -94,15 +95,17 @@ export default async function CalendarPage() {
   return (
     <main className="page">
       <header style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <Avatar
-          name={profile?.display_name ?? "Pique"}
-          size={48}
-          src={
-            profile?.avatar_path && summary?.user?.id
-              ? `/api/v1/media/profiles/${summary.user.id}`
-              : null
-          }
-        />
+        <Link href="/perfil" aria-label="Tu perfil">
+          <Avatar
+            name={profile?.display_name ?? "Pique"}
+            size={48}
+            src={
+              profile?.avatar_path && summary?.user?.id
+                ? `/api/v1/media/profiles/${summary.user.id}`
+                : null
+            }
+          />
+        </Link>
         <h1
           className="display"
           style={{ color: "var(--violet)", fontSize: 26, margin: 0, flex: 1 }}

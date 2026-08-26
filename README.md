@@ -2,7 +2,7 @@
 
 PWA privada y mobile-first para convertir objetivos cotidianos en retos compartidos. Incluye reglas aceptadas, calendario, evidencia fotográfica privada, validación social, ledger de puntos, ranking, rachas y consecuencias no monetarias.
 
-Versión actual: **0.5.0**. Consulta [CHANGELOG.md](CHANGELOG.md).
+Versión actual: **0.6.0**. Consulta [CHANGELOG.md](CHANGELOG.md).
 
 ## Experiencia actual
 

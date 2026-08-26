@@ -2,6 +2,26 @@
 
 Este proyecto sigue [versionado semántico](https://semver.org/lang/es/): `MAJOR.MINOR.PATCH`.
 
+## 0.6.0 — 2026-08-26
+
+### Añadido
+
+- Multiplicador de racha opcional por reto: los puntos suben hasta x2 según `challenge_participants.streak_days`, normalizada por unidad de cadencia completa (día o semana) para que un reto de varias veces al día no llegue al tope más rápido que uno diario. Se activa al crear el reto y se muestra junto a él en `/hoy` y en la vista de círculo.
+- Recordatorio de tarde (`notify_afternoon_reminder`): avisa si sigues sin cumplir un reto a media tarde, con tono distinto si tienes racha en juego.
+- Auto-aprobado de check-ins sin validar en 24h (`auto_approve_stale_check_ins`), para que un validador lento o ausente no retenga la racha del otro participante.
+- Puntos por check-in fijos a 5/10/20 (antes texto libre), para que el ranking y las medallas por puntos funcionen igual en todos los retos.
+- Pestaña "Validar" en la navegación inferior (sustituye a "Perfil", que ahora se accede tocando tu foto); `/validaciones` muestra también tus propios check-ins pendientes de que te los validen.
+- Selector de círculo y de validación (rival/autovalidación) en el asistente de creación, con tarjetas en vez de desplegables; la lista de participantes ya no aparece vacía antes de elegir círculo.
+
+### Cambiado
+
+- El cron de mantenimiento pasa de una ejecución diaria a las 02:15 UTC (fuera de cualquier ventana horaria útil) a las 13:00 UTC, y ahora también expira ocurrencias rechazadas y abandonadas sin reenviar.
+
+### Corregido
+
+- Los retos con autovalidación (`validation_type = 'SELF'`) no otorgaban puntos ni racha: el check-in se marcaba `APPROVED` al instante, pero solo la aprobación por rival disparaba la puntuación.
+- Un check-in rechazado y nunca reenviado no rompía la racha del participante.
+
 ## 0.5.0 — 2026-08-14
 
 ### Añadido
