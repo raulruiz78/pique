@@ -2,6 +2,16 @@
 
 Este proyecto sigue [versionado semántico](https://semver.org/lang/es/): `MAJOR.MINOR.PATCH`.
 
+## 0.8.0 — 2026-08-26
+
+### Añadido
+
+- Pantalla de ajustes del círculo (`/circulos/[id]/ajustes`), solo para el creador, con la foto en modo "toca para ver opciones" en vez de las burbujas de cambiar/eliminar sobre el avatar.
+
+### Corregido
+
+- Las fotos de círculo se subían bien pero nunca se podían ver, ni para el propio dueño: la política de lectura de Storage comparaba `circle.avatar_path = name` esperando la ruta del archivo, pero al tener `circles` su propia columna `name`, Postgres resolvía la comparación contra el nombre del círculo en vez de contra la ruta — la condición nunca se cumplía. Mismo fallo corregido en las políticas de subida y borrado.
+
 ## 0.7.0 — 2026-08-26
 
 ### Añadido

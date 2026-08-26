@@ -6,7 +6,6 @@ import { RankingList } from "@/components/ranking-list";
 import { CircleInviteButton } from "@/components/circle-invite-button";
 import { CircleAccessPanel } from "@/components/circle-access-panel";
 import { CategoryBadge } from "@/components/challenge-category";
-import { ImageUpload } from "@/components/image-upload";
 import { MultiplierBadge } from "@/components/multiplier-badge";
 import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 import {
@@ -14,6 +13,7 @@ import {
   ChevronRight,
   Clock3,
   Plus,
+  Settings,
   Trophy,
   UsersRound,
 } from "lucide-react";
@@ -135,37 +135,28 @@ export default async function CirclePage({
           {circle.name}
         </strong>
         <CircleInviteButton circleId={circle.id} compact />
+        {circle.owner_id === user?.id && (
+          <Link
+            href={`/circulos/${circle.id}/ajustes`}
+            aria-label="Ajustes del círculo"
+            className="button button-secondary"
+            style={{ width: 48, minHeight: 48, padding: 0 }}
+          >
+            <Settings size={18} />
+          </Link>
+        )}
       </nav>
       <header className="screen-header">
-        {circle.owner_id === user?.id ? (
-          <ImageUpload
-            endpoint={`/api/v1/circles/${circle.id}/image`}
-            hasImage={Boolean(circle.avatar_path)}
-            label="Foto del círculo"
-          >
-            <Avatar
-              name={circle.name}
-              size={58}
-              accent="var(--lime)"
-              src={
-                circle.avatar_path
-                  ? `/api/v1/media/circles/${circle.id}?v=${encodeURIComponent(circle.avatar_path)}`
-                  : null
-              }
-            />
-          </ImageUpload>
-        ) : (
-          <Avatar
-            name={circle.name}
-            size={58}
-            accent="var(--lime)"
-            src={
-              circle.avatar_path
-                ? `/api/v1/media/circles/${circle.id}?v=${encodeURIComponent(circle.avatar_path)}`
-                : null
-            }
-          />
-        )}
+        <Avatar
+          name={circle.name}
+          size={58}
+          accent="var(--lime)"
+          src={
+            circle.avatar_path
+              ? `/api/v1/media/circles/${circle.id}?v=${encodeURIComponent(circle.avatar_path)}`
+              : null
+          }
+        />
         <div>
           <span className="eyebrow">Círculo privado</span>
           <h1 className="display" style={{ fontSize: 30, margin: "5px 0" }}>
