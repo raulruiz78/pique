@@ -2,6 +2,25 @@
 
 Este proyecto sigue [versionado semántico](https://semver.org/lang/es/): `MAJOR.MINOR.PATCH`.
 
+## 0.7.0 — 2026-08-26
+
+### Añadido
+
+- Crear círculo pasa de un cuadro de texto inline a una pantalla propia (`/circulos/crear`), con nombre, descripción y foto opcional con recorte.
+- Foto de perfil: tocarla abre una hoja con "Cambiar foto"/"Eliminar foto" en vez de las dos burbujas siempre visibles sobre el avatar.
+- "Foto como evidencia" en el asistente de creación solo aparece si "Que te vigile el rival" está activo.
+- Fechas del asistente de creación: "Empieza" no admite días anteriores a hoy; "Termina" no admite antes de "Empieza".
+
+### Cambiado
+
+- Tocar una notificación ahora la marca como leída y navega a su destino, en vez de no hacer nada; las notificaciones leídas desaparecen de `/notificaciones` (antes solo el botón "Marcar leídas" existía, y marcaba todas de golpe).
+- Normalización CSS del `<input type="date">` para iOS, donde se renderizaba más grande que el resto de campos del mismo formulario.
+
+### Corregido
+
+- La notificación "👀 Toca validar" llevaba a `/hoy` en vez de a `/validaciones`, la página construida para revisar evidencias pendientes.
+- El teclado móvil tapaba la nota del check-in al escribir (sin scroll automático hacia el campo enfocado dentro de la hoja inferior).
+
 ## 0.6.0 — 2026-08-26
 
 ### Añadido

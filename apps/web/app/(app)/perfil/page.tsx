@@ -103,6 +103,7 @@ export default async function ProfilePage() {
           endpoint="/api/v1/users/me/avatar"
           hasImage={Boolean(value?.avatar_path)}
           label="Foto de perfil"
+          menu
         >
           <Avatar
             name={value?.display_name ?? "Pique"}

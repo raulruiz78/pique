@@ -1,6 +1,7 @@
 import { CircleManager } from "@/components/circle-manager";
 import { Avatar } from "@/components/avatar";
 import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 
 export default async function CirclesPage() {
@@ -63,14 +64,37 @@ export default async function CirclesPage() {
           Hoy toca dar la talla.
         </h2>
       </header>
-      <header>
-        <span className="eyebrow" style={{ color: "var(--lime)" }}>
-          Comunidad
-        </span>
-        <h1 className="display screen-title">Tus Círculos</h1>
-        <p className="muted" style={{ margin: 0 }}>
-          Entra en un círculo para ver qué se juega y quién manda.
-        </p>
+      <header
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: 12,
+        }}
+      >
+        <div>
+          <span className="eyebrow" style={{ color: "var(--lime)" }}>
+            Comunidad
+          </span>
+          <h1 className="display screen-title">Tus Círculos</h1>
+          <p className="muted" style={{ margin: 0 }}>
+            Entra en un círculo para ver qué se juega y quién manda.
+          </p>
+        </div>
+        <Link
+          href="/circulos/crear"
+          aria-label="Crear círculo"
+          className="button button-primary"
+          style={{
+            width: 48,
+            height: 48,
+            padding: 0,
+            borderRadius: "50%",
+            flexShrink: 0,
+          }}
+        >
+          <Plus />
+        </Link>
       </header>
 
       <div style={{ marginTop: 38 }}>

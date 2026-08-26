@@ -4,7 +4,6 @@ import {
   Compass,
   Copy,
   LoaderCircle,
-  Plus,
   Trash2,
   Users,
   Zap,
@@ -29,8 +28,6 @@ export function CircleManager({
   }>;
 }) {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [removedIds, setRemovedIds] = useState<string[]>([]);
   const [exploring, setExploring] = useState(false);
@@ -67,20 +64,6 @@ export function CircleManager({
     if (!response.ok) return toast.error("No se pudo completar la unión.");
     toast.success("Solicitud enviada. El creador debe aprobarla.");
     setPublicCircles((items) => items.filter((item) => item.id !== circleId));
-  }
-  async function create() {
-    if (name.length < 2) return;
-    setLoading(true);
-    const response = await fetch("/api/v1/circles", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
-    setLoading(false);
-    if (!response.ok) return toast.error("No se pudo crear el círculo.");
-    setName("");
-    toast.success("Círculo creado.");
-    router.refresh();
   }
   async function invite(
     event: React.MouseEvent<HTMLButtonElement>,
@@ -301,26 +284,6 @@ export function CircleManager({
             </div>
           </article>
         ))}
-      <div
-        className="stitch-card"
-        style={{ padding: 14, display: "flex", gap: 8 }}
-      >
-        <input
-          className="field"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          placeholder="Nombre del nuevo círculo"
-        />
-        <button
-          aria-label="Crear círculo"
-          disabled={loading}
-          className="button button-primary"
-          style={{ width: 50, padding: 0 }}
-          onClick={create}
-        >
-          {loading ? <LoaderCircle className="animate-spin" /> : <Plus />}
-        </button>
-      </div>
       <button
         className="stitch-card"
         onClick={explore}
