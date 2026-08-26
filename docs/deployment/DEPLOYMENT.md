@@ -44,7 +44,7 @@ Conecta el dominio y repite URL/callback en Supabase. Fuerza HTTPS.
 
 ## 6. Cron y trabajos
 
-Programa `POST /api/v1/cron/maintenance` cada 15 minutos con header `Authorization: Bearer CRON_SECRET`. El job es reintentable: caduca ocurrencias, rompe rachas, finaliza retos, asigna posiciones/consecuencias y marca outbox procesada. Para volumen mayor, separa el consumidor outbox sin alterar las transacciones.
+`POST /api/v1/cron/maintenance` corre una vez al día (`apps/web/vercel.json`, 13:00 UTC — media tarde en España) con header `Authorization: Bearer CRON_SECRET`. Un día era el plan original ("cada 15 minutos"), pero el plan Hobby de Vercel de este proyecto solo permite cron diario; si se pasa a un plan con cron más frecuente, las ventanas horarias de `notify_streak_at_risk`/`notify_occurrence_pending` (pensadas para "N horas antes del cierre") volverían a tener sentido evaluadas varias veces al día. El job es reintentable: caduca ocurrencias, rompe rachas, finaliza retos, asigna posiciones/consecuencias y marca outbox procesada. Para volumen mayor, separa el consumidor outbox sin alterar las transacciones.
 
 ## 7. Correo transaccional
 

@@ -3,7 +3,7 @@ import {
   CalendarDays,
   CirclePlus,
   House,
-  UserRound,
+  ShieldCheck,
   UsersRound,
 } from "lucide-react";
 import Link from "next/link";
@@ -19,7 +19,12 @@ const items = [
   },
   { href: "/crear", label: "Crear", Icon: CirclePlus, create: true },
   { href: "/circulos", label: "Círculos", Icon: UsersRound, create: false },
-  { href: "/perfil", label: "Perfil", Icon: UserRound, create: false },
+  {
+    href: "/validaciones",
+    label: "Validar",
+    Icon: ShieldCheck,
+    create: false,
+  },
 ] as const;
 
 export function BottomNav() {

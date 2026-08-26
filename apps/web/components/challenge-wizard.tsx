@@ -4,6 +4,7 @@ import {
   Camera,
   ChevronLeft,
   ChevronRight,
+  Flame,
   LoaderCircle,
   ShieldCheck,
   Sparkles,
@@ -27,6 +28,7 @@ interface Circle {
   name: string;
   circle_members: Member[];
 }
+const pointsOptions = [5, 10, 20] as const;
 const weekdays = [
   { value: "MO", label: "L", name: "Lunes" },
   { value: "TU", label: "M", name: "Martes" },
@@ -63,9 +65,10 @@ export function ChallengeWizard({
     days: "MO,WE,FR",
     weeklyTarget: 3,
     dailyTarget: 2,
-    points: "10",
+    points: 10 as (typeof pointsOptions)[number],
     evidenceRequired: true,
-    validationType: "PEER_REVIEW",
+    peerReview: true,
+    streakMultiplier: false,
     consequence: "",
     participantIds: [] as string[],
   });
@@ -96,9 +99,7 @@ export function ChallengeWizard({
     () =>
       form.title.length >= 3 &&
       form.circleId &&
-      form.participantIds.length >= 2 &&
-      Number(form.points) >= 1 &&
-      Number(form.points) <= 10_000,
+      form.participantIds.length >= 2,
     [form],
   );
   function chooseCategory(category: ChallengeCategory) {
@@ -147,9 +148,10 @@ export function ChallengeWizard({
             : form.scheduleMode === "dailyMultiple"
               ? `FREQ=DAILY;DAILYCOUNT=${form.dailyTarget}`
               : `FREQ=WEEKLY;BYDAY=${form.days}`,
-        points: Number(form.points),
+        points: form.points,
         evidenceRequired: form.evidenceRequired,
-        validationType: form.validationType,
+        validationType: form.peerReview ? "PEER_REVIEW" : "SELF",
+        streakMultiplier: form.streakMultiplier,
         consequence: form.consequence,
         participantIds: form.participantIds,
       }),
@@ -243,74 +245,87 @@ export function ChallengeWizard({
                 placeholder="Qué cuenta, qué no y cómo se resuelve una duda."
               />
             </label>
-            <label>
-              <span className="field-label">Círculo</span>
-              <select
-                className="field"
-                value={form.circleId}
-                onChange={(event) => {
-                  const selected = circles.find(
-                    (item) => item.id === event.target.value,
-                  );
-                  setForm({
-                    ...form,
-                    circleId: event.target.value,
-                    participantIds:
-                      selected?.circle_members.map(
-                        (member) => member.user_id,
-                      ) ?? [],
-                  });
-                }}
-              >
-                <option value="">Selecciona un círculo</option>
-                {circles.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {circles.length === 0 && (
-              <p className="muted">
-                Primero crea un círculo desde tu perfil e invita a otra persona.
-              </p>
-            )}
             <div>
-              <span className="field-label">Participantes</span>
-              <div className="stitch-card" style={{ padding: 12 }}>
-                {circle?.circle_members.map((member) => (
-                  <label
-                    key={member.user_id}
-                    style={{
-                      display: "flex",
-                      gap: 10,
-                      padding: 8,
-                      alignItems: "center",
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={form.participantIds.includes(member.user_id)}
-                      onChange={(event) =>
-                        setForm({
-                          ...form,
-                          participantIds: event.target.checked
-                            ? [...form.participantIds, member.user_id]
-                            : form.participantIds.filter(
-                                (id) => id !== member.user_id,
-                              ),
-                        })
-                      }
-                    />
-                    <Users size={17} />
-                    <span>
-                      {member.profiles?.display_name ??
-                        member.profiles?.username}
-                    </span>
-                  </label>
-                ))}
-              </div>
+              <span className="field-label">Círculo</span>
+              {circles.length === 0 ? (
+                <p className="muted">
+                  Primero crea un círculo desde tu perfil e invita a otra
+                  persona.
+                </p>
+              ) : (
+                <div style={{ display: "grid", gap: 8 }}>
+                  {circles.map((item) => {
+                    const selected = form.circleId === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        aria-pressed={selected}
+                        className="choice-card"
+                        onClick={() =>
+                          setForm({
+                            ...form,
+                            circleId: item.id,
+                            participantIds: item.circle_members.map(
+                              (member) => member.user_id,
+                            ),
+                          })
+                        }
+                      >
+                        <span className="choice-dot" />
+                        <span>
+                          <b>{item.name}</b>
+                          <small className="muted" style={{ display: "block" }}>
+                            {item.circle_members.length}{" "}
+                            {item.circle_members.length === 1
+                              ? "persona"
+                              : "personas"}
+                          </small>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
+            {circle && (
+              <div>
+                <span className="field-label">Participantes</span>
+                <div className="stitch-card" style={{ padding: 12 }}>
+                  {circle.circle_members.map((member) => (
+                    <label
+                      key={member.user_id}
+                      style={{
+                        display: "flex",
+                        gap: 10,
+                        padding: 8,
+                        alignItems: "center",
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={form.participantIds.includes(member.user_id)}
+                        onChange={(event) =>
+                          setForm({
+                            ...form,
+                            participantIds: event.target.checked
+                              ? [...form.participantIds, member.user_id]
+                              : form.participantIds.filter(
+                                  (id) => id !== member.user_id,
+                                ),
+                          })
+                        }
+                      />
+                      <Users size={17} />
+                      <span>
+                        {member.profiles?.display_name ??
+                          member.profiles?.username}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -484,22 +499,45 @@ export function ChallengeWizard({
                 </label>
               )}
             </fieldset>
-            <label>
+            <div>
               <span className="field-label">Puntos por check-in</span>
-              <input
-                className="field"
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={5}
-                value={form.points}
-                onChange={(event) => {
-                  const value = event.target.value.replace(/\D/g, "");
-                  setForm({ ...form, points: value });
+              <div
+                role="group"
+                aria-label="Puntos por check-in"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, 1fr)",
+                  gap: 8,
+                  marginTop: 8,
                 }}
-                placeholder="Ej. 10"
-              />
-            </label>
+              >
+                {pointsOptions.map((value) => {
+                  const selected = form.points === value;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => setForm({ ...form, points: value })}
+                      style={{
+                        height: 48,
+                        borderRadius: 15,
+                        border: `1px solid ${selected ? "var(--violet)" : "var(--line)"}`,
+                        background: selected
+                          ? "var(--violet)"
+                          : "var(--surface)",
+                        color: selected ? "#25005a" : "var(--ink)",
+                        font: "inherit",
+                        fontWeight: 800,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {value} pt
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             <label
               className="stitch-card"
               style={{
@@ -524,18 +562,70 @@ export function ChallengeWizard({
                 }
               />
             </label>
-            <label>
-              <span className="field-label">Validación</span>
-              <select
-                className="field"
-                value={form.validationType}
-                onChange={(event) =>
-                  setForm({ ...form, validationType: event.target.value })
-                }
+            <div>
+              <label
+                className="stitch-card"
+                style={{
+                  padding: 16,
+                  display: "flex",
+                  gap: 12,
+                  alignItems: "center",
+                }}
               >
-                <option value="PEER_REVIEW">La revisa el rival</option>
-                <option value="SELF">Autovalidación</option>
-              </select>
+                <ShieldCheck color="var(--violet)" />
+                <span style={{ flex: 1 }}>
+                  <b>Que te vigile el rival</b>
+                  <small className="muted" style={{ display: "block" }}>
+                    Nadie se cuela. Tu contrincante da el visto bueno a cada
+                    prueba.
+                  </small>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={form.peerReview}
+                  onChange={(event) =>
+                    setForm({ ...form, peerReview: event.target.checked })
+                  }
+                />
+              </label>
+              {!form.peerReview && (
+                <small
+                  className="muted"
+                  style={{
+                    display: "block",
+                    marginTop: 8,
+                    color: "var(--danger)",
+                  }}
+                >
+                  ⚠️ Sin árbitro: cada check-in se da por bueno solo. Tú decides
+                  si juegas limpio.
+                </small>
+              )}
+            </div>
+            <label
+              className="stitch-card"
+              style={{
+                padding: 16,
+                display: "flex",
+                gap: 12,
+                alignItems: "center",
+              }}
+            >
+              <Flame color="var(--lime)" />
+              <span style={{ flex: 1 }}>
+                <b>Multiplicador de racha</b>
+                <small className="muted" style={{ display: "block" }}>
+                  Racha viva, puntos gordos — hasta x2. Un fallo y vuelves a
+                  cero.
+                </small>
+              </span>
+              <input
+                type="checkbox"
+                checked={form.streakMultiplier}
+                onChange={(event) =>
+                  setForm({ ...form, streakMultiplier: event.target.checked })
+                }
+              />
             </label>
           </div>
         </section>
@@ -580,6 +670,15 @@ export function ChallengeWizard({
                 Icon={Camera}
                 label="Evidencia"
                 value={form.evidenceRequired ? "Foto obligatoria" : "Opcional"}
+              />
+              <Summary
+                Icon={Flame}
+                label="Racha"
+                value={
+                  form.streakMultiplier
+                    ? "Multiplicador hasta x2"
+                    : "Sin multiplicador"
+                }
               />
             </div>
           </div>

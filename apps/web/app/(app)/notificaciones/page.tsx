@@ -48,15 +48,17 @@ export default async function NotificationsPage() {
             Notificaciones
           </h1>
         </div>
-        <Avatar
-          name={profile?.display_name ?? "Pique"}
-          size={46}
-          src={
-            profile?.avatar_path && user
-              ? `/api/v1/media/profiles/${user.id}`
-              : null
-          }
-        />
+        <Link href="/perfil" aria-label="Tu perfil">
+          <Avatar
+            name={profile?.display_name ?? "Pique"}
+            size={46}
+            src={
+              profile?.avatar_path && user
+                ? `/api/v1/media/profiles/${user.id}`
+                : null
+            }
+          />
+        </Link>
       </header>
       <div
         style={{
