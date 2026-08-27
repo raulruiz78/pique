@@ -1,11 +1,12 @@
 "use client";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Camera, Check, LoaderCircle, X } from "lucide-react";
+import { Camera, Check, LoaderCircle, ShieldCheck, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { BottomSheet } from "@/components/bottom-sheet";
 import { CameraCapture } from "@/components/camera-capture";
+import { PiqueCoin } from "@/components/pique-coin";
 import { tap } from "@/lib/haptics";
 import { createBrowserSupabase } from "@/lib/supabase/browser";
 
@@ -21,6 +22,7 @@ export function CheckInButton({
   evidenceRequired,
   title,
   resubmit = false,
+  shieldCount = 0,
 }: {
   occurrenceId: string;
   evidenceRequired: boolean;
@@ -28,15 +30,42 @@ export function CheckInButton({
   /** El check-in anterior de esta ocurrencia fue rechazado — esto es un
    * reintento, no el primer envío. */
   resubmit?: boolean;
+  /** Comodines disponibles en el círculo de este reto — si hay al menos
+   * uno, se ofrece saltar el check-in en vez de subir prueba. */
+  shieldCount?: number;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [shielding, setShielding] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [note, setNote] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [cameraOpen, setCameraOpen] = useState(false);
+  async function useShield() {
+    setShielding(true);
+    try {
+      const response = await fetch(
+        `/api/v1/occurrences/${occurrenceId}/shield`,
+        { method: "POST" },
+      );
+      const body = (await response.json()) as { error?: { message: string } };
+      if (!response.ok)
+        throw new Error(body.error?.message ?? "No se pudo usar el comodín.");
+      toast.success("Comodín usado. Racha a salvo.");
+      tap(15);
+      setOpen(false);
+      setSubmitted(true);
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "No se pudo usar el comodín.",
+      );
+    } finally {
+      setShielding(false);
+    }
+  }
   async function submit() {
     if (evidenceRequired && !file)
       return toast.error("Este reto necesita una foto.");
@@ -189,6 +218,40 @@ export function CheckInButton({
             : "Asegúrate de que el resultado sea visible para que tu círculo pueda validarlo."}
         </Dialog.Description>
         <span className="pill pill-violet">{title}</span>
+        {shieldCount > 0 && (
+          <button
+            type="button"
+            className="stitch-card"
+            disabled={shielding}
+            onClick={useShield}
+            style={{
+              width: "100%",
+              marginTop: 16,
+              padding: 16,
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              textAlign: "left",
+              color: "inherit",
+              cursor: "pointer",
+              borderColor: "var(--lime)",
+            }}
+          >
+            <ShieldCheck color="var(--lime)" />
+            <span style={{ flex: 1 }}>
+              <b>Usar comodín — sáltate esto</b>
+              <small className="muted" style={{ display: "block" }}>
+                Sin foto, sin puntos. Solo salva la racha. Te quedan{" "}
+                {shieldCount}.
+              </small>
+            </span>
+            {shielding ? (
+              <LoaderCircle className="animate-spin" size={18} />
+            ) : (
+              <PiqueCoin size={20} />
+            )}
+          </button>
+        )}
         <div style={{ display: "grid", gap: 15, marginTop: 20 }}>
           <div>
             <span className="field-label">

@@ -6,6 +6,7 @@ import { RankingList } from "@/components/ranking-list";
 import { CircleInviteButton } from "@/components/circle-invite-button";
 import { CircleAccessPanel } from "@/components/circle-access-panel";
 import { CategoryBadge } from "@/components/challenge-category";
+import { CircleShieldMarket } from "@/components/circle-shield-market";
 import { MultiplierBadge } from "@/components/multiplier-badge";
 import { createServerSupabase, getCurrentUser } from "@/lib/supabase/server";
 import {
@@ -45,11 +46,14 @@ export default async function CirclePage({
   const { data: circle } = await supabase
     .from("circles")
     .select(
-      "id,name,description,avatar_path,owner_id,circle_members(user_id,profiles(display_name,username,avatar_path)),challenges(id,title,category,status,creator_id,start_at,end_at,goals(streak_multiplier_enabled),challenge_participants(user_id,acceptance,score,current_streak,streak_days,profiles(display_name,username,avatar_path)))",
+      "id,name,description,avatar_path,owner_id,circle_members(user_id,coin_balance,shield_count,profiles(display_name,username,avatar_path)),challenges(id,title,category,status,creator_id,start_at,end_at,goals(streak_multiplier_enabled),challenge_participants(user_id,acceptance,score,current_streak,streak_days,profiles(display_name,username,avatar_path)))",
     )
     .eq("id", circleId)
     .maybeSingle();
   if (!circle) notFound();
+  const me = circle.circle_members.find(
+    (member) => member.user_id === user?.id,
+  );
 
   const { data: activities } = await supabase
     .from("activities")
@@ -168,6 +172,11 @@ export default async function CirclePage({
           </p>
         </div>
       </header>
+      <CircleShieldMarket
+        circleId={circle.id}
+        coinBalance={me?.coin_balance ?? 0}
+        shieldCount={me?.shield_count ?? 0}
+      />
       {circle.owner_id === user?.id && (
         <CircleAccessPanel circleId={circle.id} />
       )}
