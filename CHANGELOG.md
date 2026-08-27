@@ -2,6 +2,12 @@
 
 Este proyecto sigue [versionado semántico](https://semver.org/lang/es/): `MAJOR.MINOR.PATCH`.
 
+## 0.9.1 — 2026-08-27
+
+### Añadido
+
+- Entrada animada al abrir la cámara (fundido, reutilizando `.motion-fade-in`, igual que el overlay del bottom sheet) — antes aparecía de golpe.
+
 ## 0.9.0 — 2026-08-27
 
 ### Añadido
