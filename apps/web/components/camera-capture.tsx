@@ -205,6 +205,7 @@ export function CameraCapture({
 
   return (
     <div
+      className="motion-fade-in"
       style={{
         position: "fixed",
         inset: 0,

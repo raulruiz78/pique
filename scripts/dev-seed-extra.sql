@@ -77,3 +77,45 @@ begin
 
   raise notice 'Listo: círculo 2 (%), retos A/B/C (%/%/%)  ', circle2, challenge_a, challenge_b, challenge_c;
 end $$;
+
+-- Coins y comodines (0.9.0): Raúl con saldo de sobra para comprar en
+-- vivo y ya con 1 comodín para probar "usar comodín" en el check-in de
+-- hoy; Carmen por debajo del umbral para ver el botón desactivado; y un
+-- check-in pasado ya resuelto con comodín para verlo marcado en el feed
+-- y en /mis-pruebas sin tener que generarlo tú.
+do $$
+declare
+  raul uuid := '10000000-0000-0000-0000-000000000001';
+  carmen uuid := '10000000-0000-0000-0000-000000000002';
+  circle1 uuid := '20000000-0000-0000-0000-000000000001';
+  challenge_b uuid := '30000000-0000-0000-0000-000000000003';
+  shielded_occ uuid;
+  shielded_check_in uuid;
+begin
+  update public.circle_members set coin_balance = 2400, shield_count = 1
+    where circle_id = circle1 and user_id = raul;
+  update public.circle_members set coin_balance = 350, shield_count = 0
+    where circle_id = circle1 and user_id = carmen;
+  insert into public.circle_coin_transactions(circle_id, user_id, amount, source_type, source_id, reason)
+  values
+    (circle1, raul, 2400, 'CHECK_IN', gen_random_uuid(), 'SEED'),
+    (circle1, carmen, 350, 'CHECK_IN', gen_random_uuid(), 'SEED')
+  on conflict do nothing;
+
+  -- Un check-in ya pasado de Raúl en "Flexiones x3", resuelto con
+  -- comodín, para que se vea marcado desde el primer segundo.
+  select id into shielded_occ from public.goal_occurrences
+    where challenge_id = challenge_b and participant_id = raul and status = 'PENDING'
+      and starts_at < now() - interval '1 day'
+    order by starts_at limit 1;
+  if shielded_occ is not null then
+    insert into public.check_ins(occurrence_id, challenge_id, user_id, status, via_shield, submitted_at, reviewed_at)
+    values (shielded_occ, challenge_b, raul, 'APPROVED', true, now() - interval '1 day', now() - interval '1 day')
+    returning id into shielded_check_in;
+    update public.goal_occurrences set status = 'APPROVED' where id = shielded_occ;
+    insert into public.activities(circle_id, challenge_id, actor_id, type, payload)
+    values (circle1, challenge_b, raul, 'CHECK_IN_SHIELDED', jsonb_build_object('goalName', 'Flexiones', 'challengeTitle', 'Flexiones x3'));
+  end if;
+
+  raise notice 'Coins listos: Raúl 2400 coins + 1 comodín, Carmen 350 coins.';
+end $$;
