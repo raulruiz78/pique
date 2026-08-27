@@ -33,6 +33,8 @@ function describeActivity(activity: Activity): string {
       return `«${challengeTitle}» ha terminado`;
     case "CHECK_IN_APPROVED":
       return `${actorName} ha clavado «${(activity.payload.goalName as string) ?? challengeTitle}» (+${(activity.payload.points as number) ?? 0} pt)`;
+    case "CHECK_IN_SHIELDED":
+      return `🛡️ ${actorName} se ha saltado «${(activity.payload.goalName as string) ?? challengeTitle}» con un comodín`;
     case "STREAK_INCREASED":
       return `${actorName} lleva ${(activity.payload.streak as number) ?? 0} días de racha`;
     case "CHALLENGE_LEAD":

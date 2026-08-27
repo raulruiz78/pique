@@ -158,13 +158,26 @@ export async function todayOccurrencesQuery(timezone: string) {
   const { data } = await supabase
     .from("goal_occurrences")
     .select(
-      "id,starts_at,closes_at,status,goals(id,name,recurrence,base_points,evidence_required,streak_multiplier_enabled),challenges(id,title,category,challenge_participants(user_id,streak_days)),check_ins(id,validations(reason,decision,created_at))",
+      "id,starts_at,closes_at,status,goals(id,name,recurrence,base_points,evidence_required,streak_multiplier_enabled),challenges(id,title,category,circle_id,challenge_participants(user_id,streak_days)),check_ins(id,validations(reason,decision,created_at))",
     )
     .eq("participant_id", user.id)
     .lt("starts_at", end.toISOString())
     .gte("closes_at", start.toISOString())
     .order("starts_at");
   return data ?? [];
+}
+
+export async function myShieldCountsQuery() {
+  const supabase = await createServerSupabase();
+  if (!supabase) return new Map<string, number>();
+  const user = await getCurrentUser();
+  if (!user) return new Map<string, number>();
+  const { data } = await supabase
+    .from("circle_members")
+    .select("circle_id,shield_count")
+    .eq("user_id", user.id)
+    .gt("shield_count", 0);
+  return new Map((data ?? []).map((row) => [row.circle_id, row.shield_count]));
 }
 
 export async function unreadNotificationsCountQuery() {
@@ -229,7 +242,7 @@ export async function myCheckInsQuery() {
   const { data: checkIns } = await supabase
     .from("check_ins")
     .select(
-      "id,note,status,submitted_at,reviewed_at,challenges(title),goal_occurrences(starts_at,closes_at,goals(name)),validations(decision,reason,created_at,reviewer_id,profiles(display_name))",
+      "id,note,status,via_shield,submitted_at,reviewed_at,challenges(title),goal_occurrences(starts_at,closes_at,goals(name)),validations(decision,reason,created_at,reviewer_id,profiles(display_name))",
     )
     .eq("user_id", user.id)
     .order("submitted_at", { ascending: false })

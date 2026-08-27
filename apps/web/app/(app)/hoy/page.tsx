@@ -9,6 +9,7 @@ import { CategoryBadge } from "@/components/challenge-category";
 import { MultiplierBadge } from "@/components/multiplier-badge";
 import { NotificationBell } from "@/components/notification-bell";
 import {
+  myShieldCountsQuery,
   pendingReviewsQuery,
   profileSummaryQuery,
   todayOccurrencesQuery,
@@ -26,6 +27,7 @@ interface Relation {
   streak_multiplier_enabled?: boolean;
   title?: string;
   category?: string;
+  circle_id?: string;
   challenge_participants?: { user_id: string; streak_days: number }[];
 }
 export default async function TodayPage() {
@@ -38,11 +40,13 @@ export default async function TodayPage() {
     current_streak?: number;
     timezone?: string;
   } | null;
-  const [rawOccurrences, reviewRows, unreadNotifications] = await Promise.all([
-    todayOccurrencesQuery(profile?.timezone ?? "Europe/Madrid"),
-    pendingReviewsQuery(),
-    unreadNotificationsCountQuery(),
-  ]);
+  const [rawOccurrences, reviewRows, unreadNotifications, shieldCounts] =
+    await Promise.all([
+      todayOccurrencesQuery(profile?.timezone ?? "Europe/Madrid"),
+      pendingReviewsQuery(),
+      unreadNotificationsCountQuery(),
+      myShieldCountsQuery(),
+    ]);
   const occurrences = rawOccurrences as unknown as Array<{
     id: string;
     status: string;
@@ -383,6 +387,11 @@ export default async function TodayPage() {
                       evidenceRequired={Boolean(goal?.evidence_required)}
                       title={goal?.name ?? "Objetivo"}
                       resubmit={rejected}
+                      shieldCount={
+                        (challenge?.circle_id &&
+                          shieldCounts.get(challenge.circle_id)) ||
+                        0
+                      }
                     />
                   )}
                 </div>

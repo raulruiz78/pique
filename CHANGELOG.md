@@ -2,6 +2,14 @@
 
 Este proyecto sigue [versionado semántico](https://semver.org/lang/es/): `MAJOR.MINOR.PATCH`.
 
+## 0.9.0 — 2026-08-27
+
+### Añadido
+
+- Coins y comodines por círculo: cada punto que ganas en un reto suma 1 coin a un saldo aparte de ese círculo (nunca resta de tu puntuación de ranking). Con 1000 coins se compra un comodín; un comodín salta un check-in con auto-aprobado, sin foto ni puntos — solo salva la racha. Comprables desde la vista del círculo; se usan desde la propia hoja de check-in si tienes alguno disponible.
+- El feed de actividad y el historial de check-ins (`/mis-pruebas`) marcan de forma visible cuándo un check-in se resolvió con un comodín, en vez de mostrarlo como una validación normal.
+- Icono propio de la moneda de Pique (una "P" sobre una moneda lima) para todo lo relacionado con coins/comodines.
+
 ## 0.8.0 — 2026-08-26
 
 ### Añadido

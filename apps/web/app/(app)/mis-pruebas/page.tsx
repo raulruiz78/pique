@@ -1,7 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
 import { EmptyState } from "@/components/empty-state";
 import { myCheckInsQuery } from "@/lib/queries";
-import { ArrowLeft, Clock3, Eye, Check, X, History } from "lucide-react";
+import {
+  ArrowLeft,
+  Clock3,
+  Eye,
+  Check,
+  X,
+  History,
+  ShieldCheck,
+} from "lucide-react";
 import Link from "next/link";
 
 interface Relation {
@@ -12,6 +20,7 @@ type MyCheckIn = {
   id: string;
   note: string | null;
   status: string;
+  via_shield: boolean;
   submitted_at: string;
   reviewed_at: string | null;
   challenges: Relation | Relation[] | null;
@@ -85,8 +94,13 @@ export default async function MyCheckInsPage() {
             const challenge = Array.isArray(row.challenges)
               ? row.challenges[0]
               : row.challenges;
-            const status =
-              STATUS_LABEL[row.status] ?? STATUS_LABEL.PENDING_REVIEW!;
+            const status = row.via_shield
+              ? {
+                  label: "COMODÍN",
+                  className: "pill-lime",
+                  icon: ShieldCheck,
+                }
+              : (STATUS_LABEL[row.status] ?? STATUS_LABEL.PENDING_REVIEW!);
             const StatusIcon = status.icon;
             const history = [...row.validations].sort((a, b) =>
               b.created_at.localeCompare(a.created_at),
